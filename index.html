@@ -185,7 +185,12 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .lb .who{min-width:0}
 .lb .who b{display:block;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb .who small{color:#888;font-weight:700;font-size:11px;text-transform:uppercase}
-.lb .v{font-weight:900;color:var(--green)}
+.lb .v{font-weight:900;color:var(--green);display:flex;align-items:center;gap:8px}
+.lb.fr{background:#FFF6EE}.dark .lb.fr{background:#2A2219}
+.frx{width:32px;height:32px;border:0;border-radius:50%;background:#EFEDE6;color:#8A8676;font-weight:900;font-size:13px;cursor:pointer;flex:none}
+.dark .frx{background:#263031;color:#A3ABA6}
+.code{font-weight:900;font-size:clamp(22px,7vw,30px);letter-spacing:2px;white-space:nowrap;color:var(--green);background:#F1F8DC;padding:14px 18px;width:100%;text-align:center;user-select:text;-webkit-user-select:text}
+.dark .code{background:#22301F}
 .tabs2{display:flex;gap:4px;padding:6px}
 .tabs2 button{flex:1;padding:9px 4px;background:#fff;font-weight:800;font-size:12px;color:#777;text-transform:uppercase}
 .tabs2 button.on{background:var(--lime);color:var(--green-d)}
@@ -480,7 +485,9 @@ const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*(boostOn()?2:1
 const threatRaw=()=>s.owned.reduce((a,o)=>a+st(o).threat,0);
 const threat=()=>Math.max(0,threatRaw());
 const nw=()=>s.cash+s.owned.reduce((a,o)=>a+o.stored+o.inv,0);
-function board(){return RIVALS.map(r=>[r[0],r[0],r[1],r[2],r[3]]).concat([['@me',s.name||'You','You',nw(),'#3E9B37']]).sort((a,b)=>b[3]-a[3])}
+let friends=[],friendsLoaded=false;
+const FCOL=['#FF7A3D','#5AB8F0','#8A6FE0','#2FA877','#EF6F9A','#F5B946'];
+function board(){return RIVALS.map(r=>[r[0],r[0],r[1],r[2],r[3]]).concat(friends.map((f,i)=>['@f:'+f.user_id,f.name||'Friend','Friend',+f.net_worth||0,FCOL[i%FCOL.length]]),[['@me',s.name||'You','You',nw(),'#3E9B37']]).sort((a,b)=>b[3]-a[3])}
 const myRank=()=>board().findIndex(r=>r[0]==='@me')+1;
 const sellable=o=>{const b=B[o.bid];return b.sellT===1||b.sellT===3};
 const sellValue=o=>{const b=B[o.bid];return(b.sellT===3?b.price*.05:o.inv*b.sellP/100)+o.stored};
@@ -637,10 +644,37 @@ function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
 function threatDlg(){const th=threatRaw(),risk=100*(1-Math.pow(1-Math.pow(Math.max(0,th)/100,2)*.3,2));
  dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(Math.max(0,th))}%</span></p><p class="s">Every 30 seconds the authorities may look into you. Higher threat means higher odds. Get caught and your riskiest business is seized, you pay a 10% fine and go to jail.</p>
  <div class="cmp num"><span>Chance of a raid each minute</span><span></span><span style="color:var(--red)">${risk.toFixed(1)}%</span>${th<0?`<span>Spare cover</span><span></span><span>${Math.round(-th)}%</span>`:''}</div><p class="s">Keep it under 30%. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
-function ranksBody(f){const cats={all:null,friends:['Neighbour kid','Friend','Family','Neighbour','Local legend','You'],famous:['Celebrity','Pop star','Pro athlete','Celebrity chef','Top investor','Oil baron','Old money','Tech founder','Shipping heiress','Fairy-tale royalty','Superhero','Tycoon','You'],legends:['Mythical beast','Legend','Cosmic','You']};
+const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
+function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
+ const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
+ return`<div class="lb${id==='@me'?' you':''}${fr?' fr':''}${p<=3?' top':''}"><div class="pos">${p}</div><div class="av" style="background:${col}">${esc(n.replace(/["']/g,'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div><div class="who"><b>${esc(n)}</b><small>${esc(sub)}</small></div><div class="v num">${$m(v)}${showRemove&&fr?`<button class="frx" data-act="unfriend" data-v="${fr.user_id}" aria-label="Remove ${esc(n)}">✕</button>`:''}</div></div>`}
+function friendsBody(){
+ if(!cloudOn())return`<div class="pad"><p>Friends need online saves, which aren't set up for this game.</p></div>`;
+ if(!cloudUser)return`<div class="pad"><p><b>Play against your friends</b></p><p class="s" style="text-align:left">Sign in to invite friends with a private code. Only people you connect with can see your name and net worth.</p><button class="bigbtn" data-act="auth" data-v="in">Sign in</button></div>`;
+ const rows=board().map((r,i)=>[i+1,...r]).filter(r=>r[1]==='@me'||r[1].startsWith('@f:')).map((r,i)=>(r[0]=i+1,r));
+ return`<div class="pad" style="padding-bottom:6px"><div style="display:flex;gap:8px"><button class="bigbtn" data-act="invite" style="flex:1;padding:12px;font-size:15px">Invite a friend</button><button class="bigbtn ghost" data-act="addfriend" style="flex:1;padding:12px;font-size:15px">Add friend</button></div></div>`+
+  rows.map(r=>lbRow(r,true)).join('')+
+  (friendsLoaded&&!friends.length?`<div class="pad"><p class="s" style="text-align:left">No friends yet. Tap <b>Invite a friend</b> to get your code and send it to someone. When they enter it under <b>Add friend</b>, you'll both appear here.</p></div>`:'')+
+  (!friendsLoaded?`<div class="pad"><p class="s">Loading friends…</p></div>`:'')}
+function ranksBody(f){const cats={all:null,famous:['Celebrity','Pop star','Pro athlete','Celebrity chef','Top investor','Oil baron','Old money','Tech founder','Shipping heiress','Fairy-tale royalty','Superhero','Tycoon','You'],legends:['Mythical beast','Legend','Cosmic','You']};
+ const tabs=`<div class="tabs2">${[['all','Global'],['friends','Friends'],['famous','Famous'],['legends','Legends']].map(([k,l])=>`<button data-act="lbf" data-v="${k}" class="${f===k?'on':''}">${l}</button>`).join('')}</div>`;
+ if(f==='friends')return tabs+friendsBody();
  const rows=board().map((r,i)=>[i+1,...r]).filter(r=>!cats[f]||cats[f].includes(r[3]));
- return`<div class="tabs2">${[['all','Global'],['friends','Friends'],['famous','Famous'],['legends','Legends']].map(([k,l])=>`<button data-act="lbf" data-v="${k}" class="${f===k?'on':''}">${l}</button>`).join('')}</div>`+
- rows.map(([p,id,n,c,v,col])=>`<div class="lb${id==='@me'?' you':''}${p<=3?' top':''}"><div class="pos">${p}</div><div class="av" style="background:${col}">${esc(n.replace(/["']/g,'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div><div class="who"><b>${esc(n)}</b><small>${esc(c)}</small></div><div class="v num">${$m(v)}</div></div>`).join('')}
+ return tabs+rows.map(r=>lbRow(r,false)).join('')}
+async function loadFriends(){if(!supa||!cloudUser)return;try{const {data,error}=await supa.rpc('my_friends');if(!error){friends=data||[];friendsLoaded=true}}catch(e){}if(ovKind==='ranks'){const el=$('sb');if(el)el.innerHTML=ranksBody(lbF)}}
+const shareText=c=>`Play Trillionaire Tycoon with me! Open the game, go to the Rich list › Friends › Add friend, and enter my code: ${c}\n${location.origin}`;
+async function inviteDlg(regen){if(!supa||!cloudUser)return;dialog('Invite a friend','<p class="s">Getting your code…</p>','<button class="no" data-act="close">Close</button>','invite');
+ try{const {data,error}=await supa.rpc('my_invite_code',{regenerate:!!regen});if(error)throw error;const c=data;
+  dialog('Invite a friend',`<p class="s">Send this code to a friend. When they enter it under <b>Add friend</b>, you'll see each other on the Friends leaderboard.</p>
+  <div class="code num" id="icode">${esc(c)}</div><div style="display:flex;gap:8px;width:100%"><button class="bigbtn" data-act="copyinvite" data-v="${esc(c)}" style="flex:1;padding:12px;font-size:15px">Copy</button>${navigator.share?`<button class="bigbtn" data-act="shareinvite" data-v="${esc(c)}" style="flex:1;padding:12px;font-size:15px">Share</button>`:''}</div>
+  <p class="s">Only people with this code can connect with you. <button type="button" class="linkbtn" data-act="newcode">Make a new code</button> to stop the old one working.</p>`,'<button class="ok" data-act="close">Done</button>','invite')}
+ catch(e){dialog('Invite a friend',`<p>Couldn't get your code.</p><p class="s">${/function|schema|exist/i.test(String(e.message||''))?'The friends feature isn\'t set up in Supabase yet. Run friends-setup.sql first.':'Check your connection and try again.'}</p>`,'<button class="ok" data-act="close">OK</button>')}}
+function addFriendDlg(){dialog('Add a friend',`<p class="s">Enter the code your friend sent you.</p><input class="nm num" id="fcode" placeholder="TYC-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Friend's code" style="font-size:20px;letter-spacing:2px"><p class="s" id="fmsg" role="status"></p>`,
+ '<button class="no" data-act="close">Cancel</button><button class="yes" data-act="redeem">Add</button>','addfriend');setTimeout(()=>$('fcode')?.focus(),60)}
+async function redeem(){const v=($('fcode').value||'').trim(),m=$('fmsg');if(v.replace(/[^a-z0-9]/gi,'').length<6){m.textContent='Enter the full code, like TYC-7K4QXP.';return}
+ m.textContent='Connecting…';try{const {data,error}=await supa.rpc('redeem_invite',{invite:v});if(error)throw error;
+  closeOv();toast(`You're now friends with ${data}!`,'good');lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks');loadFriends()}
+ catch(e){const t=String(e.message||'');m.textContent=/NO_MATCH/.test(t)?"That code doesn't match anyone. Check it and try again.":/OWN_CODE/.test(t)?"That's your own code. Send it to a friend instead.":/function|schema|exist/i.test(t)?"Friends isn't set up in Supabase yet.":"Couldn't connect. Check your connection and try again."}}
 let lbF='all';
 function mailRow([id,t,d,,g]){const st_=s.ach[id]||0;return`<div class="mail ${st_===1?'ready':st_===2?'done':''}"><div class="ic">${st_?'★':'?'}</div><div><b>${esc(t)}</b><small>${esc(d)}</small></div>
  ${st_===1?`<button data-act="claim" data-v="${id}">CLAIM ${GEM}${g}</button>`:st_===2?'<button disabled>CLAIMED</button>':`<button disabled>${GEM}${g}</button>`}</div>`}
@@ -683,8 +717,8 @@ stage.addEventListener('pointerup',e=>{if(swipeX!=null&&Math.abs(e.clientX-swipe
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(swiped&&stage.contains(el)){swiped=false;return}
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
  switch(a){
-  case'dimclose':if(e.target===el&&ovKind!=='name'&&ovKind!=='choose')closeOv();break;
-  case'close':closeOv();break;
+  case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
+  case'close':if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'site':tapSite(e);break;
   case'collect':collect();break;
   case'finish':{const o=cur();if(!o||!o.busy)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
@@ -696,8 +730,16 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'sell':askSell();break;case'dosell':sell();break;
   case'prev':step(-1);break;case'next':step(1);break;
   case'threat':threatDlg();break;
-  case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');break;
-  case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);break;
+  case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');loadFriends();break;
+  case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
+  case'invite':inviteDlg(false);break;
+  case'newcode':inviteDlg(true);break;
+  case'copyinvite':{const c=el.dataset.v;try{navigator.clipboard.writeText(shareText(c)).then(()=>toast('Invite copied. Paste it into a message.','good'),()=>toast('Copy the code: '+c))}catch(e){toast('Copy the code: '+c)}break}
+  case'shareinvite':{const c=el.dataset.v;navigator.share?.({title:'Trillionaire Tycoon',text:shareText(c)}).catch(()=>{});break}
+  case'addfriend':addFriendDlg();break;
+  case'redeem':redeem();break;
+  case'unfriend':{const fr=friends.find(x=>x.user_id===el.dataset.v);if(!fr)break;dialog('Remove friend?',`<p>Remove <span class="hl">${esc(fr.name)}</span>?</p><p class="s">You'll stop seeing each other on the Friends leaderboard. You can reconnect any time with a new invite code.</p>`,`<button class="no" data-act="close">Cancel</button><button class="yes" data-act="dounfriend" data-v="${fr.user_id}">Remove</button>`,'unfriend');break}
+  case'dounfriend':{const id=el.dataset.v;supa.rpc('remove_friend',{friend:id}).then(()=>{friends=friends.filter(x=>x.user_id!==id);toast('Friend removed');sheet('Rich list',ranksBody('friends'),'ranks')},()=>toast("Couldn't remove. Try again.",'bad'));break}
   case'mail':sheet('Mailbox',mailBody(),'mail');break;
   case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
   case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);s.cash+=c;s.gems+=2;s.freeAt=now()+6e5;
@@ -735,7 +777,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'bribe':{const c=Math.max(100,s.cash*.25);if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.');break}
  }});
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
- if(e.key==='Enter'){if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
+ if(e.key==='Enter'){if($('fcode')){redeem();return}if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
 
 /* ================= cloud save (Supabase) ================= */
 // Accounts turn on when config.js (next to index.html) sets your Supabase project URL and anon key.
@@ -752,12 +794,14 @@ async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
  supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct()});
  await swInit();
- if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{})}
+ if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
+ setInterval(()=>{if(cloudUser&&!document.hidden)loadFriends()},120000);
  setInterval(()=>{if(cloudUser)cloudPush()},30000);
  addEventListener('online',()=>{if(cloudUser)cloudPush()});refreshAcct()}
 async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote)return;pushing=true;cloudState='syncing';refreshAcct();
  try{s.notify=notifyInfo();save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
-  if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok'}catch(e){cloudState='error'}pushing=false;refreshAcct()}
+  if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';
+  supa.from('profiles').upsert({user_id:cloudUser.id,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;refreshAcct()}
 async function cloudFetch(){const {data,error}=await supa.from('saves').select('data').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;return data?unpack(data.data):null}
 const hasProgress=st=>st.owned.length>0||(st.earned||0)>0;
 const nwOf=st=>st.cash+st.owned.reduce((a,o)=>a+(o.stored||0)+(o.inv||0),0);
@@ -842,9 +886,9 @@ async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||
   if(r.error&&mode==='up'&&/already registered/i.test(r.error.message||'')){const si=await supa.auth.signInWithPassword({email:e,password:p});if(!si.error)r=si}
   if(r.error)throw r.error;
   if(mode==='up'&&!r.data.session){m.textContent='Account created. Tap the confirmation link we emailed you, then come back and sign in.';return}
-  cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');await cloudPull(0,true);if(ovKind!=='choose')setTimeout(()=>notifyPrompt(true),400)}
+  cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');loadFriends();await cloudPull(0,true);if(ovKind!=='choose')setTimeout(()=>notifyPrompt(true),400)}
  catch(err){const t=String(err.message||'');m.textContent=isNet(err)?"Couldn't reach the save server. Check your connection and tap the button again.":/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
-async function signOut(){try{await cloudPush();await disablePush();await supa.auth.signOut()}catch(e){}cloudUser=null;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
+async function signOut(){try{await cloudPush();await disablePush();await supa.auth.signOut()}catch(e){}cloudUser=null;friends=[];friendsLoaded=false;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
 
 /* ================= loop ================= */
 let lastRank=null,pendingWelcome=null;

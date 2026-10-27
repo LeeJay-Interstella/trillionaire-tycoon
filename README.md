@@ -163,3 +163,16 @@ To test syncing: sign in with the same email on a second device (a laptop or tab
 ## Notifications
 
 Players can get notified when a business is full, when construction or an upgrade finishes, and when they're released from jail. Setup steps are in `NOTIFICATIONS-SETUP.md`, which came in the same package. The private parts of that setup live in Supabase only and are never stored in this repo.
+
+---
+
+## Friends leaderboard
+
+Players can connect privately with an invite code and see each other on the **Rich list › Friends** tab.
+
+1. **One-time setup (you):** in Supabase, open **SQL Editor** › **New query**, paste in `friends-setup.sql` and click **Run**.
+2. **Invite:** Rich list › Friends › **Invite a friend** shows your code (like `TYC-7K4QXP`). Copy or share it.
+3. **Connect:** your friend opens Rich list › Friends › **Add friend** and enters the code. You both appear on each other's Friends tab.
+4. **Remove** a friend with the ✕ next to their name. **Make a new code** in the invite box stops your old code working.
+
+Only connected friends can see your boss name and net worth. Emails are never shown, and Supabase enforces this, not just the game.
