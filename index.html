@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Trillionaire Tycoon</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap">
@@ -262,6 +262,10 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .round{border-color:#141A1B}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:14px 16px;font-weight:800;font-size:15px;color:var(--ink);border:0;width:100%;font-family:inherit}
 .dark .switch{background:#1C2425}
+.acct{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:12px 14px;flex-wrap:wrap}
+.acct b{display:block;font-weight:800;font-size:14px;overflow-wrap:anywhere}.acct small{display:block;color:#6b6b6b;font-weight:600;font-size:12px;margin-top:2px}
+.dark .acct{background:#1C2425}.dark .acct small{color:#A3ABA6}
+.linkbtn{background:none;border:0;color:var(--teal);font:inherit;font-weight:800;font-size:13px;text-decoration:underline;padding:6px;cursor:pointer}
 .switch i{width:50px;height:30px;border-radius:15px;background:#C9C9C9;position:relative;transition:background .2s;flex:none}
 .switch i::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px #0004}
 .switch[aria-checked="true"] i{background:var(--green)}.switch[aria-checked="true"] i::after{transform:translateX(20px)}
@@ -430,15 +434,27 @@ const MIS=[
 MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+(steps.length>1?' '+'I II III IV V'.split(' ')[i]:''),d,f,r,gi,i])));
 
 /* ================= state ================= */
-const KEY='mogul.tycoon.v3',now=()=>Date.now();
+// Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
+// so adding, removing or reordering businesses in an update keeps everyone's progress.
+const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>Date.now();
 const fresh=()=>({name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now()});
+function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
+function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
+ if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
+ const st=Object.assign(fresh(),d,{ach:Object.assign({},d.ach||{})});
+ st.owned=d.owned.map(o=>{const b=o.code!=null?BY[o.code]:B[o.bid];if(!b)return null;const c=Object.assign({level:1,stored:0,inv:0,busy:null},o,{bid:b.id});delete c.code;return c}).filter(Boolean);
+ const seen=new Set();st.owned=st.owned.filter(o=>!seen.has(o.bid)&&seen.add(o.bid));
+ st.cur=Math.max(0,Math.min(st.cur|0,st.owned.length-1));st.tier=Math.max(1,Math.min(11,st.tier|0||1));
+ ['cash','gems','earned','taps'].forEach(k=>{if(!isFinite(st[k])||st[k]<0)st[k]=0});return st}
 let s=null;
-try{const r=localStorage.getItem(KEY);if(r)s=JSON.parse(r)}catch(e){}
-if(window.claude?.hot?.data?.s)s=window.claude.hot.data.s;
-if(!s||!Array.isArray(s.owned)||s.owned.some(o=>!B[o.bid]))s=fresh();
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};
-window.claude?.hot?.snapshot?.(()=>({s}));
+try{s=unpack(localStorage.getItem(SAVE_KEY));if(!s)for(const k of OLD_KEYS){const r=localStorage.getItem(k);if(r&&(s=unpack(r)))break}}catch(e){}
+if(window.claude?.hot?.data?.s)s=unpack(window.claude.hot.data.s)||s;
+if(!s)s=fresh();
+const bootSavedAt=s.savedAt||0;
+const save=()=>{s.savedAt=now();try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}};
+save();
+window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
 
 /* ================= helpers ================= */
 const $m=n=>'$'+money(n);
@@ -632,9 +648,15 @@ function mailBody(){const mis=MIS.map((_,gi)=>{const steps=ACH.filter(a=>a[5]===
  return`<div class="tierh"><b>Side missions</b></div>`+mis.map(mailRow).join('')+`<div class="tierh"><b>Achievements</b></div>`+ACH.filter(a=>a[5]===undefined).map(mailRow).join('')}
 const DKEY='trillionaire.dark';let darkOn=false;try{darkOn=localStorage.getItem(DKEY)==='1'}catch(e){}
 function applyDark(){document.documentElement.classList.toggle('dark',darkOn)}applyDark();
-function bossBody(){return`<div class="statgrid num"><div><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
+function bossBody(){return`${acctHTML()}<div class="statgrid num"><div><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
  <div class="pad" style="padding-bottom:0"><button type="button" class="switch" role="switch" aria-checked="${darkOn}" data-act="dark">Dark mode<i></i></button></div><div class="pad"><label for="pn" style="font-weight:800;font-size:12px;color:#777">BOSS NAME</label><input class="nm" id="pn" maxlength="20" value="${esc(s.name)}" autocomplete="off">
- <button class="bigbtn" data-act="savename">Save name</button><button class="bigbtn ghost" data-act="howto">How to play</button><button class="bigbtn danger" data-act="reset" id="rst">Reset all progress</button></div>`}
+ <button class="bigbtn" data-act="savename">Save name</button><button class="bigbtn ghost" data-act="howto">How to play</button><button class="bigbtn ghost" data-act="backup">Back up or move my save</button><button class="bigbtn danger" data-act="reset" id="rst">Reset all progress</button></div>`}
+function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
+ dialog('Back up your save',`<p class="s">Copy this code and keep it somewhere safe. Paste it on another phone or browser to carry on where you left off.</p>
+ <textarea id="bk" readonly style="width:100%;height:84px;font:600 11px/1.3 monospace;border:3px solid var(--lime);padding:8px;resize:none;word-break:break-all">${code}</textarea>
+ <button class="bigbtn" data-act="copybk">Copy code</button>
+ <p class="s" style="margin-top:6px">Got a code from another device?</p><textarea id="rs" placeholder="Paste a save code here" style="width:100%;height:60px;font:600 11px/1.3 monospace;border:3px solid #ddd;padding:8px;resize:none"></textarea>`,
+ `<button class="no" data-act="close">Close</button><button class="yes" data-act="restore">Load code</button>`)}
 function howto(){dialog('How to play',`<p class="s" style="text-align:left;color:var(--ink)">1. Tap the shop button to buy a business.<br><br>2. Tap the building site to speed up construction, or finish it with crystals.<br><br>3. Bills pile up next to your business until it hits max capacity. Tap COLLECT before it fills.<br><br>4. Upgrade to earn more. Sell weak or risky businesses.<br><br>5. Keep threat low or you'll end up in jail.<br><br>6. Grow your net worth to unlock new tiers and climb the rich list.</p>`,`<button class="yes" data-act="close">Let's go</button>`)}
 
 /* jail */
@@ -661,7 +683,7 @@ stage.addEventListener('pointerup',e=>{if(swipeX!=null&&Math.abs(e.clientX-swipe
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(swiped&&stage.contains(el)){swiped=false;return}
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
  switch(a){
-  case'dimclose':if(e.target===el&&ovKind!=='name')closeOv();break;
+  case'dimclose':if(e.target===el&&ovKind!=='name'&&ovKind!=='choose')closeOv();break;
   case'close':closeOv();break;
   case'site':tapSite(e);break;
   case'collect':collect();break;
@@ -690,6 +712,16 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'boss':sheet('Boss',bossBody(),'boss');break;
   case'savename':{const v=$('pn').value.trim();if(v){s.name=v;save();toast('Name saved','good')}closeOv();break}
   case'howto':howto();break;
+  case'backup':backupDlg();break;
+  case'auth':authDlg(el.dataset.v);break;
+  case'authgo':authGo(el.dataset.v);break;
+  case'syncnow':cloudPull(lastPushedAt);break;
+  case'signout':signOut();break;
+  case'useremote':if(pendingRemote)adopt(pendingRemote,'Loaded your account save');break;
+  case'keeplocal':pendingRemote=null;closeOv();cloudPush().then(()=>toast('Kept this device. Your account now matches it.','good'));break;
+  case'copybk':{const t=$('bk');const done=()=>toast('Save code copied','good');try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();toast('Code selected. Copy it from the box.')})}catch(e){t.select();toast('Code selected. Copy it from the box.')}break}
+  case'restore':{const v=($('rs').value||'').trim();if(!v)return toast('Paste a save code first','bad');let st=null;try{st=unpack(decodeURIComponent(escape(atob(v))))}catch(e){}
+   if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
   case'dark':darkOn=!darkOn;try{localStorage.setItem(DKEY,darkOn?'1':'0')}catch(e){}applyDark();el.setAttribute('aria-checked',darkOn);break;
   case'reset':if(el.dataset.arm!=='1'){el.dataset.arm='1';el.textContent='Tap again to wipe everything';return}s=fresh();save();lastRank=null;closeOv();upd();askName();break;
   case'begin':closeOv();if(s.jail)openJail();else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null}break;
@@ -701,6 +733,67 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  }});
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
  if(e.key==='Enter'){if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
+
+/* ================= cloud save (Supabase) ================= */
+// Accounts turn on when config.js (next to index.html) sets your Supabase project URL and anon key.
+// Without it, the game saves on this device only, exactly as before.
+const CFG=window.TRILLIONAIRE_CONFIG||{};
+const SUPABASE_URL=String(CFG.supabaseUrl||'').trim();
+const SUPABASE_ANON_KEY=String(CFG.supabaseAnonKey||'').trim();
+let supa=null,cloudUser=null,cloudState='idle',lastSync=0,lastPushedAt=0,pendingRemote=null,pushing=false;
+const cloudOn=()=>!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
+function loadSupabase(){return new Promise((ok,no)=>{if(window.supabase)return ok();const sc=document.createElement('script');
+ sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';sc.onload=()=>ok();sc.onerror=no;document.head.appendChild(sc)})}
+async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';return}
+ supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
+ const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
+ supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct()});
+ if(cloudUser)await cloudPull(bootSavedAt);
+ setInterval(()=>{if(cloudUser)cloudPush()},30000);
+ addEventListener('online',()=>{if(cloudUser)cloudPush()});refreshAcct()}
+async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote)return;pushing=true;cloudState='syncing';refreshAcct();
+ try{save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
+  if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok'}catch(e){cloudState='error'}pushing=false;refreshAcct()}
+async function cloudFetch(){const {data,error}=await supa.from('saves').select('data').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;return data?unpack(data.data):null}
+const hasProgress=st=>st.owned.length>0||(st.earned||0)>0;
+const nwOf=st=>st.cash+st.owned.reduce((a,o)=>a+(o.stored||0)+(o.inv||0),0);
+// baseline: the timestamp of the save this device last knew about. A newer cloud save means another device played since.
+async function cloudPull(baseline,askIfBoth){if(!supa||!cloudUser)return;cloudState='syncing';refreshAcct();
+ try{const remote=await cloudFetch();
+  if(!remote||!hasProgress(remote)){await cloudPush();return}
+  if(!hasProgress(s)){adopt(remote,'Loaded your saved game');return}
+  if(askIfBoth&&Math.abs((remote.savedAt||0)-(s.savedAt||0))>1000){chooseSave(remote);return}
+  if((remote.savedAt||0)>baseline+1000){adopt(remote,'Picked up where you left off on your other device');return}
+  await cloudPush()}catch(e){cloudState='error';refreshAcct()}}
+function adopt(remote,msg){s=remote;save();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';lastRank=null;pendingRemote=null;
+ if(ovKind!=='jail')closeOv();if(s.jail)openJail();upd();toast(msg,'good')}
+function chooseSave(remote){pendingRemote=remote;const ago=t=>t?dur((now()-t)/1000)+' ago':'unknown';
+ dialog('Two saves found',`<p class="s">This device and your account have different progress. Choose which one to keep. The other is replaced.</p>
+ <div class="cmp num"><span><b>This device</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(s))}</span><span>Businesses</span><span></span><span>${s.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(s.savedAt)}</span>
+ <span style="margin-top:8px"><b>Your account</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(remote))}</span><span>Businesses</span><span></span><span>${remote.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(remote.savedAt)}</span></div>`,
+ `<button class="no" data-act="keeplocal" style="font-size:16px">Keep this device</button><button class="yes" data-act="useremote" style="font-size:16px">Use account</button>`,'choose')}
+function syncText(){return cloudState==='syncing'?'Syncing…':cloudState==='error'?"Couldn't sync. It retries when you're back online.":lastSync?'Synced '+dur((now()-lastSync)/1000)+' ago':'Not synced yet'}
+function acctHTML(){if(!cloudOn())return'';
+ if(!cloudUser)return`<div class="pad" style="padding-bottom:0"><div class="acct"><div><b>Save to the cloud</b><small>Sign in to keep your progress synced on every device.</small></div><button class="bigbtn" data-act="auth" data-v="in" style="padding:12px 16px;font-size:15px;width:auto">Sign in</button></div></div>`;
+ return`<div class="pad" style="padding-bottom:0"><div class="acct"><div style="min-width:0"><b>${esc(cloudUser.email||'Signed in')}</b><small id="syncst">${syncText()}</small></div><div style="display:flex;gap:6px"><button class="bigbtn ghost" data-act="syncnow" style="padding:10px 12px;font-size:13px;width:auto">Sync now</button><button class="bigbtn ghost" data-act="signout" style="padding:10px 12px;font-size:13px;width:auto">Sign out</button></div></div></div>`}
+function refreshAcct(){if(ovKind==='boss'){const el=$('sb');if(el)el.innerHTML=bossBody()}}
+function authDlg(mode){const up=mode==='up';
+ dialog(up?'Create account':'Sign in',`<p class="s">${up?'Make an account to save your progress online.':'Sign in to load your progress on this device.'}</p>
+ <input class="nm" id="ae" type="email" aria-label="Email" placeholder="Email" autocomplete="email" autocapitalize="off" style="text-align:left;font-size:16px">
+ <input class="nm" id="ap" type="password" aria-label="Password" placeholder="Password, 6+ characters" autocomplete="${up?'new-password':'current-password'}" style="text-align:left;font-size:16px">
+ <p class="s" id="amsg" role="status"></p>
+ <button type="button" class="linkbtn" data-act="auth" data-v="${up?'in':'up'}">${up?'Already have an account? Sign in':'New here? Create an account'}</button>`,
+ `<button class="no" data-act="close">Cancel</button><button class="yes" data-act="authgo" data-v="${mode}">${up?'Create':'Sign in'}</button>`,'auth');setTimeout(()=>$('ae')?.focus(),60)}
+async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||'',m=$('amsg');
+ if(!/^\S+@\S+\.\S+$/.test(e)||p.length<6){m.textContent='Enter your email and a password of at least 6 characters.';return}
+ if(!supa){m.textContent="Can't reach the save server right now. Check your connection.";return}
+ m.textContent=mode==='up'?'Creating your account…':'Signing in…';
+ try{const r=mode==='up'?await supa.auth.signUp({email:e,password:p}):await supa.auth.signInWithPassword({email:e,password:p});
+  if(r.error)throw r.error;
+  if(mode==='up'&&!r.data.session){m.textContent='Account created. Tap the confirmation link we emailed you, then come back and sign in.';return}
+  cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');await cloudPull(0,true)}
+ catch(err){const t=String(err.message||'');m.textContent=/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
+async function signOut(){try{await cloudPush();await supa.auth.signOut()}catch(e){}cloudUser=null;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
 
 /* ================= loop ================= */
 let lastRank=null,pendingWelcome=null;
@@ -715,7 +808,9 @@ if(s.name&&away.dt>60000&&(away.gained>0||away.done))pendingWelcome=[away,!wasJ0
 lastRank=myRank();upd();splash();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
 addEventListener('resize',()=>{layout();stackN=-1;updStage()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden)save();else tick()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(cloudUser)cloudPush()}else{tick();if(cloudUser)cloudPull(lastPushedAt)}});
+cloudInit();
+setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
 const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):start();
 })();
 </script>
