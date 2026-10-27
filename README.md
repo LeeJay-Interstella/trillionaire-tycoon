@@ -11,7 +11,9 @@ This guide turns on **accounts with cloud saves**, so your progress and a friend
 | File | What it is |
 |---|---|
 | `index.html` | The whole game. This is the file Vercel serves. |
-| `config.js` | Where your two Supabase keys go. Kept separate so game updates never wipe them. |
+| `config.js` | Your public keys (Supabase and notifications). Kept separate so game updates never wipe them. |
+| `sw.js` | Receives notifications while the game is closed. |
+| `manifest.json`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` | Let iPhone treat the game as an app (needed for notifications). |
 | `supabase-setup.sql` | A one-time script that creates the table where saves are stored. |
 | `README.md` | This guide. GitHub shows it on your repo's front page. |
 
@@ -152,6 +154,12 @@ To test syncing: sign in with the same email on a second device (a laptop or tab
 ## For future updates
 
 - Keep pushing updates to the **same repo and Vercel project**, so the web address never changes.
-- To update the game, **upload only the new `index.html`**. Leave `config.js` alone: it holds your keys, and the game reads them from there.
+- To update the game, **upload only the new `index.html`**. Leave `config.js`, `sw.js`, `manifest.json` and the icons alone: `config.js` holds your keys, and the game reads them from there.
 - If you ever overwrite `config.js` by mistake, the game falls back to saving on each device. Nobody loses progress, but syncing pauses until you paste the keys back in.
 - Don't change a business's short code (like `lem` for Lemonade Stand) in the game data. Saves rely on those codes; display names can change freely.
+
+---
+
+## Notifications
+
+Players can get notified when a business is full, when construction or an upgrade finishes, and when they're released from jail. Setup steps are in `NOTIFICATIONS-SETUP.md`, which came in the same package. The private parts of that setup live in Supabase only and are never stored in this repo.

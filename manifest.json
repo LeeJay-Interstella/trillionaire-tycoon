@@ -1,0 +1,31 @@
+{
+  "name": "Trillionaire Tycoon",
+  "short_name": "Trillionaire",
+  "description": "Build businesses, collect cash and climb the rich list from lemonade stand to trillionaire.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3E9B37",
+  "theme_color": "#3E9B37",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

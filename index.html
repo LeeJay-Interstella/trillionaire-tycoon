@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Trillionaire Tycoon</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Trillionaire"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap">
@@ -648,7 +648,7 @@ function mailBody(){const mis=MIS.map((_,gi)=>{const steps=ACH.filter(a=>a[5]===
  return`<div class="tierh"><b>Side missions</b></div>`+mis.map(mailRow).join('')+`<div class="tierh"><b>Achievements</b></div>`+ACH.filter(a=>a[5]===undefined).map(mailRow).join('')}
 const DKEY='trillionaire.dark';let darkOn=false;try{darkOn=localStorage.getItem(DKEY)==='1'}catch(e){}
 function applyDark(){document.documentElement.classList.toggle('dark',darkOn)}applyDark();
-function bossBody(){return`${acctHTML()}<div class="statgrid num"><div><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
+function bossBody(){return`${acctHTML()}${notifRow()}<div class="statgrid num"><div><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
  <div class="pad" style="padding-bottom:0"><button type="button" class="switch" role="switch" aria-checked="${darkOn}" data-act="dark">Dark mode<i></i></button></div><div class="pad"><label for="pn" style="font-weight:800;font-size:12px;color:#777">BOSS NAME</label><input class="nm" id="pn" maxlength="20" value="${esc(s.name)}" autocomplete="off">
  <button class="bigbtn" data-act="savename">Save name</button><button class="bigbtn ghost" data-act="howto">How to play</button><button class="bigbtn ghost" data-act="backup">Back up or move my save</button><button class="bigbtn danger" data-act="reset" id="rst">Reset all progress</button></div>`}
 function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
@@ -717,14 +717,17 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'authgo':authGo(el.dataset.v);break;
   case'syncnow':cloudPull(lastPushedAt);break;
   case'signout':signOut();break;
-  case'useremote':if(pendingRemote)adopt(pendingRemote,'Loaded your account save');break;
-  case'keeplocal':pendingRemote=null;closeOv();cloudPush().then(()=>toast('Kept this device. Your account now matches it.','good'));break;
+  case'useremote':if(pendingRemote){adopt(pendingRemote,'Loaded your account save');setTimeout(()=>notifyPrompt(true),400)}break;
+  case'keeplocal':pendingRemote=null;closeOv();cloudPush().then(()=>{toast('Kept this device. Your account now matches it.','good');setTimeout(()=>notifyPrompt(true),400)});break;
   case'copybk':{const t=$('bk');const done=()=>toast('Save code copied','good');try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();toast('Code selected. Copy it from the box.')})}catch(e){t.select();toast('Code selected. Copy it from the box.')}break}
   case'restore':{const v=($('rs').value||'').trim();if(!v)return toast('Paste a save code first','bad');let st=null;try{st=unpack(decodeURIComponent(escape(atob(v))))}catch(e){}
    if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
   case'dark':darkOn=!darkOn;try{localStorage.setItem(DKEY,darkOn?'1':'0')}catch(e){}applyDark();el.setAttribute('aria-checked',darkOn);break;
   case'reset':if(el.dataset.arm!=='1'){el.dataset.arm='1';el.textContent='Tap again to wipe everything';return}s=fresh();save();lastRank=null;closeOv();upd();askName();break;
-  case'begin':closeOv();if(s.jail)openJail();else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null}break;
+  case'begin':closeOv();if(s.jail)openJail();else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null}else notifyPrompt();break;
+  case'notifon':enablePush();break;
+  case'notiflater':try{localStorage.setItem(NASK,String(now()))}catch(e){}closeOv();break;
+  case'notifoff':disablePush().then(()=>toast('Notifications off'));break;
   case'named':{const v=($('on').value||'').trim()||'Boss';s.name=v;save();closeOv();
    dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${art(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
   case'serve':if(!s.jail)return;s.jail.until-=3000;s.taps++;vib(6);if(now()>=s.jail.until)release('Sentence served. You walked free!');else updJail();break;
@@ -748,11 +751,12 @@ async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e
  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
  supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct()});
- if(cloudUser)await cloudPull(bootSavedAt);
+ await swInit();
+ if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{})}
  setInterval(()=>{if(cloudUser)cloudPush()},30000);
  addEventListener('online',()=>{if(cloudUser)cloudPush()});refreshAcct()}
 async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote)return;pushing=true;cloudState='syncing';refreshAcct();
- try{save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
+ try{s.notify=notifyInfo();save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
   if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok'}catch(e){cloudState='error'}pushing=false;refreshAcct()}
 async function cloudFetch(){const {data,error}=await supa.from('saves').select('data').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;return data?unpack(data.data):null}
 const hasProgress=st=>st.owned.length>0||(st.earned||0)>0;
@@ -766,13 +770,57 @@ async function cloudPull(baseline,askIfBoth){if(!supa||!cloudUser)return;cloudSt
   if((remote.savedAt||0)>baseline+1000){adopt(remote,'Picked up where you left off on your other device');return}
   await cloudPush()}catch(e){cloudState='error';refreshAcct()}}
 function adopt(remote,msg){s=remote;save();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';lastRank=null;pendingRemote=null;
- if(ovKind!=='jail')closeOv();if(s.jail)openJail();upd();toast(msg,'good')}
+ if(ovKind!=='jail'&&ovKind!=='splash')closeOv();if(s.jail&&ovKind!=='splash')openJail();upd();toast(msg,'good')}
 function chooseSave(remote){pendingRemote=remote;const ago=t=>t?dur((now()-t)/1000)+' ago':'unknown';
  dialog('Two saves found',`<p class="s">This device and your account have different progress. Choose which one to keep. The other is replaced.</p>
  <div class="cmp num"><span><b>This device</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(s))}</span><span>Businesses</span><span></span><span>${s.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(s.savedAt)}</span>
  <span style="margin-top:8px"><b>Your account</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(remote))}</span><span>Businesses</span><span></span><span>${remote.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(remote.savedAt)}</span></div>`,
  `<button class="no" data-act="keeplocal" style="font-size:16px">Keep this device</button><button class="yes" data-act="useremote" style="font-size:16px">Use account</button>`,'choose')}
 function syncText(){return cloudState==='syncing'?'Syncing…':cloudState==='error'?"Couldn't sync. It retries when you're back online.":lastSync?'Synced '+dur((now()-lastSync)/1000)+' ago':'Not synced yet'}
+/* ================= push notifications ================= */
+// Turned on when config.js has vapidPublicKey and the game runs as a home-screen app with an account.
+const VAPID=String(CFG.vapidPublicKey||'').trim();
+let swReg=null,pushOn=false,isAway=false;
+const NASK='trillionaire.notifAsk';
+const pushCapable=()=>!!(VAPID&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window);
+function notifState(){if(!VAPID||!cloudOn())return'off';if(!pushCapable())return'unsupported';if(Notification.permission==='denied')return'blocked';
+ if(!cloudUser)return'signin';return Notification.permission==='granted'&&pushOn?'on':'ask'}
+async function swInit(){if(!VAPID||!('serviceWorker' in navigator))return;try{swReg=await navigator.serviceWorker.register('sw.js');
+  swReg.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{})}catch(e){swReg=null}}
+function b64u(x){const p='='.repeat((4-x.length%4)%4),b=atob((x+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0))}
+async function pushSync(){if(!swReg||!supa||!cloudUser||!pushCapable()||Notification.permission!=='granted')return false;
+ let sub=await swReg.pushManager.getSubscription();if(!sub)sub=await swReg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(VAPID)});
+ const j=sub.toJSON();const {error}=await supa.from('push_subs').upsert({endpoint:j.endpoint,user_id:cloudUser.id,subscription:j});pushOn=!error;refreshAcct();return pushOn}
+// Must run straight from a tap: iPhone only shows the Allow prompt in response to one.
+function enablePush(){if(!pushCapable()){closeOv();return toast('Add the game to your Home Screen to get notifications.')}
+ let req;try{req=Notification.requestPermission()}catch(e){req=Promise.resolve(Notification.permission)}
+ Promise.resolve(req).then(async p=>{try{localStorage.setItem(NASK,String(now()))}catch(e){}
+  if(p!=='granted'){closeOv();refreshAcct();return toast('Notifications are off. You can turn them on in iPhone Settings later.')}
+  if(!swReg)await swInit();
+  try{const ok=await pushSync();if(ok){closeOv();cloudPush();toast("Notifications on. We'll tell you when cash is ready.",'good')}else throw 0}
+  catch(e){closeOv();toast("Couldn't turn on notifications. Check you're online and try again.",'bad')}})}
+async function disablePush(){try{const sub=await swReg?.pushManager.getSubscription();if(sub){await supa?.from('push_subs').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe()}}catch(e){}pushOn=false;refreshAcct()}
+function notifyPrompt(force){const st=notifState();if(st!=='ask')return false;
+ if(!force){let last=0;try{last=+localStorage.getItem(NASK)||0}catch(e){}if(now()-last<3*864e5)return false}
+ dialog('Never miss a payday',`<p>Get a notification when:</p><div class="cmp" style="grid-template-columns:1fr"><span>• a business is full and ready to collect</span><span>• construction or an upgrade finishes</span><span>• you're released from jail</span></div><p class="s">You'll get one each time a business fills, so you can empty it straight away.</p>`,
+  `<button class="no" data-act="notiflater" style="font-size:16px">Not now</button><button class="yes" data-act="notifon" style="font-size:16px">Turn on</button>`,'notif');return true}
+// When things will happen, so the server knows when to ping. Recomputed on every sync.
+function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.jail.until>t?s.jail.until:0;if(jailEnd)out.jailAt=jailEnd;
+ let build=null;const fulls=[];
+ for(const o of s.owned){const b=B[o.bid],x=st(o);
+  if(o.busy&&(!build||o.end<build.at))build={at:o.end,name:b.name,kind:o.busy,level:o.level+1};
+  if(!(x.rate>0))continue;let start=o.busy?o.end:t;if(jailEnd&&start<jailEnd)start=jailEnd;const stored=o.busy?0:(o.stored||0);
+  if(!o.busy&&stored>=x.hold-1e-9)continue;
+  fulls.push({at:Math.round(start+(x.hold-stored)/x.rate*60000),name:b.name,amount:money(x.hold)})}
+ // every business's fill time, soonest first, so the server can name whichever ones fill
+ fulls.sort((p,q)=>p.at-q.at);out.fulls=fulls.slice(0,60);
+ if(build){out.buildAt=Math.round(build.at);out.buildName=build.name;out.buildKind=build.kind;out.buildLevel=build.level}
+ return out}
+function notifRow(){const st=notifState();if(st==='off')return'';
+ const txt={unsupported:['Notifications','Open the game from its Home Screen icon to turn these on.'],blocked:['Notifications are blocked','Turn them on in iPhone Settings › Notifications › Trillionaire.'],signin:['Notifications','Sign in above to get notified when cash is ready.'],ask:['Notifications','Get told when cash is full, builds finish or you leave jail.'],on:['Notifications are on',"We'll ping you when cash is ready."]}[st];
+ const btn=st==='ask'?`<button class="bigbtn" data-act="notifon" style="padding:10px 14px;font-size:13px;width:auto">Turn on</button>`:st==='on'?`<button class="bigbtn ghost" data-act="notifoff" style="padding:10px 14px;font-size:13px;width:auto">Turn off</button>`:'';
+ return`<div class="pad" style="padding-bottom:0;padding-top:8px"><div class="acct"><div style="min-width:0"><b>${txt[0]}</b><small>${txt[1]}</small></div>${btn}</div></div>`}
+
 function acctHTML(){if(!cloudOn())return'';
  if(!cloudUser)return`<div class="pad" style="padding-bottom:0"><div class="acct"><div><b>Save to the cloud</b><small>Sign in to keep your progress synced on every device.</small></div><button class="bigbtn" data-act="auth" data-v="in" style="padding:12px 16px;font-size:15px;width:auto">Sign in</button></div></div>`;
  return`<div class="pad" style="padding-bottom:0"><div class="acct"><div style="min-width:0"><b>${esc(cloudUser.email||'Signed in')}</b><small id="syncst">${syncText()}</small></div><div style="display:flex;gap:6px"><button class="bigbtn ghost" data-act="syncnow" style="padding:10px 12px;font-size:13px;width:auto">Sync now</button><button class="bigbtn ghost" data-act="signout" style="padding:10px 12px;font-size:13px;width:auto">Sign out</button></div></div></div>`}
@@ -788,12 +836,15 @@ async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||
  if(!/^\S+@\S+\.\S+$/.test(e)||p.length<6){m.textContent='Enter your email and a password of at least 6 characters.';return}
  if(!supa){m.textContent="Can't reach the save server right now. Check your connection.";return}
  m.textContent=mode==='up'?'Creating your account…':'Signing in…';
- try{const r=mode==='up'?await supa.auth.signUp({email:e,password:p}):await supa.auth.signInWithPassword({email:e,password:p});
+ const isNet=x=>/load failed|failed to fetch|networkerror|network request failed|fetch/i.test(String(x&&(x.message||x)));
+ const attempt=()=>mode==='up'?supa.auth.signUp({email:e,password:p}):supa.auth.signInWithPassword({email:e,password:p});
+ try{let r;try{r=await attempt();if(r.error&&isNet(r.error))throw r.error}catch(x){if(!isNet(x))throw x;m.textContent='Connection hiccup. Trying again…';await new Promise(z=>setTimeout(z,1200));r=await attempt()}
+  if(r.error&&mode==='up'&&/already registered/i.test(r.error.message||'')){const si=await supa.auth.signInWithPassword({email:e,password:p});if(!si.error)r=si}
   if(r.error)throw r.error;
   if(mode==='up'&&!r.data.session){m.textContent='Account created. Tap the confirmation link we emailed you, then come back and sign in.';return}
-  cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');await cloudPull(0,true)}
- catch(err){const t=String(err.message||'');m.textContent=/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
-async function signOut(){try{await cloudPush();await supa.auth.signOut()}catch(e){}cloudUser=null;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
+  cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');await cloudPull(0,true);if(ovKind!=='choose')setTimeout(()=>notifyPrompt(true),400)}
+ catch(err){const t=String(err.message||'');m.textContent=isNet(err)?"Couldn't reach the save server. Check your connection and tap the button again.":/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
+async function signOut(){try{await cloudPush();await disablePush();await supa.auth.signOut()}catch(e){}cloudUser=null;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
 
 /* ================= loop ================= */
 let lastRank=null,pendingWelcome=null;
@@ -808,7 +859,8 @@ if(s.name&&away.dt>60000&&(away.gained>0||away.done))pendingWelcome=[away,!wasJ0
 lastRank=myRank();upd();splash();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
 addEventListener('resize',()=>{layout();stackN=-1;updStage()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){save();if(cloudUser)cloudPush()}else{tick();if(cloudUser)cloudPull(lastPushedAt)}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)cloudPull(lastPushedAt)}});
+addEventListener('pagehide',()=>{isAway=true;if(cloudUser)cloudPush()});
 cloudInit();
 setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
 const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):start();
