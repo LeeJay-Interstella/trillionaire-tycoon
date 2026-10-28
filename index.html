@@ -288,6 +288,11 @@ input.nm:focus{outline:none;border-color:var(--green)}
 
 [hidden]{display:none!important}
 /* ===== Daily chance + perks ===== */
+.dc-done{display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;background:#E1F0D8;color:var(--green-d);font-weight:900;font-size:15px;text-transform:uppercase;text-align:center}
+.dark .dc-done{background:#22301F;color:#9BE08F}
+.dark .dc-h b,.dark .dc-win .dur,.dark .dc-perk .n{color:#8EDB7F}.dark .dc-h span{color:#A3ABA6}
+.dark .dc-rc{opacity:.8;border-color:#2B3637;background:#1C2425}.dark .dc-rc b{color:#DDE3DC}.dark .dc-rc small{color:#9AA39D}
+.dark .dc-hint{color:#8E9893}.dark .dc-streak .dc-t span{color:#F0A640}
 .tool .dot.y{background:var(--gold);color:#5A3A08;font-size:11px}
 .tool.glow{animation:toolglow 1.6s ease-in-out infinite}
 @keyframes toolglow{0%,100%{box-shadow:0 3px 0 var(--green-d),0 0 0 2px var(--gold)}50%{box-shadow:0 3px 0 var(--green-d),0 0 0 6px #F5B94666}}
@@ -843,7 +848,7 @@ function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['cr
 function dcPick(i){if(!dcReady())return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
  for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
  if(pos===7)cards[i]={k:'mgr',v:mgrHours(n),streak:true};
- const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now())}};s.dcSeen=true;
+ const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};s.dcSeen=true;
  if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems')s.gems+=p.v;else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
  vib([20,30,20]);save();upd();openDaily()}
 function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7),h=mgrHours(n);
@@ -861,12 +866,15 @@ function dailyBody(){
   <div class="dc-hint">Could be cash, crystals, a jail-free card… or a manager</div>${wbar()}`}
  const g=s.dc.got;if(!g||!g.cards)return streakHTML()+`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
  const p=g.cards[g.pick],o=g.cards.filter((_,j)=>j!==g.pick),f=prizeInfo(p);
- const head=p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
+ const head=!g.fresh?"Today's pick":p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
  let btns='';
- if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it before bed from your perk wallet</small></button>`;
+ if(!g.fresh){const inWallet=p.k==='mgr'?s.perks.mgr.includes(p.v):p.k==='jail'||(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0);
+  const txt=p.k==='cash'||p.k==='gems'?'Collected':inWallet?'Saved in your perk wallet':p.k==='mgr'?'Shift started':p.k==='jail'?'Used: it kept you out of jail':'Used';
+  btns=`<div class="dc-done">✓ ${txt}</div>${inWallet?`<button class="dc-bb l" data-act="perks">Open your perks</button>`:''}`}
+ else if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it before bed from your perk wallet</small></button>`;
  else if(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
  else btns=`<button class="dc-bb" data-act="close">${p.k==='cash'||p.k==='gems'?'Collect':'Got it'}</button>`;
- return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>The cards you didn't pick are shown too</span></div>
+ return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>${g.fresh?"The cards you didn't pick are shown too":'Come back tomorrow for another card'}</span></div>
  <div class="dc-rev">${prizeCard(o[0])}${prizeCard(p,true)}${prizeCard(o[1])}</div>
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
 function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
@@ -925,7 +933,8 @@ function welcome(r,arr){dialog('Welcome back, boss',`<p>You were away for <span 
 let swipeX=null,swiped=false;
 stage.addEventListener('pointerdown',e=>{swipeX=e.clientX;swiped=false});
 stage.addEventListener('pointerup',e=>{if(swipeX!=null&&Math.abs(e.clientX-swipeX)>60){swiped=true;step(e.clientX<swipeX?1:-1)}swipeX=null});
-document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;if(swiped&&stage.contains(el)){swiped=false;return}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;
+ if(ovKind==='daily'&&s.dc.got&&s.dc.got.fresh&&['perks','perkuse','close'].includes(el.dataset.act)||(el.dataset.act==='dimclose'&&e.target===el&&ovKind==='daily'&&s.dc.got)){if(s.dc.got)s.dc.got.fresh=false;save()}if(swiped&&stage.contains(el)){swiped=false;return}
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
  switch(a){
   case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
