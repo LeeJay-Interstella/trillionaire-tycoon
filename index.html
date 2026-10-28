@@ -305,6 +305,9 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dlg .lvl .rb{background:#2FA3AE;color:#fff;font-weight:900;font-size:26px;width:46px;text-align:center;padding:0 0 4px}.dlg .lvl .rb small{display:block;font-size:9px;background:var(--lime);color:var(--green-d);padding:2px 0;margin-bottom:2px}
 .mc{background:#fff;margin:6px;border:3px solid #1F3A5F}
 .mc .top{background:#1F3A5F;color:#fff;display:flex;align-items:center;gap:12px;padding:10px 12px}.mc .top svg{width:28px;height:40px}
+.sr-me{display:flex;align-items:center;gap:10px;background:#fff;margin:6px 6px 4px;padding:10px 12px;border-left:5px solid #1F3A5F}.sr-me svg{width:24px;height:34px;flex:none}.sr-me b{display:block;font-weight:900;font-size:14px}.sr-me small{display:block;font-weight:600;font-size:12px;color:#6b6b6b}
+.dark .sr-me{background:#1C2425;border-left-color:#5B8AC6}.dark .sr-me small{color:#A3ABA6}
+.mc .shiftrow{display:flex;align-items:center;gap:10px;padding:8px 8px 0}
 .mc .top small{display:block;font-weight:800;font-size:10px;letter-spacing:1px;color:#9FB6D6}.mc .top b{display:block;font-weight:900;font-size:16px}
 .mc .lv{margin-left:auto;background:#2FA3AE;font-weight:900;font-size:12px;padding:4px 8px}
 .mc .row{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px}
@@ -1001,19 +1004,18 @@ function dailyBody(){
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
 function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
 function perksBody(){return`<div class="sr-tabs"><button data-act="perkstab" data-v="wallet" class="${perksTab==='wallet'?'on':''}">Wallet${perkCount()?` <i>${perkCount()}</i>`:''}</button><button data-act="perkstab" data-v="shifts" class="${perksTab==='shifts'?'on':''}">Manager shifts</button></div>`+(perksTab==='shifts'?shiftsBody():walletBody())}
-function walletBody(){let a='',w='';const t=now();a+=mgrCard();
- if(mgrOn())a+=`<div class="dc-perk">${MGR}<div><b>${mgrName(s.mgrTotal/36e5)} on duty</b><small>Earning past full · <span id="pt-mgr" class="num">${dur((s.mgrUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,(s.mgrUntil-t)/s.mgrTotal*100))}%"></i></div></div><button class="dc-use g" data-act="shiftlive" style="background:#1F3A5F">SHIFT SO FAR</button></div>`;
+function walletBody(){let a='',w='';const t=now();
  if(cleanOn())a+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record</b><small>Threat −20% · <span id="pt-clean" class="num">${dur((s.cleanUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-clean" style="width:${Math.max(0,(s.cleanUntil-t)/(CLEAN_H*36e5)*100)}%"></i></div></div><div></div></div>`;
  if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>2× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
  const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
- Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h} hours of earning past full. Start it whenever you like.</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
+ Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h}-hour shift · Lv ${s.mgr.level} · ${Math.round(commission()*100)}% commission${s.mgr.train&&!mgrOn()?' · training resumes on shift':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
  if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly.</small></div><span class="dc-use off">READY</span></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
  if(s.perks.manual)w+=`<div class="dc-perk">${PICON.manual}<div><b>Training manual<span class="n">×${s.perks.manual}</span></b><small>Instantly trains your manager one level.</small></div><button class="dc-use" data-act="perkuse" data-v="manual">USE</button></div>`;
  if(s.perks.clean)w+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record<span class="n">×${s.perks.clean}</span></b><small>Lowers your threat by 20% for 12 hours.</small></div><button class="dc-use" data-act="perkuse" data-v="clean">USE</button></div>`;
- return(a?`<div class="dc-sec">Active now</div>${a}`:'')+`<div class="dc-sec">In your wallet</div>`+(w||`<div class="dc-perk" style="grid-template-columns:1fr"><div><b>No perks saved</b><small>Pick a card in Daily chance every day to win managers, boosts and more.</small></div></div>`)+
+ a=(mgrOn()?mgrCard():'')+a;return(a?`<div class="dc-sec">Active now</div>${a}`:'')+`<div class="dc-sec">In your wallet</div>`+(w||`<div class="dc-perk" style="grid-template-columns:1fr"><div><b>No perks saved</b><small>Pick a card in Daily chance every day to win managers, boosts and more.</small></div></div>`)+
  `<div class="dc-hint">Perks never expire until you use them</div>`+(dcReady()?`<div class="dc-btns" style="padding-top:0"><button class="dc-bb" data-act="daily">Pick today's card</button></div>`:'')}
 function openPerks(){perksTab='wallet';sheet('Your perks',perksBody(),'perks')}
 function usePerk(v){const t=now();
@@ -1064,7 +1066,8 @@ function mgrCard(){const lv=s.mgr.level,c=Math.round(commission()*100),m=s.mgr.t
  let tr;if(m)tr=`<div class="bar"><i style="width:${Math.max(0,Math.min(100,(1-m.left/m.total)*100))}%"></i></div><span class="t2">Lv ${lv+1} in <span id="pt-train" class="num">${dur(m.left/1000)}</span></span><button class="dc-use n" data-act="train">${on?'SPEED UP':'PAUSED'}</button>`;
  else if(lv>=MGR_MAX)tr=`<span class="nx">Fully trained · lowest commission</span>`;
  else tr=`<span class="nx num">Next: Lv ${lv+1} · ${c-1}% · ${$m(trainCost())} · ${hrs(trainTime())}</span><button class="dc-use n" data-act="train">${CAPI} TRAIN</button>`;
- return`<div class="mc"><div class="top">${MGR}<div><small>YOUR MANAGER</small><b>${on?'On duty':'Off duty'}</b></div><span class="lv">LV ${lv}</span></div>
+ return`<div class="mc"><div class="top">${MGR}<div><small>YOUR MANAGER</small><b>${on?'On duty':'Off duty'}</b>${on?`<small class="num" style="letter-spacing:0;color:#C9D6EA;font-weight:700;font-size:12px">${mgrName(s.mgrTotal/36e5)} shift · <span id="pt-mgr">${dur((s.mgrUntil-now())/1000)}</span> left</small>`:''}</div><span class="lv">LV ${lv}</span></div>
+ ${on?`<div class="shiftrow"><div class="dc-tm" style="flex:1;margin:0"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,(s.mgrUntil-now())/s.mgrTotal*100))}%"></i></div><button class="dc-use n" data-act="shiftlive">SHIFT SO FAR</button></div>`:''}
  <div class="row"><div><small>COMMISSION</small><b>${c}%</b></div><div><small>YOU KEEP</small><b class="g">${100-c}%</b></div></div><div class="tr">${tr}</div></div>`}
 
 /* ================= manager shift reports ================= */
@@ -1135,7 +1138,7 @@ function collectAll(){if(s.jail)return jailNag();let a=0;for(const o of s.owned)
 function shiftsBody(){const t=now(),list=s.shifts||[],wk=list.filter(r=>r.end>t-7*864e5);let h='';
  const live=s.shift?shiftData('live'):null,lx=live?shiftStats(live):null;
  const tot=wk.reduce((a,r)=>a+r.rows.reduce((b,x)=>b+x.extra-(x.cut||0),0),0)+(lx?lx.keep:0),bus=wk.reduce((a,r)=>a+r.jails.length,0)+(live?live.jails.length:0);
- h+=`<div style="height:6px"></div><div class="sr-sum"><div><small>LAST 7 DAYS</small><b class="g num">+${$m(tot)}</b></div><div><small>SHIFTS</small><b>${wk.length+(live?1:0)}</b></div><div><small>BUSTED</small><b>${bus}×</b></div></div>`;
+ h+=`<div class="sr-me">${MGR}<div><b>Your manager · Lv ${s.mgr.level}</b><small>${Math.round(commission()*100)}% commission · you keep ${100-Math.round(commission()*100)}%${s.mgr.train?` · training to Lv ${s.mgr.level+1}${mgrOn()?'':' (paused until the next shift)'}`:''}</small></div></div><div class="sr-sum"><div><small>LAST 7 DAYS</small><b class="g num">+${$m(tot)}</b></div><div><small>SHIFTS</small><b>${wk.length+(live?1:0)}</b></div><div><small>BUSTED</small><b>${bus}×</b></div></div>`;
  if(!live&&!list.length)return h+`<div class="sr-note" style="padding:24px 16px">No shifts yet. Start a manager from your Wallet and their shift reports will build up here.</div>`;
  const svg=MGR,label=ts=>{const k=dayKey(ts);return k===dayKey(t)?'Today':k===dayKey(t,-1)?'Yesterday · '+dmy(ts):dmy(ts)};
  if(live)h+=`<div class="sr-dh">Now</div><button type="button" class="sr-row live" data-act="shiftlive">${svg}<div><b>${mgrName(live.hours)} · ${live.hours}h<span class="sr-live">LIVE</span></b><small>${hm(live.start)} – ${hm(live.end)} · ${hrs(live.end-t)} left</small></div><div class="x"><b class="num">+${$m(lx.keep)}</b><small>so far ›</small></div></button>`;
