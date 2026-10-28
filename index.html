@@ -291,6 +291,35 @@ input.nm:focus{outline:none;border-color:var(--green)}
 @media (max-height:640px){.t-nw b{font-size:28px}.t{padding-block:5px}.collect,.finish{height:54px}.lines{font-size:13px;line-height:1.35}}
 
 [hidden]{display:none!important}
+
+/* ===== manager training ===== */
+.round.train{background:#1F3A5F}.round.train svg{fill:#fff}
+.round.train.can{animation:tglow 1.2s infinite}@keyframes tglow{50%{box-shadow:0 3px 0 #0002,0 0 0 6px #F5B94699}}
+.round.train.off{background:#9AA3AE}
+.mgrfig.tr{pointer-events:auto;cursor:pointer}
+.tcall{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;margin-bottom:4px;filter:drop-shadow(0 3px 0 #0002)}
+.tcall b{background:#1F3A5F;color:#fff;font-weight:900;font-size:13px;padding:3px 8px}
+.tcall small{background:var(--gold);color:#3A2604!important;border:0!important;font-weight:900;font-size:8.5px;padding:2px 6px;white-space:nowrap}
+.tcall:after{content:"";border:6px solid transparent;border-top-color:var(--gold);margin-top:-1px}
+.dlg .lvl{display:flex;align-items:center;gap:10px}.dlg .lvl svg{width:54px;height:76px}
+.dlg .lvl .rb{background:#2FA3AE;color:#fff;font-weight:900;font-size:26px;width:46px;text-align:center;padding:0 0 4px}.dlg .lvl .rb small{display:block;font-size:9px;background:var(--lime);color:var(--green-d);padding:2px 0;margin-bottom:2px}
+.mc{background:#fff;margin:6px;border:3px solid #1F3A5F}
+.mc .top{background:#1F3A5F;color:#fff;display:flex;align-items:center;gap:12px;padding:10px 12px}.mc .top svg{width:28px;height:40px}
+.mc .top small{display:block;font-weight:800;font-size:10px;letter-spacing:1px;color:#9FB6D6}.mc .top b{display:block;font-weight:900;font-size:16px}
+.mc .lv{margin-left:auto;background:#2FA3AE;font-weight:900;font-size:12px;padding:4px 8px}
+.mc .row{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px}
+.mc .row div{background:#F3F3EE;padding:8px;text-align:center}.mc .row small{display:block;font-weight:800;font-size:9.5px;letter-spacing:.5px;color:#888}.mc .row b{display:block;font-weight:900;font-size:17px;color:#1F3A5F}.mc .row b.g{color:#C98F1E}
+.mc .tr{display:flex;align-items:center;gap:10px;padding:0 8px 8px;font-weight:700;font-size:12px;color:#555}
+.mc .tr .nx{flex:1}.mc .bar{flex:1;height:10px;background:#E7E7E2}.mc .bar i{display:block;height:100%;background:var(--gold)}
+.mc .tr .t2{font-weight:900;color:#C98F1E;white-space:nowrap}
+.dc-use.n{background:#1F3A5F;color:#fff}
+.sr-sal{background:#fff;margin:0 4px 4px;padding:10px 16px;display:grid;grid-template-columns:1fr auto;gap:4px;font-weight:700;font-size:14px}
+.sr-sal .m{color:#1F3A5F}.sr-sal .k{font-weight:900;font-size:17px;color:#C98F1E}.sr-sal hr{grid-column:1/3;border:0;border-top:2px solid #E7E7E2;margin:4px 0}
+.sr-stats.four{grid-template-columns:repeat(4,minmax(0,1fr))}.sr-stats.four b{font-size:15px}
+.sr-stats .t{color:#2FA3AE}
+.dark .mc{background:#1C2425;border-color:#2B4A6F}.dark .mc .row div{background:#263031}.dark .mc .row b{color:#9FC3EA}.dark .mc .tr{color:#A3ABA6}
+.dark .sr-biz [style*="color:#1F3A5F"]{color:#9FC3EA!important}.dark .sr-biz .hb i[style*="#1F3A5F"],.dark .sr-key i[style*="#1F3A5F"]{background:#5B8AC6!important}
+.dark .sr-sal{background:#1C2425}.dark .sr-sal .m{color:#9FC3EA}.dark .sr-sal hr{border-color:#263031}
 /* ===== manager shift reports ===== */
 .duty{pointer-events:auto!important;cursor:pointer}
 .duty .chev{margin-left:auto;font-weight:900;font-size:18px;color:#9FB6D6;flex:none}
@@ -611,12 +640,12 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>Date.now();
 const fresh=()=>({name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
- dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
+ dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0},mgr:{level:1,train:null},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
 function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
 function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
  if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
  const st=Object.assign(fresh(),d,{ach:Object.assign({},d.ach||{})});
- st.dc=Object.assign({last:'',streak:0,got:null},d.dc||{});st.perks=Object.assign({mgr:[],jail:0,boost:0,crew:0,clean:0},d.perks||{});if(!Array.isArray(st.perks.mgr))st.perks.mgr=[];
+ st.dc=Object.assign({last:'',streak:0,got:null},d.dc||{});st.perks=Object.assign({mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0},d.perks||{});st.mgr=Object.assign({level:1,train:null},d.mgr||{});if(!Array.isArray(st.perks.mgr))st.perks.mgr=[];
  if(d.dc===undefined&&!d.dcSeen&&d.owned.length)st.dcGift=true;
  if(!d.seed)st.seed=(Math.random()*2147483647)|0;
  st.owned=d.owned.map(o=>{const b=o.code!=null?BY[o.code]:B[o.bid];if(!b)return null;const c=Object.assign({level:1,stored:0,inv:0,busy:null},o,{bid:b.id});delete c.code;return c}).filter(Boolean);
@@ -716,11 +745,12 @@ function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=
   for(const[p,q]of segs){
    // while a manager is on duty, cash past max capacity goes into the safe instead of being lost
    const me=Math.max(p,Math.min(q,s.mgrUntil||0)),s0=o.stored;let v=o.stored+earn(p,me);
-   if(v>x.hold){o.safe=(o.safe||0)+v-x.hold;shiftAdd(o,v-x.hold,s0>=x.hold-1e-9?p:p+(x.hold-s0)/x.rate*60000);v=x.hold}o.stored=Math.min(x.hold,v+earn(me,q))}
+   if(v>x.hold){const ex=v-x.hold,cm=commission();o.safe=(o.safe||0)+ex*(1-cm);shiftAdd(o,ex,s0>=x.hold-1e-9?p:p+(x.hold-s0)/x.rate*60000,ex*cm);v=x.hold}o.stored=Math.min(x.hold,v+earn(me,q))}
   gained+=o.stored+(o.safe||0)-before;o.from=0}
  if(s.jail&&t>=s.jail.until){jailOut('served',s.jail.until);s.jail=null;if(!quiet){toast('You walked free. Back to business!','good');closeJail()}}
  if(!quiet)done.forEach(([o,k])=>toast(`${B[o.bid].name} ${k==='up'?'is now level '+o.level:'is open for business!'}`,'good'));
  while(s.tier<11&&tierReady(s.tier+1)){s.tier++;if(!quiet)toast(`New businesses unlocked: ${TIERS[s.tier]}`,'good')}
+ if(s.mgr.train){const on=Math.max(0,Math.min(t,s.mgrUntil||0)-Math.max(from,(s.mgrUntil||0)-(s.mgrTotal||0)));if(on>0){s.mgr.train.left-=on;if(s.mgr.train.left<=0)finishTrain(quiet)}}
  shiftCheck(t);
  return{gained,dt,done:done.length}}
 
@@ -737,7 +767,7 @@ function sigNow(){const o=cur();return o?`${o.bid}|${o.busy||''}|${o.level}|${s.
 function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML='';$('tube').hidden=true;artEl.dataset.p='';
  let L='';
  if(s.owned.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous business"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next business"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><div class="pager num">${s.cur+1} / ${s.owned.length}</div>`;
- L+=`<div class="boost num" id="boostChip" hidden></div><div class="duty" id="duty" hidden data-act="shiftlive" role="button" aria-label="See the shift so far"><svg viewBox="0 0 20 20"><path d="M13 2a8 8 0 1 0 5 13A7 7 0 0 1 13 2z" fill="#F5B946"/></svg><div style="min-width:0"><b id="dutyT">Manager on duty</b><small class="num" id="dutyS"></small></div><span class="chev">›</span></div>`;
+ L+=`<div class="boost num" id="boostChip" hidden></div><div class="duty" id="duty" hidden data-act="shiftlive" role="button" aria-label="See the shift so far"><svg viewBox="0 0 20 20"><rect x="2" y="6" width="16" height="11" rx="2" fill="#F5B946"/><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6" stroke="#F5B946" stroke-width="2" fill="none"/><rect x="2" y="10" width="16" height="1.6" fill="#C98F1E"/></svg><div style="min-width:0"><b id="dutyT">Manager on duty</b><small class="num" id="dutyS"></small></div><span class="chev">›</span></div>`;
  if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`;
@@ -746,9 +776,9 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p></div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
  }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(art(b),TOPS[b.vis]);artEl.dataset.act='collect';
-  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" hidden>${MGR}<span>ON DUTY</span></div>
+  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
-   <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button></div>`;
+   <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>TIER ${b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
    ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span></div>`:
     `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span></div>`}</div></div>
@@ -756,13 +786,13 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boostOn();if(boostOn())bc.textContent='2X INCOME · '+dur((s.boostUntil-now())/1000)}
- {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty';$('dutyS').textContent='Earning past full · '+dur((s.mgrUntil-now())/1000)+' left'}}}
+ {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=Math.round(commission()*100)+'% commission · '+dur((s.mgrUntil-now())/1000)+' left'}}}
  if(!o)return;
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
- const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));return}
+ const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));updTrain();return}
  const sf=o.safe||0;$('camt').textContent=money(o.stored+sf);{const c=$('csafe');c.hidden=!(sf>=1);if(sf>=1)c.textContent='incl. '+$m(sf)+' from the safe'}
- {const f=$('mgrfig');f.hidden=!mgrOn();if(mgrOn()){const[X,Y]=P(-30,50,0);f.style.left=Math.round(VIEW.ox+X*VIEW.sc-28)+'px';f.style.top=Math.round(VIEW.oy+Y*VIEW.sc-62)+'px'}}$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
+ updTrain();{const f=$('mgrfig');f.hidden=!mgrOn();f.classList.toggle('tr',!!s.mgr.train);const tc=$('tcall');if(tc){tc.hidden=!s.mgr.train;if(s.mgr.train)$('tcallT').textContent=dur(s.mgr.train.left/1000)}if(mgrOn()){const[X,Y]=P(-30,50,0);f.style.left=Math.round(VIEW.ox+X*VIEW.sc-28)+'px';f.style.top=Math.round(VIEW.oy+Y*VIEW.sc-62)+'px'}}$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
  const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full||sf>=1;{const sb=$('safeb');sb.hidden=!(sf>=1);if(sf>=1)sb.textContent='+'+$m(sf)+' in the safe'}
  $('upBtn').classList.toggle('can',s.cash>=x.up);
  const gm=$('getmore');if(gm)gm.hidden=s.seenShop||!(s.owned.length<4&&B.some(b=>!own(b.id)&&available(b)&&canPay(b,buyPrice(b))));
@@ -911,17 +941,18 @@ const PICON={
  boost:'<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#B5D43B"/><path d="M16 4L7 17h7l-1 9 9-13h-7z" fill="#2C7526"/></svg>',
  crew:'<svg viewBox="0 0 30 30"><path d="M5 19a10 10 0 0 1 20 0z" fill="#F5B946"/><rect x="3" y="19" width="24" height="4" rx="2" fill="#E08A1E"/><rect x="13" y="8" width="4" height="9" fill="#E08A1E"/></svg>',
  clean:'<svg viewBox="0 0 30 30"><path d="M15 2l11 4v8c0 7-5 12-11 14C9 26 4 21 4 14V6z" fill="#3E9B37"/><path d="M10 15l3.5 3.5L20.5 11" stroke="#fff" stroke-width="3" fill="none"/></svg>',
- mgr:MGR};
+ mgr:MGR,
+ manual:'<svg viewBox="0 0 30 30"><rect x="5" y="3" width="20" height="25" rx="2" fill="#8A6FE0"/><rect x="8" y="6" width="14" height="3" fill="#fff" opacity=".8"/><rect x="8" y="12" width="10" height="2" fill="#fff" opacity=".6"/><rect x="8" y="16" width="12" height="2" fill="#fff" opacity=".6"/><circle cx="21" cy="22" r="5" fill="#F5B946"/><path d="M21 19v6M18 22h6" stroke="#5A3A08" stroke-width="1.6"/></svg>'};
 const BOOST_MIN=30,CLEAN_H=12,CREW_N=3;
-const mgrName=h=>(h>8.01?Math.round(h)+'-hour manager':'Night manager');
-const mgrHours=n=>Math.min(24,8+4*(Math.ceil(n/7)-1)); // week 1: 8h, week 2: 12h ... up to 24h
+const mgrName=h=>(h>8.01?Math.round(h)+'-hour manager':'Manager');
+const mgrHours=n=>8; // shifts are always 8 hours
 function dayKey(t,off=0){const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 const dayStart=(t,off=0)=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getTime()};
 const dcReady=()=>s.dc.last!==dayKey(now());
 // streak so far: still alive if your last pick was today or yesterday
 const dcAlive=()=>s.dc.last===dayKey(now())||s.dc.last===dayKey(now(),-1)?s.dc.streak:0;
 const dcToday=()=>dcReady()?dcAlive()+1:s.dc.streak; // the streak day you're on today
-const perkCount=()=>s.perks.mgr.length+s.perks.jail+s.perks.boost+s.perks.crew+s.perks.clean;
+const perkCount=()=>s.perks.mgr.length+s.perks.jail+s.perks.boost+s.perks.crew+s.perks.clean+(s.perks.manual||0);
 function crewTime(ms){if(s.crew>0){s.crew--;toast(`Builder's crew on the job: twice as fast${s.crew?` (${s.crew} left)`:''}`,'good');return Math.max(1000,ms/2)}return ms}
 const nextIn=()=>dur((dayStart(now(),1)-now())/1000);
 function prizeInfo(p){switch(p.k){
@@ -931,8 +962,9 @@ function prizeInfo(p){switch(p.k){
  case'crew':return{n:"Builder's crew",sm:'3 jobs, 2× fast',d:'Your next 3 builds or upgrades finish twice as fast.',r:'c'};
  case'clean':return{n:'Clean record',sm:'−20% threat',d:'Lowers your threat by 20% for 12 hours.',r:'c'};
  case'jail':return{n:'Get out of jail free',sm:'Walk free instantly',d:'Use it on the busted screen to walk free instantly.',r:'r'};
+ case'manual':return{n:'Training manual',sm:'+1 manager level',d:'Instantly trains your manager one level, lowering their commission by 1%.',r:'r'};
  case'mgr':return{n:mgrName(p.v),sm:p.v+'-hour shift',d:'Your businesses keep earning past full. Extra cash goes in the safe.',r:'r'}}}
-function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day]].filter(x=>!avoid.includes(x[0]));
+function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day],['manual',4]].filter(x=>!avoid.includes(x[0]));
  let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
  const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?8:1;return{k,v}}
 function dcPick(i){if(!dcReady())return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
@@ -944,41 +976,42 @@ function dcPick(i){if(!dcReady())return openDaily();const n=dcAlive()+1,pos=(n-1
 function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7),h=mgrHours(n);
  let d='';for(let i=1;i<=7;i++){const done=i<pos||(i===pos&&picked),today=i===pos&&!picked,gold=i===7;
   d+=`<div class="dc-day${done?' done':''}${today&&!gold?' today':''}${gold?' gold':''}">${gold&&!done?MGR:done?'<i>✓</i>':today?'<i>★</i>':''}${today?'TODAY':'DAY '+i}</div>`}
- return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: ${h}-hour manager</span></div><div class="dc-days">${d}</div></div>`}
+ return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: free manager</span></div><div class="dc-days">${d}</div></div>`}
 function prizeCard(p,win){const f=prizeInfo(p);
  if(!win)return`<div class="dc-rc">${PICON[p.k]}<b>${esc(f.n)}</b><small class="num">${esc(f.sm)}</small></div>`;
  return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
 const wbar=()=>{const n=perkCount();return`<button type="button" class="dc-wbar" data-act="perks">${PICON.cash}<div><b>Your perks</b><span>${n?n+' waiting in your wallet':'Nothing saved yet'}</span></div><span class="go">OPEN</span></button>`};
 function dailyBody(){
  if(dcReady()){const n=dcToday(),pos=(n-1)%7+1;
-  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your ${mgrHours(n)}-hour manager`:'One card per day. Better odds the longer your streak.'}</span></div>
+  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your manager`:'One card per day. Better odds the longer your streak.'}</span></div>
   <div class="dc-cards">${[0,1,2].map(i=>`<div class="dc-card" role="button" tabindex="0" aria-label="Card ${i+1}" data-act="dcpick" data-v="${i}"><div class="pat"></div><div class="q">?</div></div>`).join('')}</div>
   <div class="dc-hint">Could be cash, crystals, a jail-free card… or a manager</div>${wbar()}`}
  const g=s.dc.got;if(!g||!g.cards)return streakHTML()+`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
  const p=g.cards[g.pick],o=g.cards.filter((_,j)=>j!==g.pick),f=prizeInfo(p);
  const head=!g.fresh?"Today's pick":p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
  let btns='';
- if(!g.fresh){const inWallet=p.k==='mgr'?s.perks.mgr.includes(p.v):p.k==='jail'||(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0);
+ if(!g.fresh){const inWallet=p.k==='mgr'?s.perks.mgr.includes(p.v):p.k==='jail'||(['boost','crew','clean','manual'].includes(p.k)&&s.perks[p.k]>0);
   const txt=p.k==='cash'||p.k==='gems'?'Collected':inWallet?'Saved in your perk wallet':p.k==='mgr'?'Shift started':p.k==='jail'?'Used: you walked free':'Used';
   btns=`<div class="dc-done">✓ ${txt}</div>${inWallet?`<button class="dc-bb l" data-act="perks">Open your perks</button>`:''}`}
- else if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it before bed from your perk wallet</small></button>`;
- else if(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
+ else if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it any time from your perk wallet</small></button>`;
+ else if(['boost','crew','clean','manual'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
  else btns=`<button class="dc-bb" data-act="close">${p.k==='cash'||p.k==='gems'?'Collect':'Got it'}</button>`;
  return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>${g.fresh?"The cards you didn't pick are shown too":'Come back tomorrow for another card'}</span></div>
  <div class="dc-rev">${prizeCard(o[0])}${prizeCard(p,true)}${prizeCard(o[1])}</div>
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
 function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
 function perksBody(){return`<div class="sr-tabs"><button data-act="perkstab" data-v="wallet" class="${perksTab==='wallet'?'on':''}">Wallet${perkCount()?` <i>${perkCount()}</i>`:''}</button><button data-act="perkstab" data-v="shifts" class="${perksTab==='shifts'?'on':''}">Manager shifts</button></div>`+(perksTab==='shifts'?shiftsBody():walletBody())}
-function walletBody(){let a='',w='';const t=now();
+function walletBody(){let a='',w='';const t=now();a+=mgrCard();
  if(mgrOn())a+=`<div class="dc-perk">${MGR}<div><b>${mgrName(s.mgrTotal/36e5)} on duty</b><small>Earning past full · <span id="pt-mgr" class="num">${dur((s.mgrUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,(s.mgrUntil-t)/s.mgrTotal*100))}%"></i></div></div><button class="dc-use g" data-act="shiftlive" style="background:#1F3A5F">SHIFT SO FAR</button></div>`;
  if(cleanOn())a+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record</b><small>Threat −20% · <span id="pt-clean" class="num">${dur((s.cleanUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-clean" style="width:${Math.max(0,(s.cleanUntil-t)/(CLEAN_H*36e5)*100)}%"></i></div></div><div></div></div>`;
  if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>2× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
  const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
- Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h} hours of earning past full.${h<=8?' Start it before bed.':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
+ Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h} hours of earning past full. Start it whenever you like.</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
  if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly.</small></div><span class="dc-use off">READY</span></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
+ if(s.perks.manual)w+=`<div class="dc-perk">${PICON.manual}<div><b>Training manual<span class="n">×${s.perks.manual}</span></b><small>Instantly trains your manager one level.</small></div><button class="dc-use" data-act="perkuse" data-v="manual">USE</button></div>`;
  if(s.perks.clean)w+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record<span class="n">×${s.perks.clean}</span></b><small>Lowers your threat by 20% for 12 hours.</small></div><button class="dc-use" data-act="perkuse" data-v="clean">USE</button></div>`;
  return(a?`<div class="dc-sec">Active now</div>${a}`:'')+`<div class="dc-sec">In your wallet</div>`+(w||`<div class="dc-perk" style="grid-template-columns:1fr"><div><b>No perks saved</b><small>Pick a card in Daily chance every day to win managers, boosts and more.</small></div></div>`)+
  `<div class="dc-hint">Perks never expire until you use them</div>`+(dcReady()?`<div class="dc-btns" style="padding-top:0"><button class="dc-bb" data-act="daily">Pick today's card</button></div>`:'')}
@@ -989,9 +1022,11 @@ function usePerk(v){const t=now();
   else{if(s.shift)endShift();s.mgrUntil=t+h*36e5;s.mgrTotal=h*36e5;s.shift={start:t,end:s.mgrUntil,hours:h,jails:[],biz:{}};toast(`${mgrName(h)} on duty for ${h} hours`,'good')}}
  else if(v==='boost'){if(!s.perks.boost)return;s.perks.boost--;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('2× income for 30 minutes!','good')}
  else if(v==='crew'){if(!s.perks.crew)return;s.perks.crew--;s.crew=(s.crew||0)+CREW_N;toast("Builder's crew hired: your next 3 jobs are twice as fast",'good')}
+ else if(v==='manual'){if(!s.perks.manual)return;if(s.mgr.level>=MGR_MAX)return toast('Your manager is already fully trained');s.perks.manual--;if(s.mgr.train)finishTrain();else{s.mgr.level++;toast(`Your manager is now Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good')}}
  else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
  vib(15);save();closeOv();upd()}
-function updPerkUI(){if(ovKind==='shiftrep'&&shiftIdx==='live'&&now()-(updPerkUI.last||0)>3000){updPerkUI.last=now();const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shiftBody('live');sb.scrollTop=y}}
+function updPerkUI(){{const e=$('pt-train');if(e&&s.mgr.train)e.textContent=dur(s.mgr.train.left/1000)}
+ if(ovKind==='shiftrep'&&shiftIdx==='live'&&now()-(updPerkUI.last||0)>3000){updPerkUI.last=now();const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shiftBody('live');sb.scrollTop=y}}
  if(s.shiftPending&&!ovKind&&(s.shifts||[]).length){s.shiftPending=0;save();shiftPopup()}
  if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
  if(ovKind==='perks'){const t=now();
@@ -1001,33 +1036,59 @@ function dcIntro(){const gift=!!s.dcGift;if(gift){s.perks.mgr.push(8);s.dcGift=f
  ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dc-modal" role="dialog" aria-label="Daily chance is here"><div class="dc-mh"><div class="dc-new">NEW</div><h2>Daily chance is here</h2><p>A free pick, every day</p></div>
  <div class="dc-mini">${[0,1,2].map(()=>'<div class="dc-card"><div class="pat"></div><div class="q">?</div></div>').join('')}</div>
  <div class="dc-feat"><i>1</i><div><b>Pick one card a day</b><span>Cash, crystals, a jail-free card, a 2× boost or a manager.</span></div></div>
- <div class="dc-feat"><i>2</i><div><b>Keep your streak</b><span>Come back 7 days in a row and day 7 is always a manager. Every week you keep it going, the shift gets longer: 8, 12, 16, 20, then 24 hours.</span></div></div>
+ <div class="dc-feat"><i>2</i><div><b>Keep your streak</b><span>Come back 7 days in a row and day 7 is always a manager.</span></div></div>
  <div class="dc-feat"><i>3</i><div><b>Save perks for later</b><span>Everything waits in your perk wallet until you use it.</span></div></div>
- ${gift?`<div class="dc-gift">${MGR}<div><small>WELCOME GIFT · FOR EARLY PLAYERS</small><b>Free Night manager</b><span>Already in your wallet. Start it before bed tonight.</span></div></div>`:''}
+ ${gift?`<div class="dc-gift">${MGR}<div><small>WELCOME GIFT · FOR EARLY PLAYERS</small><b>Free manager</b><span>Already in your wallet. Start a shift whenever you like.</span></div></div>`:''}
  <div class="dc-btns" style="padding:18px 16px"><button class="dc-bb" data-act="daily">Pick my first card</button></div></div></div>`}
+
+/* ================= manager training ================= */
+const MGR_MAX=21,CAPI='<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;vertical-align:-2px"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg>';
+const commission=()=>Math.max(20,41-s.mgr.level)/100; // Lv 1: 40% ... Lv 21: 20%
+const trainCost=()=>{const inc=s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0);return Math.max(5000,Math.round(inc*15*s.mgr.level))}; // about 15 min of income per level
+const trainTime=()=>s.mgr.level*20*6e4; // 20 min per level
+const trainSkip=()=>Math.max(1,Math.round(Math.sqrt(Math.max(1,s.mgr.train.left/1000))*1.3));
+function finishTrain(quiet){s.mgr.level++;s.mgr.train=null;if(s.shift)s.shift.trained=(s.shift.trained||0)+1;
+ if(!quiet)toast(`Training complete! Your manager is Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good');save()}
+function updTrain(){const tb=$('trainBtn');if(!tb)return;tb.hidden=!mgrOn();const busy=!!s.mgr.train,max=s.mgr.level>=MGR_MAX,can=!busy&&!max&&s.cash>=trainCost();
+ tb.classList.toggle('can',can);tb.classList.toggle('off',!busy&&!can)}
+function trainDlg(){const lv=s.mgr.level,c=Math.round(commission()*100);
+ if(s.mgr.train){const m=s.mgr.train;return dialog('Training',`<div class="lvl">${MGR}<div class="rb"><small>LEVEL</small>${lv}</div></div><p>Training to <span class="hl">Level ${lv+1}</span><br><span class="hlg num">${dur(m.left/1000)}</span> to go</p><p class="s">${mgrOn()?'Tap your manager on the building to speed it up.':'Paused until your manager\'s next shift starts.'}</p>`,
+  `<button class="no" data-act="close">Close</button><button class="yes" data-act="trainskip" ${s.gems<trainSkip()?'disabled':''}>Finish ${GEM} ${trainSkip()}</button>`)}
+ if(lv>=MGR_MAX)return dialog('Fully trained',`<div class="lvl">${MGR}<div class="rb"><small>LEVEL</small>${lv}</div></div><p>Your manager is at the top level, with the lowest commission: <span class="hl">20%</span>.</p>`,`<button class="ok" data-act="close">OK</button>`);
+ const cost=trainCost(),ok=s.cash>=cost;
+ dialog('Train your manager',`<div class="lvl">${MGR}<div class="rb"><small>LEVEL</small>${lv}</div></div><p>Spend <span class="hlg num">${COIN} ${money(cost)}</span> to train<br>to <span class="hl">Level ${lv+1}</span>?</p>
+ <div class="cmp num"><span>Commission</span><span>${c}%</span><span>→ ${c-1}%</span><span>You keep</span><span>${100-c}%</span><span>→ ${101-c}%</span><span>Training time</span><span></span><span style="color:var(--ink)">${hrs(trainTime())}</span></div>
+ <p class="s">Training only happens while your manager is on a shift. Tap them to speed it up, or finish with crystals.</p>${ok?'':`<p class="s" style="color:var(--red)">You need ${$m(cost-s.cash)} more.</p>`}`,
+ `<button class="no" data-act="close">No</button><button class="yes" data-act="dotrain" ${ok?'':'disabled'}>Yes</button>`)}
+function mgrCard(){const lv=s.mgr.level,c=Math.round(commission()*100),m=s.mgr.train,on=mgrOn();
+ let tr;if(m)tr=`<div class="bar"><i style="width:${Math.max(0,Math.min(100,(1-m.left/m.total)*100))}%"></i></div><span class="t2">Lv ${lv+1} in <span id="pt-train" class="num">${dur(m.left/1000)}</span></span><button class="dc-use n" data-act="train">${on?'SPEED UP':'PAUSED'}</button>`;
+ else if(lv>=MGR_MAX)tr=`<span class="nx">Fully trained · lowest commission</span>`;
+ else tr=`<span class="nx num">Next: Lv ${lv+1} · ${c-1}% · ${$m(trainCost())} · ${hrs(trainTime())}</span><button class="dc-use n" data-act="train">${CAPI} TRAIN</button>`;
+ return`<div class="mc"><div class="top">${MGR}<div><small>YOUR MANAGER</small><b>${on?'On duty':'Off duty'}</b></div><span class="lv">LV ${lv}</span></div>
+ <div class="row"><div><small>COMMISSION</small><b>${c}%</b></div><div><small>YOU KEEP</small><b class="g">${100-c}%</b></div></div><div class="tr">${tr}</div></div>`}
 
 /* ================= manager shift reports ================= */
 const hm=ts=>new Date(ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 const dmy=ts=>new Date(ts).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 const hrs=ms=>{const m=Math.max(0,Math.round(ms/6e4));return m<60?m+'m':Math.floor(m/60)+'h'+(m%60?' '+String(m%60).padStart(2,'0')+'m':'')};
 let shiftAll=false,shiftIdx=null,perksTab='wallet';
-function shiftAdd(o,ex,at){if(!s.shift)return;const k=B[o.bid].code,r=s.shift.biz[k]||(s.shift.biz[k]={extra:0,fillAt:0});r.extra+=ex;if(!r.fillAt)r.fillAt=Math.round(Math.max(at,s.shift.start))}
+function shiftAdd(o,ex,at,cut){if(!s.shift)return;const k=B[o.bid].code,r=s.shift.biz[k]||(s.shift.biz[k]={extra:0,fillAt:0});r.extra+=ex;r.cut=(r.cut||0)+(cut||0);if(!r.fillAt)r.fillAt=Math.round(Math.max(at,s.shift.start))}
 function shiftCheck(t){if(!s.shift&&(s.mgrUntil||0)>t)s.shift={start:s.mgrUntil-s.mgrTotal,end:s.mgrUntil,hours:s.mgrTotal/36e5,jails:[],biz:{},partial:t}; // a shift that started before this update
  if(!s.shift)return;if((s.mgrUntil||0)>s.shift.start)s.shift.end=s.mgrUntil;
  if(s.shift.partial&&!s.shift.seeded){for(const o of s.owned){const sf=o.safe||0;if(sf<1)continue;const k=B[o.bid].code,r=s.shift.biz[k]||(s.shift.biz[k]={extra:0,fillAt:0});r.extra=Math.max(r.extra,sf)}s.shift.seeded=1}if(t>=s.shift.end)endShift()}
 function endShift(){const sh=s.shift;s.shift=null;if(!sh)return;const rows=[];let nEarn=0;
- for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0))continue;nEarn++;const r=sh.biz[b.code];if(r&&r.extra>=1)rows.push({name:b.name,lv:o.level,cap:st(o).hold,extra:r.extra,fillAt:r.fillAt})}
+ for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0))continue;nEarn++;const r=sh.biz[b.code];if(r&&r.extra>=1)rows.push({name:b.name,lv:o.level,cap:st(o).hold,extra:r.extra,cut:r.cut||0,fillAt:r.fillAt})}
  rows.sort((a,b)=>b.extra-a.extra);
- s.shifts=[{start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0}].concat(s.shifts||[]).slice(0,30);s.shiftPending=1}
+ s.shifts=[{start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level}].concat(s.shifts||[]).slice(0,30);s.shiftPending=1}
 // one shape for the live shift and for past ones
 function shiftData(i){const t=now();
  if(i==='live'){const sh=s.shift;if(!sh)return null;const rows=[];let nEarn=0;
-  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0)||o.busy)continue;nEarn++;const r=sh.biz[b.code]||{extra:0,fillAt:0};const x=st(o),full=o.stored>=x.hold-1e-9,ph=x.rate*60*(boostOn()?2:1);rows.push({name:b.name,lv:o.level,cap:x.hold,extra:r.extra,fillAt:r.fillAt,safe:o.safe||0,ph:full?ph:0,rate:ph,fills:full?t:t+(x.hold-o.stored)/x.rate*6e4})}
-  rows.sort((a,b)=>b.extra-a.extra);return{live:true,start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,upto:Math.min(t,sh.end)}}
+  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0)||o.busy)continue;nEarn++;const r=sh.biz[b.code]||{extra:0,fillAt:0};const x=st(o),full=o.stored>=x.hold-1e-9,ph=x.rate*60*(boostOn()?2:1);rows.push({name:b.name,lv:o.level,cap:x.hold,extra:r.extra,cut:r.cut||0,fillAt:r.fillAt,safe:o.safe||0,ph:full?ph:0,rate:ph,fills:full?t:t+(x.hold-o.stored)/x.rate*6e4})}
+  rows.sort((a,b)=>b.extra-a.extra);return{live:true,start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level,upto:Math.min(t,sh.end)}}
  const r=(s.shifts||[])[i];return r?Object.assign({live:false,upto:r.end},r):null}
 function shiftStats(d){const t=now();let lost=0;
  for(const j of d.jails){const e=j.end!=null?j.end:(d.live&&s.jail?t:j.at+j.sec*1000);lost+=Math.max(0,Math.min(e,d.upto)-Math.max(j.at,d.start))}
- const total=d.rows.reduce((a,r)=>a+r.extra,0),worked=Math.max(0,d.upto-d.start-lost);return{lost,total,worked}}
+ const total=d.rows.reduce((a,r)=>a+r.extra,0),cut=d.rows.reduce((a,r)=>a+(r.cut||0),0),worked=Math.max(0,d.upto-d.start-lost);return{lost,total,worked,cut,keep:total-cut}}
 function tlBar(d){const span=d.end-d.start,pc=x=>Math.max(0,x/span*100).toFixed(2)+'%';let h='',a=d.start;
  const js=d.jails.map(j=>[Math.max(j.at,d.start),Math.min(j.end!=null?j.end:(d.live?d.upto:j.at+j.sec*1000),d.end)]).filter(([p,q])=>q>p);
  for(const[p,q]of js){if(p>a)h+=`<i style="width:${pc(p-a)};background:#43B14F"></i>`;h+=`<i style="width:${pc(q-p)};background:#E04B3A"></i>`;a=q}
@@ -1037,22 +1098,23 @@ const capX=(e,c)=>{const q=e/Math.max(1,c);return q>=10?Math.round(q)+'× its ca
 const HOW={served:'served the sentence',lawyer:'lawyer got you out',bribe:'bribed out',card:'jail-free card'};
 function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">This shift has ended.</div>`;const t=now(),x=shiftStats(d),wh=x.worked/36e5;
  const name=mgrName(d.hours)+' · '+d.hours+' hours';
- let h=`<div class="sr-top">${MGR}<div><small>${d.live?'Shift so far':i===0?'Shift report':dmy(d.start)+' · '+hm(d.start)+' – '+hm(d.end)}</small><b>${d.live?mgrName(d.hours)+' · '+hrs(d.end-t)+' left':name}</b></div></div>`;
- if(d.live){const safe=d.rows.reduce((a,r)=>a+r.safe,0),proj=x.total+d.rows.reduce((a,r)=>a+r.rate*Math.max(0,d.end-Math.max(t,r.fills))/36e5,0);
-  h+=`<div class="sr-hero"><small>In the safe right now</small><b class="num">${$m(safe)}</b><span>${proj?`On track for about <em>${$m(proj)}</em> extra by ${hm(d.end)}`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
- else h+=`<div class="sr-hero"><small>Extra from your manager</small><b class="num">${$m(x.total)}</b><span>Cash you would have lost without a manager</span></div>`;
- h+=`<div class="sr-stats"><div><small>Worked</small><b>${hrs(x.worked)}</b></div><div><small>Busted</small><b class="${d.jails.length?'r':''}">${d.jails.length}×</b></div><div><small>Lost in jail</small><b class="${x.lost?'r':''}">${hrs(x.lost)}</b></div></div>`;
+ let h=`<div class="sr-top">${MGR}<div><small>${d.live?'Shift so far':i===0?'Shift report':dmy(d.start)+' · '+hm(d.start)+' – '+hm(d.end)}${d.mlv?' · Lv '+d.mlv:''}</small><b>${d.live?mgrName(d.hours)+' · '+hrs(d.end-t)+' left':name}</b></div></div>`;
+ if(d.live){const safe=d.rows.reduce((a,r)=>a+r.safe,0),proj=x.keep+d.rows.reduce((a,r)=>a+r.rate*(1-commission())*Math.max(0,d.end-Math.max(t,r.fills))/36e5,0);
+  h+=`<div class="sr-hero"><small>In the safe right now</small><b class="num">${$m(safe)}</b><span>${proj?`On track for about <em>${$m(proj)}</em> for you by ${hm(d.end)}, after salary`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
+ else h+=`<div class="sr-hero"><small>You keep</small><b class="num">${$m(x.keep)}</b><span>${x.cut>=1?`After your manager's ${Math.round(x.cut/Math.max(1,x.total)*100)}% salary`:'Cash you would have lost without a manager'}</span></div>`;
+ if(x.cut>=1)h+=`<div class="sr-sal num"><span>Manager earned past full</span><span>${$m(x.total)}</span><span class="m">Salary · ${Math.round(x.cut/Math.max(1,x.total)*100)}% commission</span><span class="m">−${$m(x.cut)}</span><hr><span>You keep</span><span class="k">${$m(x.keep)}</span></div>`;
+ h+=`<div class="sr-stats four"><div><small>Worked</small><b>${hrs(x.worked)}</b></div><div><small>Busted</small><b class="${d.jails.length?'r':''}">${d.jails.length}×</b></div><div><small>In jail</small><b class="${x.lost?'r':''}">${hrs(x.lost)}</b></div><div><small>Trained</small><b class="${d.trained?'t':''}">${d.trained?'+'+d.trained+' lv':'—'}</b></div></div>`;
  h+=`<div class="sr-tl"><div class="lab"><span>${hm(d.start)}</span><span>${d.live?'Now '+hm(t):'Shift timeline'}</span><span>${hm(d.end)}</span></div><div class="sr-bar">${tlBar(d)}</div>
   <div class="sr-leg"><span><i style="background:#43B14F"></i>Working</span><span><i style="background:#E04B3A"></i>In jail</span>${d.live?'<span><i style="background:#BFE3B6"></i>Still to go</span>':''}</div>
   ${d.jails.map(j=>`<div class="sr-ev"><b>${hm(j.at)}</b> Busted at ${j.th}% threat · ${j.how?(j.how==='served'?`served the full ${hrs((j.end||j.at)-j.at)}`:`${HOW[j.how]||'got out'} after ${hrs((j.end||j.at)-j.at)}${j.cost?` (${j.cost})`:''}`):'still inside'}</div>`).join('')}
   ${d.partial?`<div class="sr-ev" style="color:#888">Arrests before ${hm(d.partial)} weren't tracked, because the update arrived mid-shift.</div>`:''}</div>`;
  const filled=d.rows.filter(r=>r.extra>=1),list=shiftAll?d.rows:d.rows.slice(0,3);
  h+=`<div class="sr-sec"><span>By business</span><span>${d.live?'Earning per hour':filled.length+' of '+d.nEarn+' filled up'}</span></div>
-  <div class="sr-key"><span><i style="background:#43B14F"></i>Max capacity: yours anyway</span><span><i style="background:#F5B946"></i>Extra from your manager</span></div>`;
- h+=list.map(r=>{const none=r.extra<1&&!d.live,g=none?100:Math.max(3,Math.round(r.cap/(r.cap+r.extra)*100));
-  return`<div class="sr-biz${none?' none':''}"><b>${esc(r.name)} <small>Lv ${r.lv}</small></b><span class="v num">${r.extra<1?'—':'+'+$m(r.extra)}</span>
-   <small>${d.live?(r.ph?'+'+$m(r.ph)+' / hour':r.fills<d.end?'Fills at '+hm(r.fills):'Won\'t fill this shift'):none?'Never filled up':r.fillAt?'Full at '+hm(r.fillAt):'Full before tracking started'}</small><span class="p">${r.extra<1?'':capX(r.extra,r.cap)}</span>
-   <div class="hb"><i style="width:${g}%;background:#43B14F"></i>${none?'':'<i style="flex:1;background:#F5B946"></i>'}</div><div class="cap num"><span>${$m(r.cap)}</span><span>${none?'':$m(r.extra)}</span></div></div>`}).join('');
+  <div class="sr-key"><span><i style="background:#43B14F"></i>Max capacity</span><span><i style="background:#F5B946"></i>Yours</span><span><i style="background:#1F3A5F"></i>Manager's cut</span></div>`;
+ h+=list.map(r=>{const none=r.extra<1&&!d.live,cut=r.cut||0,keep=r.extra-cut,tot=r.cap+r.extra,g=none?100:Math.max(3,Math.round(r.cap/tot*100)),k=Math.round(keep/tot*100);
+  return`<div class="sr-biz${none?' none':''}"><b>${esc(r.name)} <small>Lv ${r.lv}</small></b><span class="v num">${r.extra<1?'—':'+'+$m(keep)}</span>
+   <small>${d.live?(r.ph?'+'+$m(r.ph*(1-commission()))+' / hour':r.fills<d.end?'Fills at '+hm(r.fills):'Won\'t fill this shift'):none?'Never filled up':r.fillAt?'Full at '+hm(r.fillAt):'Full before tracking started'}</small><span class="p">${r.extra<1?'':cut>=1?`<span style="color:#1F3A5F" class="mcut">manager −${$m(cut)}</span>`:capX(r.extra,r.cap)}</span>
+   <div class="hb"><i style="width:${g}%;background:#43B14F"></i>${none?'':cut>=1?`<i style="width:${k}%;background:#F5B946"></i><i style="flex:1;background:#1F3A5F"></i>`:'<i style="flex:1;background:#F5B946"></i>'}</div><div class="cap num"><span>${$m(r.cap)}</span><span${cut>=1?' style="color:#1F3A5F"':''}>${none?'':$m(cut>=1?cut:r.extra)}</span></div></div>`}).join('');
  if(d.rows.length>3)h+=`<button type="button" class="sr-more" data-act="shiftmore">${shiftAll?'Show fewer':'Show '+(d.rows.length-3)+' more businesses'} ›</button>`;
  if(!d.rows.length)h+=`<div class="sr-note">No businesses filled up during this shift.</div>`;
  const cs=s.owned.reduce((a,o)=>a+((st(o).rate>0&&!o.busy)?(o.safe||0):0),0),ch=s.owned.reduce((a,o)=>a+((st(o).rate>0&&!o.busy)?o.stored:0),0);
@@ -1065,18 +1127,18 @@ function collectAll(){if(s.jail)return jailNag();let a=0;for(const o of s.owned)
  if(a<1)return closeOv();s.cash+=a;s.earned+=a;s.collects=(s.collects||0)+1;cashTween=performance.now();stackN=-1;colEl.innerHTML='';vib(20);closeOv();toast('Collected '+$m(a)+' from all your businesses','good');save();upd()}
 function shiftsBody(){const t=now(),list=s.shifts||[],wk=list.filter(r=>r.end>t-7*864e5);let h='';
  const live=s.shift?shiftData('live'):null,lx=live?shiftStats(live):null;
- const tot=wk.reduce((a,r)=>a+r.rows.reduce((b,x)=>b+x.extra,0),0)+(lx?lx.total:0),bus=wk.reduce((a,r)=>a+r.jails.length,0)+(live?live.jails.length:0);
+ const tot=wk.reduce((a,r)=>a+r.rows.reduce((b,x)=>b+x.extra-(x.cut||0),0),0)+(lx?lx.keep:0),bus=wk.reduce((a,r)=>a+r.jails.length,0)+(live?live.jails.length:0);
  h+=`<div style="height:6px"></div><div class="sr-sum"><div><small>LAST 7 DAYS</small><b class="g num">+${$m(tot)}</b></div><div><small>SHIFTS</small><b>${wk.length+(live?1:0)}</b></div><div><small>BUSTED</small><b>${bus}×</b></div></div>`;
  if(!live&&!list.length)return h+`<div class="sr-note" style="padding:24px 16px">No shifts yet. Start a manager from your Wallet and their shift reports will build up here.</div>`;
  const svg=MGR,label=ts=>{const k=dayKey(ts);return k===dayKey(t)?'Today':k===dayKey(t,-1)?'Yesterday · '+dmy(ts):dmy(ts)};
- if(live)h+=`<div class="sr-dh">Now</div><button type="button" class="sr-row live" data-act="shiftlive">${svg}<div><b>${mgrName(live.hours)} · ${live.hours}h<span class="sr-live">LIVE</span></b><small>${hm(live.start)} – ${hm(live.end)} · ${hrs(live.end-t)} left</small></div><div class="x"><b class="num">+${$m(lx.total)}</b><small>so far ›</small></div></button>`;
+ if(live)h+=`<div class="sr-dh">Now</div><button type="button" class="sr-row live" data-act="shiftlive">${svg}<div><b>${mgrName(live.hours)} · ${live.hours}h<span class="sr-live">LIVE</span></b><small>${hm(live.start)} – ${hm(live.end)} · ${hrs(live.end-t)} left</small></div><div class="x"><b class="num">+${$m(lx.keep)}</b><small>so far ›</small></div></button>`;
  let last='';list.forEach((r,i)=>{const l=label(r.start);if(l!==last){h+=`<div class="sr-dh">${l}</div>`;last=l}
-  const tot=r.rows.reduce((a,x)=>a+x.extra,0);
+  const tot=r.rows.reduce((a,x)=>a+x.extra-(x.cut||0),0);
   h+=`<button type="button" class="sr-row" data-act="shiftview" data-v="${i}">${svg}<div><b>${mgrName(r.hours)} · ${r.hours}h</b><small>${hm(r.start)} – ${hm(r.end)} · ${r.jails.length?'busted '+(r.jails.length===1?'once':r.jails.length+' times'):'no arrests'}</small></div><div class="x"><b class="num">+${$m(tot)}</b><small>report ›</small></div></button>`});
  return h+`<div class="dc-hint">Your last 30 shifts are kept here</div>`}
-function shiftPopup(){const r=(s.shifts||[])[0];if(!r)return;const tot=r.rows.reduce((a,x)=>a+x.extra,0),x=shiftStats(Object.assign({live:false,upto:r.end},r));ovKind='shiftdone';
+function shiftPopup(){const r=(s.shifts||[])[0];if(!r)return;const tot=r.rows.reduce((a,x)=>a+x.extra-(x.cut||0),0),x=shiftStats(Object.assign({live:false,upto:r.end},r));ovKind='shiftdone';
  ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="sr-pop" role="dialog" aria-label="Shift over"><div class="h">${MGR}<div><small>SHIFT OVER</small><b>Your manager clocked out</b></div></div>
- <p>${tot>=1?`Your manager made <em>${$m(tot)}</em> extra across ${r.rows.length} business${r.rows.length===1?'':'es'}.`:'No businesses filled up during the shift.'} ${r.jails.length?`Busted ${r.jails.length===1?'once':r.jails.length+' times'} (${hrs(x.lost)} lost).`:'No arrests.'}</p>
+ <p>${tot>=1?`You keep <em>${$m(tot)}</em> after salary, from ${r.rows.length} business${r.rows.length===1?'':'es'}.`:'No businesses filled up during the shift.'} ${r.jails.length?`Busted ${r.jails.length===1?'once':r.jails.length+' times'} (${hrs(x.lost)} lost).`:'No arrests.'}</p>
  <div class="bt"><button class="dc-bb" data-act="shiftview" data-v="0">See report</button><button class="dc-bb l" data-act="collectall">Collect</button></div></div></div>`}
 
 /* jail */
@@ -1137,6 +1199,11 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'shiftview':openShift(+el.dataset.v,ovKind==='perks');break;
   case'shiftmore':shiftAll=!shiftAll;$('sb').innerHTML=shiftBody(shiftIdx);break;
   case'collectall':collectAll();break;
+  case'train':trainDlg();break;
+  case'dotrain':{const c=trainCost();if(s.mgr.train||s.mgr.level>=MGR_MAX||s.cash<c)return;s.cash-=c;s.mgr.train={left:trainTime(),total:trainTime()};closeOv();
+   toast(mgrOn()?`Training started: Level ${s.mgr.level+1} in ${hrs(s.mgr.train.total)}`:'Training starts when your manager\'s next shift begins','good');vib(15);save();upd();break}
+  case'trainskip':{if(!s.mgr.train)return;const c=trainSkip();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;closeOv();finishTrain();upd();break}
+  case'mgrtap':{const m=s.mgr.train;if(!m||!mgrOn())return;const cut=Math.max(1300,m.total*.005);m.left-=cut;s.taps++;vib(5);floaty(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'-'+(cut/1000).toFixed(1)+'s','#1F3A5F');if(m.left<=0)finishTrain();upd();break}
   case'perkuse':usePerk(el.dataset.v);break;
   case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
   case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);s.cash+=c;s.gems+=2;s.freeAt=now()+6e5;
@@ -1253,12 +1320,12 @@ function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.
   if(o.busy&&(!build||o.end<build.at))build={at:o.end,name:b.name,kind:o.busy,level:o.level+1};
   if(!(x.rate>0))continue;let start=o.busy?o.end:t;if(jailEnd&&start<jailEnd)start=jailEnd;const stored=o.busy?0:(o.stored||0);
   const fillAt=start+(x.hold-stored)/x.rate*60000;
-  if(mgrOn()){mgrSafe+=(o.safe||0)+x.rate*Math.max(0,s.mgrUntil-Math.max(fillAt,t))/60000;
+  if(mgrOn()){mgrSafe+=(o.safe||0)+x.rate*(1-commission())*Math.max(0,s.mgrUntil-Math.max(fillAt,t))/60000;
    // a manager keeps it earning, so it only counts as full once the shift ends
    fulls.push({at:Math.round(Math.max(fillAt,s.mgrUntil)),name:b.name,amount:money(x.hold+(o.safe||0)+x.rate*Math.max(0,s.mgrUntil-Math.max(fillAt,t))/60000)});continue}
   if(!o.busy&&stored>=x.hold-1e-9)continue;
   fulls.push({at:Math.round(fillAt),name:b.name,amount:money(x.hold)})}
- if(mgrOn()){out.mgrEndAt=Math.round(s.mgrUntil);out.mgrReport=1;out.mgrSafe=money(mgrSafe);out.mgrName=mgrName(s.mgrTotal/36e5)}
+ if(mgrOn()){out.mgrEndAt=Math.round(s.mgrUntil);out.mgrReport=1;out.mgrSafe=money(mgrSafe);out.mgrName=mgrName(s.mgrTotal/36e5).toLowerCase()}
  // daily chance: remind at 8am on the day the next pick is ready
  out.dailyAt=dayStart(t,dcReady()?0:1)+8*36e5;out.dailyDay=dcReady()?dcAlive()+1:s.dc.streak+1;
  // every business's fill time, soonest first, so the server can name whichever ones fill
