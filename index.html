@@ -305,8 +305,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dlg .lvl .rb{background:#2FA3AE;color:#fff;font-weight:900;font-size:26px;width:46px;text-align:center;padding:0 0 4px}.dlg .lvl .rb small{display:block;font-size:9px;background:var(--lime);color:var(--green-d);padding:2px 0;margin-bottom:2px}
 .mc{background:#fff;margin:6px;border:3px solid #1F3A5F}
 .mc .top{background:#1F3A5F;color:#fff;display:flex;align-items:center;gap:12px;padding:10px 12px}.mc .top svg{width:28px;height:40px}
-.sr-me{display:flex;align-items:center;gap:10px;background:#fff;margin:6px 6px 4px;padding:10px 12px;border-left:5px solid #1F3A5F}.sr-me svg{width:24px;height:34px;flex:none}.sr-me b{display:block;font-weight:900;font-size:14px}.sr-me small{display:block;font-weight:600;font-size:12px;color:#6b6b6b}
-.dark .sr-me{background:#1C2425;border-left-color:#5B8AC6}.dark .sr-me small{color:#A3ABA6}
+.sr-me{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;background:#fff;margin:6px 6px 4px;padding:10px 14px;font-weight:700;font-size:12.5px;color:#555}.sr-me b{font-weight:900;color:#1F3A5F;font-size:14px}.sr-me b.g{color:#C98F1E}.sr-me em{flex-basis:100%;font-style:normal;font-weight:700;font-size:11.5px;color:#2FA3AE}
+.dark .sr-me{background:#1C2425;color:#A3ABA6}.dark .sr-me b{color:#9FC3EA}.dark .sr-me b.g{color:#F5B946}
 .mc .shiftrow{display:flex;align-items:center;gap:10px;padding:8px 8px 0}
 .mc .top small{display:block;font-weight:800;font-size:10px;letter-spacing:1px;color:#9FB6D6}.mc .top b{display:block;font-weight:900;font-size:16px}
 .mc .lv{margin-left:auto;background:#2FA3AE;font-weight:900;font-size:12px;padding:4px 8px}
@@ -1032,7 +1032,7 @@ function updPerkUI(){{const e=$('pt-train');if(e&&s.mgr.train)e.textContent=dur(
  if(s.shiftPending&&!ovKind&&(s.shifts||[]).length){s.shiftPending=0;save();shiftPopup()}
  if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
  if(ovKind==='perks'){const t=now();
-  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot)b.style.width=Math.min(100,Math.max(0,(end-t)/tot*100))+'%'}}}
+  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot){const r=Math.min(100,Math.max(0,(end-t)/tot*100));b.style.width=(k==='mgr'?100-r:r)+'%'}}}}
 const dcIntroDue=()=>!s.dcSeen&&s.owned.length>0;
 function dcIntro(){const gift=!!s.dcGift;if(gift){s.perks.mgr.push(8);s.dcGift=false}s.dcSeen=true;save();ovKind='dcintro';nextUp=()=>{if(!ovKind)notifyPrompt()};
  ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dc-modal" role="dialog" aria-label="Daily chance is here"><div class="dc-mh"><div class="dc-new">NEW</div><h2>Daily chance is here</h2><p>A free pick, every day</p></div>
@@ -1067,7 +1067,7 @@ function mgrCard(){const lv=s.mgr.level,c=Math.round(commission()*100),m=s.mgr.t
  else if(lv>=MGR_MAX)tr=`<span class="nx">Fully trained · lowest commission</span>`;
  else tr=`<span class="nx num">Next: Lv ${lv+1} · ${c-1}% · ${$m(trainCost())} · ${hrs(trainTime())}</span><button class="dc-use n" data-act="train">${CAPI} TRAIN</button>`;
  return`<div class="mc"><div class="top">${MGR}<div><small>YOUR MANAGER</small><b>${on?'On duty':'Off duty'}</b>${on?`<small class="num" style="letter-spacing:0;color:#C9D6EA;font-weight:700;font-size:12px">${mgrName(s.mgrTotal/36e5)} shift · <span id="pt-mgr">${dur((s.mgrUntil-now())/1000)}</span> left</small>`:''}</div><span class="lv">LV ${lv}</span></div>
- ${on?`<div class="shiftrow"><div class="dc-tm" style="flex:1;margin:0"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,(s.mgrUntil-now())/s.mgrTotal*100))}%"></i></div><button class="dc-use n" data-act="shiftlive">SHIFT SO FAR</button></div>`:''}
+ ${on?`<div class="shiftrow"><div class="dc-tm" style="flex:1;margin:0"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,100-(s.mgrUntil-now())/s.mgrTotal*100))}%"></i></div><button class="dc-use n" data-act="shiftlive">SHIFT SO FAR</button></div>`:''}
  <div class="row"><div><small>COMMISSION</small><b>${c}%</b></div><div><small>YOU KEEP</small><b class="g">${100-c}%</b></div></div><div class="tr">${tr}</div></div>`}
 
 /* ================= manager shift reports ================= */
@@ -1138,7 +1138,7 @@ function collectAll(){if(s.jail)return jailNag();let a=0;for(const o of s.owned)
 function shiftsBody(){const t=now(),list=s.shifts||[],wk=list.filter(r=>r.end>t-7*864e5);let h='';
  const live=s.shift?shiftData('live'):null,lx=live?shiftStats(live):null;
  const tot=wk.reduce((a,r)=>a+r.rows.reduce((b,x)=>b+x.extra-(x.cut||0),0),0)+(lx?lx.keep:0),bus=wk.reduce((a,r)=>a+r.jails.length,0)+(live?live.jails.length:0);
- h+=`<div class="sr-me">${MGR}<div><b>Your manager · Lv ${s.mgr.level}</b><small>${Math.round(commission()*100)}% commission · you keep ${100-Math.round(commission()*100)}%${s.mgr.train?` · training to Lv ${s.mgr.level+1}${mgrOn()?'':' (paused until the next shift)'}`:''}</small></div></div><div class="sr-sum"><div><small>LAST 7 DAYS</small><b class="g num">+${$m(tot)}</b></div><div><small>SHIFTS</small><b>${wk.length+(live?1:0)}</b></div><div><small>BUSTED</small><b>${bus}×</b></div></div>`;
+ h+=`<div class="sr-me"><span>Manager level <b>${s.mgr.level}</b></span><span><b>${Math.round(commission()*100)}%</b> commission</span><span>You keep <b class="g">${100-Math.round(commission()*100)}%</b></span>${s.mgr.train?`<em>Training to level ${s.mgr.level+1}${mgrOn()?'':' · paused until the next shift'}</em>`:''}</div><div class="sr-sum"><div><small>LAST 7 DAYS</small><b class="g num">+${$m(tot)}</b></div><div><small>SHIFTS</small><b>${wk.length+(live?1:0)}</b></div><div><small>BUSTED</small><b>${bus}×</b></div></div>`;
  if(!live&&!list.length)return h+`<div class="sr-note" style="padding:24px 16px">No shifts yet. Start a manager from your Wallet and their shift reports will build up here.</div>`;
  const svg=MGR,label=ts=>{const k=dayKey(ts);return k===dayKey(t)?'Today':k===dayKey(t,-1)?'Yesterday · '+dmy(ts):dmy(ts)};
  if(live)h+=`<div class="sr-dh">Now</div><button type="button" class="sr-row live" data-act="shiftlive">${svg}<div><b>${mgrName(live.hours)} · ${live.hours}h<span class="sr-live">LIVE</span></b><small>${hm(live.start)} – ${hm(live.end)} · ${hrs(live.end-t)} left</small></div><div class="x"><b class="num">+${$m(lx.keep)}</b><small>so far ›</small></div></button>`;
