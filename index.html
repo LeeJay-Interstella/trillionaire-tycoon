@@ -241,6 +241,10 @@ input.nm:focus{outline:none;border-color:var(--green)}
 #jail .card2{background:#fff;color:var(--ink);padding:14px 16px;font-weight:700;font-size:14px;line-height:1.5;width:100%;max-width:380px;text-align:left}
 #jail .serve{width:100%;max-width:380px;padding:20px;background:var(--orange);color:#fff;font-weight:900;font-size:20px;box-shadow:0 5px 0 var(--orange-d)}
 #jail .row{display:flex;gap:10px;width:100%;max-width:380px}
+#jail .freecard{width:100%;max-width:380px;padding:14px 16px;background:var(--gold);color:#3A2604;font-weight:900;font-size:16px;box-shadow:0 5px 0 #C98F1E;display:flex;align-items:center;justify-content:center;gap:12px;text-align:left;animation:cardglow 1.4s ease-in-out infinite}
+@keyframes cardglow{50%{box-shadow:0 5px 0 #C98F1E,0 0 0 7px #F5B94677}}
+#jail .freecard svg{width:34px;height:34px;flex:none}
+#jail .freecard small{display:block;font-weight:700;font-size:12px;color:#5A3A08}
 #jail .row button{flex:1;padding:12px;background:#fff;color:var(--ink);font-weight:900;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px}
 #jail .row small{font-weight:700;color:var(--green);display:flex;gap:4px;align-items:center}
 #jbar{width:100%;max-width:380px;height:12px;background:#5a5a5a}
@@ -545,13 +549,14 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>Date.now();
 const fresh=()=>({name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
- dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false});
+ dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
 function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
 function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
  if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
  const st=Object.assign(fresh(),d,{ach:Object.assign({},d.ach||{})});
  st.dc=Object.assign({last:'',streak:0,got:null},d.dc||{});st.perks=Object.assign({mgr:[],jail:0,boost:0,crew:0,clean:0},d.perks||{});if(!Array.isArray(st.perks.mgr))st.perks.mgr=[];
  if(d.dc===undefined&&!d.dcSeen&&d.owned.length)st.dcGift=true;
+ if(!d.seed)st.seed=(Math.random()*2147483647)|0;
  st.owned=d.owned.map(o=>{const b=o.code!=null?BY[o.code]:B[o.bid];if(!b)return null;const c=Object.assign({level:1,stored:0,inv:0,busy:null},o,{bid:b.id});delete c.code;return c}).filter(Boolean);
  const seen=new Set();st.owned=st.owned.filter(o=>!seen.has(o.bid)&&seen.add(o.bid));
  st.cur=Math.max(0,Math.min(st.cur|0,st.owned.length-1));st.tier=Math.max(1,Math.min(11,st.tier|0||1));
@@ -615,14 +620,29 @@ function floaty(x,y,txt,col){const f=document.createElement('div');f.className='
 
 /* ================= simulation ================= */
 // sentence length comes from the original busted table (by net worth); severity from your threat level
-function arrest(at){if(s.perks.jail>0){s.perks.jail--;s.dodged=(s.dodged||0)+1;return}const th=threat(),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
+// police checks: the same save and time always give the same result, so the game can tell the server
+// in advance when your next arrest will be, and notify you even while the game is closed
+function chance(c){let x=(Math.floor(c/1000)^s.seed)>>>0;x=Math.imul(x^x>>>16,0x45d9f3b);x=Math.imul(x^x>>>16,0x45d9f3b);x^=x>>>16;return(x>>>0)/4294967296}
+const caught=(th,c)=>th>0&&chance(c)<Math.pow(th/100,2)*.3;
+const threatAt=c=>Math.max(0,threatRaw()-(c<(s.cleanUntil||0)?20:0));
+function sentence(th,n){let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;const sev=th<20?'low':th<50?'mid':'high';return{sev,sec:sev==='low'?row[1]:sev==='mid'?row[2]:row[3],row}}
+function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0;
+ const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0}));
+ for(let c=s.nextCheck;c<t+horizon;c+=30000){if(c<jailEnd)continue;
+  const th=Math.max(0,sim.reduce((a,o)=>a+thrAt(o.b,o.level+(o.up&&c>=o.up?1:0)),0)-(c<(s.cleanUntil||0)?20:0));
+  if(!caught(th,c))continue;
+  const x=sentence(th,n);return{at:c,until:c+x.sec*1000,sec:x.sec,loss:x.sev==='high'}}
+ return null}
+function arrest(at){const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
  s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
- for(const o of s.owned){if(o.busy&&t>=o.end){if(o.busy==='up')o.level++;done.push([o,o.busy]);o.from=o.end;o.busy=null}}
+ const finish=c=>{for(const o of s.owned){if(o.busy&&c>=o.end){if(o.busy==='up')o.level++;done.push([o,o.busy]);o.from=o.end;o.busy=null}}};
  if(s.nextCheck<t-7*864e5)s.nextCheck=t-7*864e5;
- while(t>=s.nextCheck){if(s.jail&&s.nextCheck>=s.jail.until)s.jail=null;
-  if(!s.jail&&nw()>=BUSTED[0][0]){const th=threat();if(th>0&&Math.random()<Math.pow(th/100,2)*.3)arrest(s.nextCheck)}s.nextCheck+=30000}
+ // upgrades that finish while you're away change your threat from that moment, not before
+ while(t>=s.nextCheck){finish(s.nextCheck);if(s.jail&&s.nextCheck>=s.jail.until)s.jail=null;
+  if(!s.jail&&nw()>=BUSTED[0][0]&&caught(threatAt(s.nextCheck),s.nextCheck))arrest(s.nextCheck);s.nextCheck+=30000}
+ finish(t);
  let gained=0;
  if(!(s.jail&&t<s.jail.until)){for(const o of s.owned){if(o.busy){o.from=0;continue}const x=st(o),st0=Math.max(from,o.from||0);
   const earn=(a,b)=>b>a?x.rate*((b-a)+Math.max(0,Math.min(b,s.boostUntil)-a))/60000:0;
@@ -840,7 +860,7 @@ function prizeInfo(p){switch(p.k){
  case'boost':return{n:'2× boost · 30 min',sm:'Double income',d:'Double all income for 30 minutes, whenever you choose.',r:'c'};
  case'crew':return{n:"Builder's crew",sm:'3 jobs, 2× fast',d:'Your next 3 builds or upgrades finish twice as fast.',r:'c'};
  case'clean':return{n:'Clean record',sm:'−20% threat',d:'Lowers your threat by 20% for 12 hours.',r:'c'};
- case'jail':return{n:'Get out of jail free',sm:'Skip one arrest',d:'Used automatically the next time you\'re busted.',r:'r'};
+ case'jail':return{n:'Get out of jail free',sm:'Walk free instantly',d:'Use it on the busted screen to walk free instantly.',r:'r'};
  case'mgr':return{n:mgrName(p.v),sm:p.v+'-hour shift',d:'Your businesses keep earning past full. Extra cash goes in the safe.',r:'r'}}}
 function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day]].filter(x=>!avoid.includes(x[0]));
  let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
@@ -869,7 +889,7 @@ function dailyBody(){
  const head=!g.fresh?"Today's pick":p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
  let btns='';
  if(!g.fresh){const inWallet=p.k==='mgr'?s.perks.mgr.includes(p.v):p.k==='jail'||(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0);
-  const txt=p.k==='cash'||p.k==='gems'?'Collected':inWallet?'Saved in your perk wallet':p.k==='mgr'?'Shift started':p.k==='jail'?'Used: it kept you out of jail':'Used';
+  const txt=p.k==='cash'||p.k==='gems'?'Collected':inWallet?'Saved in your perk wallet':p.k==='mgr'?'Shift started':p.k==='jail'?'Used: you walked free':'Used';
   btns=`<div class="dc-done">✓ ${txt}</div>${inWallet?`<button class="dc-bb l" data-act="perks">Open your perks</button>`:''}`}
  else if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it before bed from your perk wallet</small></button>`;
  else if(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
@@ -885,7 +905,7 @@ function perksBody(){let a='',w='';const t=now();
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
  const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
  Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h} hours of earning past full.${h<=8?' Start it before bed.':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
- if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Used automatically the next time you're busted.</small></div><span class="dc-use off">READY</span></div>`;
+ if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly.</small></div><span class="dc-use off">READY</span></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
  if(s.perks.clean)w+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record<span class="n">×${s.perks.clean}</span></b><small>Lowers your threat by 20% for 12 hours.</small></div><button class="dc-use" data-act="perkuse" data-v="clean">USE</button></div>`;
@@ -917,6 +937,7 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  ovl.innerHTML=`<div class="fullscreen" id="jail"><div class="bars"></div><h2>BUSTED!</h2><p style="margin:0;font-weight:700">Your ${j.th}% threat caught up with you.</p><div class="tm num" id="jt"></div><div id="jbar"><i id="jb"></i></div>
  <div class="card2 num"><b>${j.sev==='high'?'Heavy':j.sev==='mid'?'Medium':'Light'} sentence</b><br>${j.loss?`Cash confiscated: <b>${$m(j.loss)}</b><br>`:''}Your businesses stop earning until you're out.</div>
  <button class="serve" data-act="serve">TAP TO SERVE TIME (−3s)</button>
+ ${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <div class="row"><button data-act="lawyer">CALL A LAWYER<small class="num">${GEM} ${lawyerCost()}</small></button><button data-act="bribe">BRIBE THE JUDGE<small class="num">${COIN} ${money(Math.max(100,s.cash*.25))}</small></button></div></div>`;updJail()}
 function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=dur(l);$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(5,Math.ceil((s.jail.until-now())/120000)):5;
@@ -997,6 +1018,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'named':{const v=($('on').value||'').trim()||'Boss';s.name=v;save();closeOv();
    dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${art(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
   case'serve':if(!s.jail)return;s.jail.until-=3000;s.taps++;vib(6);if(now()>=s.jail.until)release('Sentence served. You walked free!');else updJail();break;
+  case'jailcard':if(!s.jail||!(s.perks.jail>0))return;s.perks.jail--;release('Get out of jail free! You walked straight out.');break;
   case'lawyer':{const c=lawyerCost();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;}release('Your lawyer found a loophole. Free to go!');break;
   case'bribe':{const c=Math.max(100,s.cash*.25);if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.');break}
  }});
@@ -1070,7 +1092,7 @@ function enablePush(){if(!pushCapable()){closeOv();return toast('Add the game to
 async function disablePush(){try{const sub=await swReg?.pushManager.getSubscription();if(sub){await supa?.from('push_subs').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe()}}catch(e){}pushOn=false;refreshAcct()}
 function notifyPrompt(force){const st=notifState();if(st!=='ask')return false;
  if(!force){let last=0;try{last=+localStorage.getItem(NASK)||0}catch(e){}if(now()-last<3*864e5)return false}
- dialog('Never miss a payday',`<p>Get a notification when:</p><div class="cmp" style="grid-template-columns:1fr"><span>• a business is full and ready to collect</span><span>• construction or an upgrade finishes</span><span>• you're released from jail</span><span>• your daily chance is ready</span></div><p class="s">You'll get one each time a business fills, so you can empty it straight away.</p>`,
+ dialog('Never miss a payday',`<p>Get a notification when:</p><div class="cmp" style="grid-template-columns:1fr"><span>• a business is full and ready to collect</span><span>• construction or an upgrade finishes</span><span>• you get busted, and when you're released</span><span>• your daily chance is ready</span></div><p class="s">You'll get one each time a business fills, so you can empty it straight away.</p>`,
   `<button class="no" data-act="notiflater" style="font-size:16px">Not now</button><button class="yes" data-act="notifon" style="font-size:16px">Turn on</button>`,'notif');return true}
 // When things will happen, so the server knows when to ping. Recomputed on every sync.
 function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.jail.until>t?s.jail.until:0;if(jailEnd)out.jailAt=jailEnd;
@@ -1088,11 +1110,14 @@ function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.
  // daily chance: remind at 8am on the day the next pick is ready
  out.dailyAt=dayStart(t,dcReady()?0:1)+8*36e5;out.dailyDay=dcReady()?dcAlive()+1:s.dc.streak+1;
  // every business's fill time, soonest first, so the server can name whichever ones fill
+ // the next arrest, if your threat means one is coming: notify when it happens, and when you're released
+ if(!jailEnd){const bp=bustPlan();if(bp){out.bustAt=bp.at;out.bustFor=bp.sec<3600?Math.round(bp.sec/60)+' minutes':(Math.round(bp.sec/1800)/2)+(bp.sec<5400?' hour':' hours');out.bustLoss=bp.loss;out.bustCard=(s.perks.jail||0)>0;out.jailAt=bp.until;
+  for(const f of fulls)if(f.at>bp.at)f.at+=bp.until-bp.at}} // businesses are frozen while you're in jail
  fulls.sort((p,q)=>p.at-q.at);out.fulls=fulls.slice(0,60);
  if(build){out.buildAt=Math.round(build.at);out.buildName=build.name;out.buildKind=build.kind;out.buildLevel=build.level}
  return out}
 function notifRow(){const st=notifState();if(st==='off')return'';
- const txt={unsupported:['Notifications','Open the game from its Home Screen icon to turn these on.'],blocked:['Notifications are blocked','Turn them on in iPhone Settings › Notifications › Trillionaire.'],signin:['Notifications','Sign in above to get notified when cash is ready.'],ask:['Notifications','Get told when cash is full, builds finish, you leave jail or your daily chance is ready.'],on:['Notifications are on',"We'll ping you when cash is ready."]}[st];
+ const txt={unsupported:['Notifications','Open the game from its Home Screen icon to turn these on.'],blocked:['Notifications are blocked','Turn them on in iPhone Settings › Notifications › Trillionaire.'],signin:['Notifications','Sign in above to get notified when cash is ready.'],ask:['Notifications','Get told when cash is full, builds finish, you get busted or released, or your daily chance is ready.'],on:['Notifications are on',"We'll ping you when cash is ready."]}[st];
  const btn=st==='ask'?`<button class="bigbtn" data-act="notifon" style="padding:10px 14px;font-size:13px;width:auto">Turn on</button>`:st==='on'?`<button class="bigbtn ghost" data-act="notifoff" style="padding:10px 14px;font-size:13px;width:auto">Turn off</button>`:'';
  return`<div class="pad" style="padding-bottom:0;padding-top:8px"><div class="acct"><div style="min-width:0"><b>${txt[0]}</b><small>${txt[1]}</small></div>${btn}</div></div>`}
 
