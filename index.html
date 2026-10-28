@@ -1013,7 +1013,8 @@ const hrs=ms=>{const m=Math.max(0,Math.round(ms/6e4));return m<60?m+'m':Math.flo
 let shiftAll=false,shiftIdx=null,perksTab='wallet';
 function shiftAdd(o,ex,at){if(!s.shift)return;const k=B[o.bid].code,r=s.shift.biz[k]||(s.shift.biz[k]={extra:0,fillAt:0});r.extra+=ex;if(!r.fillAt)r.fillAt=Math.round(Math.max(at,s.shift.start))}
 function shiftCheck(t){if(!s.shift&&(s.mgrUntil||0)>t)s.shift={start:s.mgrUntil-s.mgrTotal,end:s.mgrUntil,hours:s.mgrTotal/36e5,jails:[],biz:{},partial:t}; // a shift that started before this update
- if(!s.shift)return;if((s.mgrUntil||0)>s.shift.start)s.shift.end=s.mgrUntil;if(t>=s.shift.end)endShift()}
+ if(!s.shift)return;if((s.mgrUntil||0)>s.shift.start)s.shift.end=s.mgrUntil;
+ if(s.shift.partial&&!s.shift.seeded){for(const o of s.owned){const sf=o.safe||0;if(sf<1)continue;const k=B[o.bid].code,r=s.shift.biz[k]||(s.shift.biz[k]={extra:0,fillAt:0});r.extra=Math.max(r.extra,sf)}s.shift.seeded=1}if(t>=s.shift.end)endShift()}
 function endShift(){const sh=s.shift;s.shift=null;if(!sh)return;const rows=[];let nEarn=0;
  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0))continue;nEarn++;const r=sh.biz[b.code];if(r&&r.extra>=1)rows.push({name:b.name,lv:o.level,cap:st(o).hold,extra:r.extra,fillAt:r.fillAt})}
  rows.sort((a,b)=>b.extra-a.extra);
@@ -1021,35 +1022,36 @@ function endShift(){const sh=s.shift;s.shift=null;if(!sh)return;const rows=[];le
 // one shape for the live shift and for past ones
 function shiftData(i){const t=now();
  if(i==='live'){const sh=s.shift;if(!sh)return null;const rows=[];let nEarn=0;
-  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0)||o.busy)continue;nEarn++;const r=sh.biz[b.code]||{extra:0,fillAt:0};rows.push({name:b.name,lv:o.level,cap:st(o).hold,extra:r.extra,fillAt:r.fillAt,safe:o.safe||0})}
+  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0)||o.busy)continue;nEarn++;const r=sh.biz[b.code]||{extra:0,fillAt:0};const x=st(o),full=o.stored>=x.hold-1e-9,ph=x.rate*60*(boostOn()?2:1);rows.push({name:b.name,lv:o.level,cap:x.hold,extra:r.extra,fillAt:r.fillAt,safe:o.safe||0,ph:full?ph:0,rate:ph,fills:full?t:t+(x.hold-o.stored)/x.rate*6e4})}
   rows.sort((a,b)=>b.extra-a.extra);return{live:true,start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,upto:Math.min(t,sh.end)}}
  const r=(s.shifts||[])[i];return r?Object.assign({live:false,upto:r.end},r):null}
 function shiftStats(d){const t=now();let lost=0;
  for(const j of d.jails){const e=j.end!=null?j.end:(d.live&&s.jail?t:j.at+j.sec*1000);lost+=Math.max(0,Math.min(e,d.upto)-Math.max(j.at,d.start))}
- const total=d.rows.reduce((a,r)=>a+r.extra,0),worked=Math.max(0,d.upto-Math.max(d.start,d.partial||0)-lost);return{lost,total,worked}}
+ const total=d.rows.reduce((a,r)=>a+r.extra,0),worked=Math.max(0,d.upto-d.start-lost);return{lost,total,worked}}
 function tlBar(d){const span=d.end-d.start,pc=x=>Math.max(0,x/span*100).toFixed(2)+'%';let h='',a=d.start;
  const js=d.jails.map(j=>[Math.max(j.at,d.start),Math.min(j.end!=null?j.end:(d.live?d.upto:j.at+j.sec*1000),d.end)]).filter(([p,q])=>q>p);
  for(const[p,q]of js){if(p>a)h+=`<i style="width:${pc(p-a)};background:#43B14F"></i>`;h+=`<i style="width:${pc(q-p)};background:#E04B3A"></i>`;a=q}
  if(d.upto>a)h+=`<i style="width:${pc(d.upto-a)};background:#43B14F"></i>`;
  if(d.live&&d.end>d.upto)h+=`<i style="flex:1;background:repeating-linear-gradient(45deg,#BFE3B6 0 6px,#D9EED3 6px 12px)"></i>`;return h}
+const capX=(e,c)=>{const q=e/Math.max(1,c);return q>=10?Math.round(q)+'× its capacity':q>=1?(+q.toFixed(1))+'× its capacity':Math.max(1,Math.round(q*100))+'% of its capacity'};
 const HOW={served:'served the sentence',lawyer:'lawyer got you out',bribe:'bribed out',card:'jail-free card'};
 function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">This shift has ended.</div>`;const t=now(),x=shiftStats(d),wh=x.worked/36e5;
  const name=mgrName(d.hours)+' · '+d.hours+' hours';
  let h=`<div class="sr-top">${MGR}<div><small>${d.live?'Shift so far':i===0?'Shift report':dmy(d.start)+' · '+hm(d.start)+' – '+hm(d.end)}</small><b>${d.live?mgrName(d.hours)+' · '+hrs(d.end-t)+' left':name}</b></div></div>`;
- if(d.live){const safe=d.rows.reduce((a,r)=>a+r.safe,0),proj=wh>.05?x.total+x.total/wh*Math.max(0,(d.end-t)/36e5):0;
+ if(d.live){const safe=d.rows.reduce((a,r)=>a+r.safe,0),proj=x.total+d.rows.reduce((a,r)=>a+r.rate*Math.max(0,d.end-Math.max(t,r.fills))/36e5,0);
   h+=`<div class="sr-hero"><small>In the safe right now</small><b class="num">${$m(safe)}</b><span>${proj?`On track for about <em>${$m(proj)}</em> extra by ${hm(d.end)}`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
  else h+=`<div class="sr-hero"><small>Extra from your manager</small><b class="num">${$m(x.total)}</b><span>Cash you would have lost without a manager</span></div>`;
  h+=`<div class="sr-stats"><div><small>Worked</small><b>${hrs(x.worked)}</b></div><div><small>Busted</small><b class="${d.jails.length?'r':''}">${d.jails.length}×</b></div><div><small>Lost in jail</small><b class="${x.lost?'r':''}">${hrs(x.lost)}</b></div></div>`;
  h+=`<div class="sr-tl"><div class="lab"><span>${hm(d.start)}</span><span>${d.live?'Now '+hm(t):'Shift timeline'}</span><span>${hm(d.end)}</span></div><div class="sr-bar">${tlBar(d)}</div>
   <div class="sr-leg"><span><i style="background:#43B14F"></i>Working</span><span><i style="background:#E04B3A"></i>In jail</span>${d.live?'<span><i style="background:#BFE3B6"></i>Still to go</span>':''}</div>
   ${d.jails.map(j=>`<div class="sr-ev"><b>${hm(j.at)}</b> Busted at ${j.th}% threat · ${j.how?(j.how==='served'?`served the full ${hrs((j.end||j.at)-j.at)}`:`${HOW[j.how]||'got out'} after ${hrs((j.end||j.at)-j.at)}${j.cost?` (${j.cost})`:''}`):'still inside'}</div>`).join('')}
-  ${d.partial?`<div class="sr-ev" style="color:#888">Tracking started at ${hm(d.partial)}, when this update arrived.</div>`:''}</div>`;
+  ${d.partial?`<div class="sr-ev" style="color:#888">Arrests before ${hm(d.partial)} weren't tracked, because the update arrived mid-shift.</div>`:''}</div>`;
  const filled=d.rows.filter(r=>r.extra>=1),list=shiftAll?d.rows:d.rows.slice(0,3);
  h+=`<div class="sr-sec"><span>By business</span><span>${d.live?'Earning per hour':filled.length+' of '+d.nEarn+' filled up'}</span></div>
   <div class="sr-key"><span><i style="background:#43B14F"></i>Max capacity: yours anyway</span><span><i style="background:#F5B946"></i>Extra from your manager</span></div>`;
- h+=list.map(r=>{const none=r.extra<1,g=none?100:Math.max(3,Math.round(r.cap/(r.cap+r.extra)*100));
-  return`<div class="sr-biz${none?' none':''}"><b>${esc(r.name)} <small>Lv ${r.lv}</small></b><span class="v num">${none?'—':'+'+$m(r.extra)}</span>
-   <small>${none?'Never filled up':d.live?'+'+$m(wh>.05?r.extra/wh:0)+' / hour':'Full at '+hm(r.fillAt)}</small><span class="p">${none?'':Math.round(r.extra/Math.max(1,r.cap))+'× its capacity'}</span>
+ h+=list.map(r=>{const none=r.extra<1&&!d.live,g=none?100:Math.max(3,Math.round(r.cap/(r.cap+r.extra)*100));
+  return`<div class="sr-biz${none?' none':''}"><b>${esc(r.name)} <small>Lv ${r.lv}</small></b><span class="v num">${r.extra<1?'—':'+'+$m(r.extra)}</span>
+   <small>${d.live?(r.ph?'+'+$m(r.ph)+' / hour':r.fills<d.end?'Fills at '+hm(r.fills):'Won\'t fill this shift'):none?'Never filled up':r.fillAt?'Full at '+hm(r.fillAt):'Full before tracking started'}</small><span class="p">${r.extra<1?'':capX(r.extra,r.cap)}</span>
    <div class="hb"><i style="width:${g}%;background:#43B14F"></i>${none?'':'<i style="flex:1;background:#F5B946"></i>'}</div><div class="cap num"><span>${$m(r.cap)}</span><span>${none?'':$m(r.extra)}</span></div></div>`}).join('');
  if(d.rows.length>3)h+=`<button type="button" class="sr-more" data-act="shiftmore">${shiftAll?'Show fewer':'Show '+(d.rows.length-3)+' more businesses'} ›</button>`;
  if(!d.rows.length)h+=`<div class="sr-note">No businesses filled up during this shift.</div>`;
