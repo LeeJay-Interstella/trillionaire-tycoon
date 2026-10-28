@@ -635,8 +635,7 @@ function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw()
  return null}
 function arrest(at){const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
- s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++;
- if((s.mgrUntil||0)>at){s.mgrUntil+=sec*1000;s.jail.mgr=1}}
+ s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
  const finish=c=>{for(const o of s.owned){if(o.busy&&c>=o.end){if(o.busy==='up')o.level++;done.push([o,o.busy]);o.from=o.end;o.busy=null}}};
  if(s.nextCheck<t-7*864e5)s.nextCheck=t-7*864e5;
@@ -1117,7 +1116,7 @@ function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.
  out.dailyAt=dayStart(t,dcReady()?0:1)+8*36e5;out.dailyDay=dcReady()?dcAlive()+1:s.dc.streak+1;
  // every business's fill time, soonest first, so the server can name whichever ones fill
  // the next arrest, if your threat means one is coming: notify when it happens, and when you're released
- if(!jailEnd){const bp=bustPlan();if(bp){if(out.mgrEndAt&&bp.at<out.mgrEndAt)out.mgrEndAt+=bp.until-bp.at;out.bustAt=bp.at;out.bustFor=bp.sec<3600?Math.round(bp.sec/60)+' minutes':(Math.round(bp.sec/1800)/2)+(bp.sec<5400?' hour':' hours');out.bustLoss=bp.loss;out.bustCard=(s.perks.jail||0)>0;out.jailAt=bp.until;
+ if(!jailEnd){const bp=bustPlan();if(bp){out.bustAt=bp.at;out.bustFor=bp.sec<3600?Math.round(bp.sec/60)+' minutes':(Math.round(bp.sec/1800)/2)+(bp.sec<5400?' hour':' hours');out.bustLoss=bp.loss;out.bustCard=(s.perks.jail||0)>0;out.jailAt=bp.until;
   for(const f of fulls)if(f.at>bp.at)f.at+=bp.until-bp.at}} // businesses are frozen while you're in jail
  fulls.sort((p,q)=>p.at-q.at);out.fulls=fulls.slice(0,60);
  if(build){out.buildAt=Math.round(build.at);out.buildName=build.name;out.buildKind=build.kind;out.buildLevel=build.level}
