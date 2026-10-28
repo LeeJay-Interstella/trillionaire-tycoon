@@ -31,6 +31,12 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .t b{display:flex;align-items:center;gap:6px;font-weight:900;font-size:clamp(17px,5.4vw,24px);white-space:nowrap;overflow:hidden}
 .t-nw{grid-column:1/4;background:var(--green);padding-left:16px;padding-block:10px}
 .t-nw small{color:var(--lime);font-size:12px}
+.nwrow{display:flex;align-items:center;justify-content:space-between;gap:8px;overflow:visible}
+.rate{display:inline-flex;align-items:center;gap:4px;background:#ffffff26;color:#fff;font-weight:900;font-size:12px;letter-spacing:.2px;text-transform:none;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.rate:empty{display:none}
+.rate.rboost{background:var(--lime);color:var(--green-d);animation:ratepulse 1.2s ease-in-out infinite}
+.rate.rfrozen{background:#00000026;color:#ffffffb3}
+@keyframes ratepulse{50%{opacity:.72}}
 .t-nw b{font-size:clamp(30px,10vw,42px)}
 .t-boss{background:var(--lime);align-items:center;color:var(--green-d);padding-right:16px}
 .t-boss svg{width:46px;height:46px;border:3px solid #fff;background:var(--green)}
@@ -283,7 +289,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 
 <div id="app">
   <header class="hud">
-    <div class="t t-nw"><small>Net worth</small><b class="num"><i class="coin"></i><span id="nw">0</span></b></div>
+    <div class="t t-nw"><small class="nwrow"><span>Net worth</span><span class="rate num" id="nwrate"></span></small><b class="num"><i class="coin"></i><span id="nw">0</span></b></div>
     <button class="t t-boss" data-act="boss" aria-label="Boss profile and settings">
       <svg viewBox="0 0 20 20" shape-rendering="crispEdges"><rect x="6" y="3" width="8" height="8" fill="#F2C99A"/><rect x="6" y="3" width="8" height="2" fill="#5A3B22"/><rect x="7" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="9" width="4" height="1" fill="#B85C3A"/><rect x="4" y="12" width="12" height="8" fill="#2C7526"/><rect x="9" y="12" width="2" height="6" fill="#F5B946"/></svg>
       <small>Boss</small></button>
@@ -587,7 +593,11 @@ function rain(){const o=cur();if(!o||o.busy||s.jail||document.hidden)return;cons
 
 /* ================= HUD ================= */
 let shownCash=null,cashTween=0;
-function hud(){$('nw').textContent=money(nw());if(shownCash===null||s.cash<shownCash||performance.now()-cashTween>1500)shownCash=s.cash;else shownCash+=(s.cash-shownCash)*.3;$('cash').textContent=money(shownCash);$('gm').textContent=s.gems;
+function hud(){$('nw').textContent=money(nw());
+ {const r=$('nwrate'),inc=income(),jailed=!!(s.jail&&s.jail.until>now());
+  r.textContent=jailed?'❚❚ Frozen':inc>0?`▲ ${$m(inc)}/min${boostOn()?' · 2×':''}`:'';
+  r.className='rate num'+(jailed?' rfrozen':boostOn()&&inc>0?' rboost':'');
+  r.setAttribute('aria-label',jailed?'Income frozen while in jail':`Earning ${$m(inc)} per minute`)}if(shownCash===null||s.cash<shownCash||performance.now()-cashTween>1500)shownCash=s.cash;else shownCash+=(s.cash-shownCash)*.3;$('cash').textContent=money(shownCash);$('gm').textContent=s.gems;
  const fit=(id,t)=>{const e=$(id).parentElement,n=t.length;e.style.fontSize=n>6?'15px':n>4?'18px':''};fit('gm',String(s.gems));fit('cash',money(s.cash));
  const th=threat();$('thr').textContent=Math.round(th)+'%';$('thrT').classList.toggle('hot',th>0);
  const fr=s.freeAt<=now();$('freeTag').textContent=fr?'FREE':dur((s.freeAt-now())/1000);$('freeTag').className=fr?'tag':'tag sm';
