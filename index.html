@@ -267,6 +267,9 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .round{border-color:#141A1B}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:14px 16px;font-weight:800;font-size:15px;color:var(--ink);border:0;width:100%;font-family:inherit}
 .dark .switch{background:#1C2425}
+.reducer{display:flex;flex-direction:column;gap:3px;background:#E3F3DF;border:2px solid var(--green);padding:10px 14px;height:64px;box-sizing:border-box;justify-content:center}
+.reducer b{color:var(--green-d);font-weight:900;font-size:15px}.reducer span{font-size:13px;font-weight:600;color:#3d5a3a;line-height:1.35}
+.dark .reducer{background:#1B2A1C}.dark .reducer b{color:#7FD17A}.dark .reducer span{color:#B9CDB6}
 .acct{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:12px 14px;flex-wrap:wrap}
 .acct b{display:block;font-weight:800;font-size:14px;overflow-wrap:anywhere}.acct small{display:block;color:#6b6b6b;font-weight:600;font-size:12px;margin-top:2px}
 .dark .acct{background:#1C2425}.dark .acct small{color:#A3ABA6}
@@ -552,14 +555,17 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>TIER ${b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
-   <div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span></div></div></div>
-   <div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<span id="camt">0</span></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`}
+   ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span></div>`:
+    `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span></div>`}</div></div>
+   ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<span id="camt">0</span></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
+    `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boostOn();if(boostOn())bc.textContent='2X INCOME · '+dur((s.boostUntil-now())/1000)}
  if(!o)return;
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
- const x=st(o);$('camt').textContent=money(o.stored);$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
+ const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));return}
+ $('camt').textContent=money(o.stored);$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
  const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full;
  $('upBtn').classList.toggle('can',s.cash>=x.up);
  const gm=$('getmore');if(gm)gm.hidden=s.seenShop||!(s.owned.length<4&&B.some(b=>!own(b.id)&&available(b)&&canPay(b,buyPrice(b))));
@@ -591,7 +597,7 @@ function hud(){$('nw').textContent=money(nw());if(shownCash===null||s.cash<shown
 
 /* ================= actions ================= */
 function jailNag(){toast("You're behind bars. Serve your time first.",'bad')}
-function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const a=o.stored;if(a<1){toast('Nothing to collect yet. Bills are on their way.');return}
+function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const a=o.stored;if(a<1){toast('Nothing to collect yet. Bills are on their way.');return}
  s.cash+=a;s.earned+=a;o.stored=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
  const tgt=$('cash').getBoundingClientRect(),bills=[...colEl.children].reverse(),last=bills.length-1;
  bills.forEach((bEl,i)=>{const r=bEl.getBoundingClientRect();const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=r.left+'px';f.style.top=r.top+'px';document.body.appendChild(f);bEl.style.visibility='hidden';
