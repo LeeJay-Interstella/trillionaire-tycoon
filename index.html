@@ -635,20 +635,26 @@ function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw()
  return null}
 function arrest(at){const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
- s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++}
+ s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++;
+ if((s.mgrUntil||0)>at){s.mgrUntil+=sec*1000;s.jail.mgr=1}}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
  const finish=c=>{for(const o of s.owned){if(o.busy&&c>=o.end){if(o.busy==='up')o.level++;done.push([o,o.busy]);o.from=o.end;o.busy=null}}};
  if(s.nextCheck<t-7*864e5)s.nextCheck=t-7*864e5;
  // upgrades that finish while you're away change your threat from that moment, not before
+ const jails=s.jail?[[0,s.jail.until]]:[]; // time spent in jail during this stretch: nothing is earned then
  while(t>=s.nextCheck){finish(s.nextCheck);if(s.jail&&s.nextCheck>=s.jail.until)s.jail=null;
-  if(!s.jail&&nw()>=BUSTED[0][0]&&caught(threatAt(s.nextCheck),s.nextCheck))arrest(s.nextCheck);s.nextCheck+=30000}
+  if(!s.jail&&nw()>=BUSTED[0][0]&&caught(threatAt(s.nextCheck),s.nextCheck)){arrest(s.nextCheck);if(s.jail)jails.push([s.nextCheck,s.jail.until])}s.nextCheck+=30000}
  finish(t);
  let gained=0;
- if(!(s.jail&&t<s.jail.until)){for(const o of s.owned){if(o.busy){o.from=0;continue}const x=st(o),st0=Math.max(from,o.from||0);
+ for(const o of s.owned){if(o.busy){o.from=0;continue}const x=st(o),st0=Math.max(from,o.from||0),before=o.stored+(o.safe||0);
   const earn=(a,b)=>b>a?x.rate*((b-a)+Math.max(0,Math.min(b,s.boostUntil)-a))/60000:0;
-  // while a manager is on duty, cash past max capacity goes into the safe instead of being lost
-  const me=Math.max(st0,Math.min(t,s.mgrUntil||0)),before=o.stored+(o.safe||0);let v=o.stored+earn(st0,me);
-  if(v>x.hold){o.safe=(o.safe||0)+v-x.hold;v=x.hold}o.stored=Math.min(x.hold,v+earn(me,t));gained+=o.stored+(o.safe||0)-before;o.from=0}}
+  // split the time into stretches outside jail, and earn only in those
+  let a=st0;const segs=[];for(const[j0,j1]of jails){if(j1<=a)continue;if(j0>=t)break;if(j0>a)segs.push([a,j0]);a=Math.max(a,j1)}if(a<t)segs.push([a,t]);
+  for(const[p,q]of segs){
+   // while a manager is on duty, cash past max capacity goes into the safe instead of being lost
+   const me=Math.max(p,Math.min(q,s.mgrUntil||0));let v=o.stored+earn(p,me);
+   if(v>x.hold){o.safe=(o.safe||0)+v-x.hold;v=x.hold}o.stored=Math.min(x.hold,v+earn(me,q))}
+  gained+=o.stored+(o.safe||0)-before;o.from=0}
  if(s.jail&&t>=s.jail.until){s.jail=null;if(!quiet){toast('You walked free. Back to business!','good');closeJail()}}
  if(!quiet)done.forEach(([o,k])=>toast(`${B[o.bid].name} ${k==='up'?'is now level '+o.level:'is open for business!'}`,'good'));
  while(s.tier<11&&tierReady(s.tier+1)){s.tier++;if(!quiet)toast(`New businesses unlocked: ${TIERS[s.tier]}`,'good')}
@@ -899,7 +905,7 @@ function dailyBody(){
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
 function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
 function perksBody(){let a='',w='';const t=now();
- if(mgrOn())a+=`<div class="dc-perk">${MGR}<div><b>${mgrName(s.mgrTotal/36e5)} on duty</b><small>Earning past full · <span id="pt-mgr" class="num">${dur((s.mgrUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-mgr" style="width:${Math.max(0,(s.mgrUntil-t)/s.mgrTotal*100)}%"></i></div></div><div></div></div>`;
+ if(mgrOn())a+=`<div class="dc-perk">${MGR}<div><b>${mgrName(s.mgrTotal/36e5)} on duty</b><small>Earning past full · <span id="pt-mgr" class="num">${dur((s.mgrUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-mgr" style="width:${Math.min(100,Math.max(0,(s.mgrUntil-t)/s.mgrTotal*100))}%"></i></div></div><div></div></div>`;
  if(cleanOn())a+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record</b><small>Threat −20% · <span id="pt-clean" class="num">${dur((s.cleanUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-clean" style="width:${Math.max(0,(s.cleanUntil-t)/(CLEAN_H*36e5)*100)}%"></i></div></div><div></div></div>`;
  if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>2× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
@@ -921,7 +927,7 @@ function usePerk(v){const t=now();
  vib(15);save();closeOv();upd()}
 function updPerkUI(){if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
  if(ovKind==='perks'){const t=now();
-  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot)b.style.width=Math.max(0,(end-t)/tot*100)+'%'}}}
+  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot)b.style.width=Math.min(100,Math.max(0,(end-t)/tot*100))+'%'}}}
 const dcIntroDue=()=>!s.dcSeen&&s.owned.length>0;
 function dcIntro(){const gift=!!s.dcGift;if(gift){s.perks.mgr.push(8);s.dcGift=false}s.dcSeen=true;save();ovKind='dcintro';nextUp=()=>{if(!ovKind)notifyPrompt()};
  ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dc-modal" role="dialog" aria-label="Daily chance is here"><div class="dc-mh"><div class="dc-new">NEW</div><h2>Daily chance is here</h2><p>A free pick, every day</p></div>
@@ -942,7 +948,7 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
 function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=dur(l);$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(5,Math.ceil((s.jail.until-now())/120000)):5;
 function closeJail(){if(ovKind==='jail')closeOv()}
-function release(m){s.jail=null;closeJail();toast(m,'good');save();upd()}
+function release(m){if(s.jail&&s.jail.mgr)s.mgrUntil-=Math.max(0,s.jail.until-now());s.jail=null;closeJail();toast(m,'good');save();upd()}
 
 /* intro */
 function splash(){ovKind='splash';let rain='';for(let i=0;i<46;i++){const sz=28+Math.random()*44,front=i%5===0;rain+=`<div class="rain${front?' front':''}" style="left:${Math.random()*96-4}%;--s:${sz.toFixed(0)}px;--sw:${(10+Math.random()*30).toFixed(0)}px;--r0:${(Math.random()*360).toFixed(0)}deg;opacity:${front?.95:.55+sz/160};animation-duration:${(3.5+Math.random()*4.5).toFixed(2)}s;animation-delay:${(-Math.random()*8).toFixed(2)}s"><div class="push">${BILL}</div></div>`}
@@ -1017,7 +1023,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'notifoff':disablePush().then(()=>toast('Notifications off'));break;
   case'named':{const v=($('on').value||'').trim()||'Boss';s.name=v;save();closeOv();
    dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${art(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
-  case'serve':if(!s.jail)return;s.jail.until-=3000;s.taps++;vib(6);if(now()>=s.jail.until)release('Sentence served. You walked free!');else updJail();break;
+  case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);if(now()>=s.jail.until)release('Sentence served. You walked free!');else updJail();break;
   case'jailcard':if(!s.jail||!(s.perks.jail>0))return;s.perks.jail--;release('Get out of jail free! You walked straight out.');break;
   case'lawyer':{const c=lawyerCost();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;}release('Your lawyer found a loophole. Free to go!');break;
   case'bribe':{const c=Math.max(100,s.cash*.25);if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.');break}
@@ -1111,7 +1117,7 @@ function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.
  out.dailyAt=dayStart(t,dcReady()?0:1)+8*36e5;out.dailyDay=dcReady()?dcAlive()+1:s.dc.streak+1;
  // every business's fill time, soonest first, so the server can name whichever ones fill
  // the next arrest, if your threat means one is coming: notify when it happens, and when you're released
- if(!jailEnd){const bp=bustPlan();if(bp){out.bustAt=bp.at;out.bustFor=bp.sec<3600?Math.round(bp.sec/60)+' minutes':(Math.round(bp.sec/1800)/2)+(bp.sec<5400?' hour':' hours');out.bustLoss=bp.loss;out.bustCard=(s.perks.jail||0)>0;out.jailAt=bp.until;
+ if(!jailEnd){const bp=bustPlan();if(bp){if(out.mgrEndAt&&bp.at<out.mgrEndAt)out.mgrEndAt+=bp.until-bp.at;out.bustAt=bp.at;out.bustFor=bp.sec<3600?Math.round(bp.sec/60)+' minutes':(Math.round(bp.sec/1800)/2)+(bp.sec<5400?' hour':' hours');out.bustLoss=bp.loss;out.bustCard=(s.perks.jail||0)>0;out.jailAt=bp.until;
   for(const f of fulls)if(f.at>bp.at)f.at+=bp.until-bp.at}} // businesses are frozen while you're in jail
  fulls.sort((p,q)=>p.at-q.at);out.fulls=fulls.slice(0,60);
  if(build){out.buildAt=Math.round(build.at);out.buildName=build.name;out.buildKind=build.kind;out.buildLevel=build.level}
