@@ -285,6 +285,91 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .switch[aria-checked="true"] i{background:var(--green)}.switch[aria-checked="true"] i::after{transform:translateX(20px)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-height:640px){.t-nw b{font-size:28px}.t{padding-block:5px}.collect,.finish{height:54px}.lines{font-size:13px;line-height:1.35}}
+
+[hidden]{display:none!important}
+/* ===== Daily chance + perks ===== */
+.tool .dot.y{background:var(--gold);color:#5A3A08;font-size:11px}
+.tool.glow{animation:toolglow 1.6s ease-in-out infinite}
+@keyframes toolglow{0%,100%{box-shadow:0 3px 0 var(--green-d),0 0 0 2px var(--gold)}50%{box-shadow:0 3px 0 var(--green-d),0 0 0 6px #F5B94666}}
+@media (max-height:760px){.tools{top:8px;gap:6px}.tool{width:40px;height:40px}.tool svg{width:22px;height:22px}}
+.duty{position:absolute;left:max(12px,env(safe-area-inset-left,0px));right:62px;top:10px;z-index:5;background:#1F3A5F;color:#fff;padding:8px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 #142844;pointer-events:none}
+.duty svg{width:16px;height:16px;flex:none}
+.duty b{display:block;font-weight:900;font-size:13px;line-height:1.2}
+.duty small{display:block;font-weight:700;font-size:11px;color:#C9D6EA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stage.onduty .pager{top:68px}#stage.onduty .boost{top:102px}
+.safeb{position:absolute;right:58px;z-index:4;background:var(--gold);color:#5A3A08;font-weight:900;font-size:12px;padding:5px 9px;box-shadow:0 3px 0 #C98F1E;white-space:nowrap;pointer-events:none}
+.mgrfig{position:absolute;z-index:3;width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+.mgrfig svg{width:36px;height:50px;filter:drop-shadow(0 3px 0 #0002)}
+.mgrfig span{background:#fff;border:2px solid #1F3A5F;color:#1F3A5F;font-weight:900;font-size:9px;padding:1px 5px;white-space:nowrap}
+.amtw{min-width:0;line-height:1;display:flex;flex-direction:column;gap:3px}
+.amtw small{font-size:10px;font-weight:700;color:#D7F0C9;overflow:hidden;text-overflow:ellipsis}
+.dc-streak{background:#fff;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px}
+.dc-streak .dc-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dc-streak .dc-t b{font-weight:900;font-size:15px}.dc-streak .dc-t span{font-weight:700;font-size:12px;color:#E08A1E;text-align:right}
+.dc-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.dc-day{height:58px;background:#F1F0EB;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:800;font-size:10px;color:#8a8a8a;border:2px solid transparent;white-space:nowrap}
+.dc-day i{font-style:normal;font-size:16px;line-height:1}
+.dc-day.done{background:var(--green);color:#fff}
+.dc-day.today{background:#fff;border-color:var(--gold);color:var(--ink)}
+.dc-day.gold{background:#FFF4D6;border:2px dashed #E0A21E;color:#9A6A10}
+.dc-day.gold.done{background:var(--green);border:2px solid var(--gold);color:#fff}
+.dc-day svg{width:22px;height:26px}
+.dc-h{text-align:center;padding:18px 16px 8px}
+.dc-h b{display:block;font-weight:900;font-size:24px;color:var(--green-d)}.dc-h span{font-weight:600;font-size:13px;color:#6b6b6b}
+.dc-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px 18px 10px;max-width:420px;margin:0 auto;width:100%}
+.dc-card{aspect-ratio:3/4.3;background:var(--green);border:3px solid #fff;outline:3px solid var(--green-d);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 0 var(--green-d);cursor:pointer;animation:dcbob 2.4s ease-in-out infinite}
+.dc-card:nth-child(2){animation-delay:.4s}.dc-card:nth-child(3){animation-delay:.8s}
+@keyframes dcbob{50%{transform:translateY(-6px) rotate(-1.5deg)}}
+.dc-card:active{transform:translateY(-10px) scale(1.04);animation:none}
+.dc-card .pat{position:absolute;inset:8px;border:2px dashed #ffffff55;background:repeating-linear-gradient(45deg,#ffffff10 0 8px,transparent 8px 16px)}
+.dc-card .q{width:56px;height:56px;border-radius:50%;background:var(--gold);border:3px solid #fff;display:grid;place-items:center;font-weight:900;font-size:30px;color:#7A4B10;z-index:1}
+.dc-hint{text-align:center;font-weight:700;font-size:12px;color:#8a8a8a;padding:16px}
+.dc-wbar{display:flex;align-items:center;gap:12px;margin:8px 14px 18px;background:#fff;padding:12px 14px;border:2px solid #E1EBC9;cursor:pointer;text-align:left;width:calc(100% - 28px);font:inherit;color:inherit}
+.dc-wbar svg{width:40px;height:30px;flex:none}
+.dc-wbar b{display:block;font-weight:900;font-size:14px}.dc-wbar span{display:block;font-weight:600;font-size:12px;color:#6b6b6b}
+.dc-wbar .go{margin-left:auto;background:var(--lime);color:var(--green-d);font-weight:900;font-size:12px;padding:8px 10px}
+.dc-rev{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:10px;padding:14px 12px 6px;align-items:center;max-width:440px;margin:0 auto;width:100%;perspective:600px}
+.dc-rc{background:#fff;border:3px solid #ddd;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.55;animation:dcflip2 .45s .45s both;min-width:0}
+.dc-rc svg{width:38px;height:38px}.dc-rc b{font-weight:900;font-size:12px}.dc-rc small{font-weight:700;font-size:10px;color:#888}
+.dc-win{background:#FFFBEA;border:4px solid var(--gold);padding:16px 10px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 0 0 6px #F5B94640,0 10px 24px #E0A21E55;animation:dcflip .5s both;min-width:0}
+@keyframes dcflip{from{transform:rotateY(90deg) scale(.9);opacity:0}}
+@keyframes dcflip2{from{transform:rotateY(90deg);opacity:0}}
+.dc-win svg{width:62px;height:62px}.dc-win svg.mg{width:62px;height:86px}
+.dc-rar{background:#8A6FE0;color:#fff;font-weight:900;font-size:10px;letter-spacing:1px;padding:3px 8px}
+.dc-rar.c{background:#9AA39A}.dc-rar.s{background:#E08A1E}
+.dc-win b{font-weight:900;font-size:18px;line-height:1.15}.dc-win p{margin:0;font-weight:600;font-size:12px;line-height:1.35;color:#555}
+.dc-win .dur{font-weight:900;font-size:13px;color:var(--green-d)}
+.dc-btns{display:flex;flex-direction:column;gap:12px;padding:14px 18px;max-width:440px;margin:0 auto;width:100%}
+.dc-bb{display:block;width:100%;padding:15px;text-align:center;font-weight:900;font-size:18px;text-transform:uppercase;color:#fff;background:var(--green);box-shadow:0 5px 0 var(--green-d)}
+.dc-bb.l{background:var(--lime);color:var(--green-d);box-shadow:0 5px 0 var(--lime-d)}
+.dc-bb small{display:block;font-weight:700;font-size:11px;text-transform:none;opacity:.85;margin-top:2px}
+.dc-sec{font-weight:900;font-size:12px;letter-spacing:.8px;color:#fff;background:var(--green-d);padding:8px 16px;text-transform:uppercase}
+.dc-perk{display:grid;grid-template-columns:46px 1fr auto;gap:12px;align-items:center;background:#fff;padding:12px 16px;border-bottom:2px solid #E7E7E2}
+.dc-perk>svg{width:40px;height:40px;justify-self:center}.dc-perk>svg.mg{width:32px;height:44px}
+.dc-perk b{display:block;font-weight:900;font-size:14px}.dc-perk small{display:block;font-weight:600;font-size:12px;color:#6b6b6b;line-height:1.3}
+.dc-perk .n{font-weight:900;font-size:11px;color:var(--green-d);margin-left:4px}
+.dc-use{font-weight:900;font-size:12px;padding:10px 11px;background:var(--lime);color:var(--green-d);white-space:nowrap}
+.dc-use.g{background:var(--green);color:#fff}.dc-use.off{background:#EEE;color:#888}
+.dc-tm{height:6px;background:#E7E7E2;margin-top:6px}.dc-tm i{display:block;height:100%;background:var(--green)}
+.dc-modal{width:100%;max-width:360px;background:#fff;box-shadow:0 14px 40px #0005;animation:in .18s ease-out;max-height:94%;overflow:auto}
+.dc-mh{background:var(--green);color:#fff;text-align:center;padding:18px 16px 16px}
+.dc-new{display:inline-block;background:var(--gold);color:#5A3A08;font-weight:900;font-size:11px;letter-spacing:1.5px;padding:4px 10px;margin-bottom:8px}
+.dc-mh h2{margin:0;font-weight:900;font-size:24px}.dc-mh p{margin:6px 0 0;font-weight:600;font-size:13px;color:#DFF2D6}
+.dc-mini{display:flex;justify-content:center;gap:10px;padding:20px 0;background:#E7E7E2}
+.dc-mini .dc-card{width:64px;flex:none}.dc-mini .dc-card .q{width:34px;height:34px;font-size:18px}
+.dc-feat{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:0 20px;margin:14px 0 0;align-items:start;text-align:left}
+.dc-feat i{font-style:normal;width:26px;height:26px;border-radius:50%;background:#E1F0D8;color:var(--green-d);font-weight:900;font-size:13px;display:grid;place-items:center}
+.dc-feat b{display:block;font-weight:900;font-size:14px}.dc-feat span{display:block;font-weight:600;font-size:12px;color:#6b6b6b;line-height:1.35}
+.dc-gift{margin:18px 16px 0;background:#FFFBEA;border:3px solid var(--gold);display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:10px 12px;text-align:left}
+.dc-gift svg{width:32px;height:44px}
+.dc-gift small{display:block;font-weight:900;font-size:10px;letter-spacing:1px;color:#C98F1E}
+.dc-gift b{display:block;font-weight:900;font-size:15px}.dc-gift span{display:block;font-weight:600;font-size:11.5px;color:#6b6b6b}
+.dark .dc-streak,.dark .dc-perk,.dark .dc-wbar,.dark .dc-rc,.dark .dc-modal{background:#1C2425;color:#ECEFE9;border-color:#0F1415}
+.dark .dc-day{background:#263031;color:#8E9893}.dark .dc-day.done{background:var(--green);color:#fff}.dark .dc-day.today{background:#1C2425;color:#ECEFE9}
+.dark .dc-day.gold{background:#2A2614;color:#E8B64A}
+.dark .dc-win{background:#2A2614}.dark .dc-win p{color:#C9CFC9}.dark .dc-win b{color:#ECEFE9}
+.dark .dc-h span,.dark .dc-perk small,.dark .dc-wbar span,.dark .dc-feat span,.dark .dc-gift span{color:#A3ABA6}
+.dark .dc-use.off,.dark .dc-tm{background:#263031}.dark .dc-wbar span.go{color:var(--green-d)}.dark .dc-mini{background:#0F1415}.dark .dc-gift{background:#2A2614}.dark .dc-feat i{background:#22301F}
 </style>
 
 <div id="app">
@@ -311,6 +396,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
       <button class="tool" data-act="boost" aria-label="Income boost"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg><span class="tag lime" id="boostTag" hidden>2X</span></button>
       <button class="tool" data-act="ranks" aria-label="Rich list"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21v-6h4v6M10 21V9h4v12M15 21v-9h4v9"/></svg></button>
       <button class="tool" data-act="mail" aria-label="Mailbox"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg><span class="dot" id="mailDot" hidden>!</span></button>
+      <button class="tool" data-act="daily" id="dailyTool" aria-label="Daily chance"><svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="1.5"/><path d="M10 9.3a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6.9v.8M12 15.6v.2"/></svg><span class="dot" id="dailyDot" hidden>!</span></button>
+      <button class="tool" data-act="perks" id="perksTool" aria-label="Your perks"><svg viewBox="0 0 24 24"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8"/><path d="M3 8a2 2 0 0 1 2-2h11V4"/><path d="M15 12.5h5v3h-5z"/></svg><span class="dot y" id="perksDot" hidden>0</span></button>
     </div>
   </section>
   <section id="panel"></section>
@@ -452,11 +539,14 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>Date.now();
 const fresh=()=>({name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
- nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now()});
+ nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
+ dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false});
 function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
 function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
  if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
  const st=Object.assign(fresh(),d,{ach:Object.assign({},d.ach||{})});
+ st.dc=Object.assign({last:'',streak:0,got:null},d.dc||{});st.perks=Object.assign({mgr:[],jail:0,boost:0,crew:0,clean:0},d.perks||{});if(!Array.isArray(st.perks.mgr))st.perks.mgr=[];
+ if(d.dc===undefined&&!d.dcSeen&&d.owned.length)st.dcGift=true;
  st.owned=d.owned.map(o=>{const b=o.code!=null?BY[o.code]:B[o.bid];if(!b)return null;const c=Object.assign({level:1,stored:0,inv:0,busy:null},o,{bid:b.id});delete c.code;return c}).filter(Boolean);
  const seen=new Set();st.owned=st.owned.filter(o=>!seen.has(o.bid)&&seen.add(o.bid));
  st.cur=Math.max(0,Math.min(st.cur|0,st.owned.length-1));st.tier=Math.max(1,Math.min(11,st.tier|0||1));
@@ -490,16 +580,17 @@ function pay(b,v){if(gemPay(b))s.gems-=v;else s.cash-=v}
 const buyPrice=b=>b.secret?0:b.price;
 const own=bid=>s.owned.find(o=>o.bid===bid);
 const boostOn=()=>now()<s.boostUntil;
+const mgrOn=()=>now()<(s.mgrUntil||0);const cleanOn=()=>now()<(s.cleanUntil||0);
 const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*(boostOn()?2:1);
 const threatRaw=()=>s.owned.reduce((a,o)=>a+st(o).threat,0);
-const threat=()=>Math.max(0,threatRaw());
-const nw=()=>s.cash+s.owned.reduce((a,o)=>a+o.stored+o.inv,0);
+const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
+const nw=()=>s.cash+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
 let friends=[],friendsLoaded=false;
 const FCOL=['#FF7A3D','#5AB8F0','#8A6FE0','#2FA877','#EF6F9A','#F5B946'];
 function board(){return RIVALS.map(r=>[r[0],r[0],r[1],r[2],r[3]]).concat(friends.map((f,i)=>['@f:'+f.user_id,f.name||'Friend','Friend',+f.net_worth||0,FCOL[i%FCOL.length]]),[['@me',s.name||'You','You',nw(),'#3E9B37']]).sort((a,b)=>b[3]-a[3])}
 const myRank=()=>board().findIndex(r=>r[0]==='@me')+1;
 const sellable=o=>{const b=B[o.bid];return b.sellT===1||b.sellT===3};
-const sellValue=o=>{const b=B[o.bid];return(b.sellT===3?b.price*.05:o.inv*b.sellP/100)+o.stored};
+const sellValue=o=>{const b=B[o.bid];return(b.sellT===3?b.price*.05:o.inv*b.sellP/100)+o.stored+(o.safe||0)};
 const lvlOf=code=>own(BY[code].id)?.level||0;
 const built=code=>{const o=own(BY[code].id);return!!o&&o.busy!=='build'};
 function condOk(c){return c[0]==='nw'?nw()>=c[1]:c[0]==='own'?c[1].every(built):c[1]===undefined?true:c[2].every(k=>lvlOf(k)>=c[1])}
@@ -519,7 +610,7 @@ function floaty(x,y,txt,col){const f=document.createElement('div');f.className='
 
 /* ================= simulation ================= */
 // sentence length comes from the original busted table (by net worth); severity from your threat level
-function arrest(at){const th=threat(),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
+function arrest(at){if(s.perks.jail>0){s.perks.jail--;s.dodged=(s.dodged||0)+1;return}const th=threat(),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
  s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
@@ -528,8 +619,11 @@ function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=
  while(t>=s.nextCheck){if(s.jail&&s.nextCheck>=s.jail.until)s.jail=null;
   if(!s.jail&&nw()>=BUSTED[0][0]){const th=threat();if(th>0&&Math.random()<Math.pow(th/100,2)*.3)arrest(s.nextCheck)}s.nextCheck+=30000}
  let gained=0;
- if(!(s.jail&&t<s.jail.until)){for(const o of s.owned){if(o.busy){o.from=0;continue}const x=st(o),st0=Math.max(from,o.from||0),ms=Math.max(0,t-st0),bms=Math.max(0,Math.min(t,s.boostUntil)-st0);
-  const before=o.stored;o.stored=Math.min(x.hold,o.stored+x.rate*(ms+bms)/60000);gained+=o.stored-before;o.from=0}}
+ if(!(s.jail&&t<s.jail.until)){for(const o of s.owned){if(o.busy){o.from=0;continue}const x=st(o),st0=Math.max(from,o.from||0);
+  const earn=(a,b)=>b>a?x.rate*((b-a)+Math.max(0,Math.min(b,s.boostUntil)-a))/60000:0;
+  // while a manager is on duty, cash past max capacity goes into the safe instead of being lost
+  const me=Math.max(st0,Math.min(t,s.mgrUntil||0)),before=o.stored+(o.safe||0);let v=o.stored+earn(st0,me);
+  if(v>x.hold){o.safe=(o.safe||0)+v-x.hold;v=x.hold}o.stored=Math.min(x.hold,v+earn(me,t));gained+=o.stored+(o.safe||0)-before;o.from=0}}
  if(s.jail&&t>=s.jail.until){s.jail=null;if(!quiet){toast('You walked free. Back to business!','good');closeJail()}}
  if(!quiet)done.forEach(([o,k])=>toast(`${B[o.bid].name} ${k==='up'?'is now level '+o.level:'is open for business!'}`,'good'));
  while(s.tier<11&&tierReady(s.tier+1)){s.tier++;if(!quiet)toast(`New businesses unlocked: ${TIERS[s.tier]}`,'good')}
@@ -541,14 +635,14 @@ $('city').innerHTML=citySVG();
 function layout(){const w=stage.clientWidth,hh=stage.clientHeight;if(!w||!hh)return;const sc=Math.max(w/VW,hh/VH),ox=w/2,oy=(hh-VH*sc)/2-VY*sc;
  BW=Math.round(Math.min(84,Math.max(54,w*.17)));BH=Math.round(BW*37/64);
  document.documentElement.style.setProperty('--bw',BW+'px');document.documentElement.style.setProperty('--bh',BH+'px');
- const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
+ VIEW={sc,ox,oy};const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
  SP=Math.max(3.5,BH*.13);PILE=Math.max(12,Math.min(40,Math.floor((hh*.8-BH)/SP)+1));try{stackN=-1}catch(e){}}
-let stageSig='',stackN=-1;
+let stageSig='',stackN=-1,VIEW={sc:1,ox:0,oy:0};
 function sigNow(){const o=cur();return o?`${o.bid}|${o.busy||''}|${o.level}|${s.owned.length}|${s.cur}`:'none|'+s.owned.length}
 function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML='';$('tube').hidden=true;artEl.dataset.p='';
  let L='';
  if(s.owned.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous business"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next business"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><div class="pager num">${s.cur+1} / ${s.owned.length}</div>`;
- L+=`<div class="boost num" id="boostChip" hidden></div>`;
+ L+=`<div class="boost num" id="boostChip" hidden></div><div class="duty" id="duty" hidden><svg viewBox="0 0 20 20"><path d="M13 2a8 8 0 1 0 5 13A7 7 0 0 1 13 2z" fill="#F5B946"/></svg><div style="min-width:0"><b id="dutyT">Manager on duty</b><small class="num" id="dutyS"></small></div></div>`;
  if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`;
@@ -557,26 +651,28 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p></div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
  }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(art(b),TOPS[b.vis]);artEl.dataset.act='collect';
-  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div>
+  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" hidden>${MGR}<span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>TIER ${b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
    ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span></div>`:
     `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span></div>`}</div></div>
-   ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<span id="camt">0</span></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
+   ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boostOn();if(boostOn())bc.textContent='2X INCOME · '+dur((s.boostUntil-now())/1000)}
+ {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty';$('dutyS').textContent='Earning past full · '+dur((s.mgrUntil-now())/1000)+' left'}}}
  if(!o)return;
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
  const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));return}
- $('camt').textContent=money(o.stored);$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
- const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full;
+ const sf=o.safe||0;$('camt').textContent=money(o.stored+sf);{const c=$('csafe');c.hidden=!(sf>=1);if(sf>=1)c.textContent='incl. '+$m(sf)+' from the safe'}
+ {const f=$('mgrfig');f.hidden=!mgrOn();if(mgrOn()){const[X,Y]=P(-30,50,0);f.style.left=Math.round(VIEW.ox+X*VIEW.sc-28)+'px';f.style.top=Math.round(VIEW.oy+Y*VIEW.sc-62)+'px'}}$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
+ const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full||sf>=1;{const sb=$('safeb');sb.hidden=!(sf>=1);if(sf>=1)sb.textContent='+'+$m(sf)+' in the safe'}
  $('upBtn').classList.toggle('can',s.cash>=x.up);
  const gm=$('getmore');if(gm)gm.hidden=s.seenShop||!(s.owned.length<4&&B.some(b=>!own(b.id)&&available(b)&&canPay(b,buyPrice(b))));
  const n=full?PILE:Math.floor(o.stored/x.hold*PILE);
- const ff=$('fullflag');if(ff)ff.style.top=(colEl.offsetTop+colEl.clientHeight-n*SP-BH-30)+'px';
+ const ff=$('fullflag'),ftop=(colEl.offsetTop+colEl.clientHeight-n*SP-BH-30)+'px';if(ff)ff.style.top=ftop;$('safeb').style.top=ftop;
  if(n!==stackN){const h=colEl.clientHeight||200;
   const billAt=i=>`<div class="bill" style="bottom:${i*SP}px;left:${JIT[i%JIT.length]}px">${BILL}</div>`;
   if(n<stackN||stackN<0){colEl.innerHTML='';for(let i=0;i<n;i++)colEl.insertAdjacentHTML('beforeend',billAt(i))}
@@ -603,12 +699,13 @@ function hud(){$('nw').textContent=money(nw());
  const fr=s.freeAt<=now();$('freeTag').textContent=fr?'FREE':dur((s.freeAt-now())/1000);$('freeTag').className=fr?'tag':'tag sm';
  $('boostTag').hidden=!boostOn();
  const cr=s.chestAt<=now();$('chestT').textContent=cr?'OPEN!':dur((s.chestAt-now())/1000);
- $('mailDot').hidden=!ACH.some(a=>s.ach[a[0]]===1)}
+ $('mailDot').hidden=!ACH.some(a=>s.ach[a[0]]===1);
+ $('dailyDot').hidden=!dcReady();{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
 
 /* ================= actions ================= */
 function jailNag(){toast("You're behind bars. Serve your time first.",'bad')}
-function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const a=o.stored;if(a<1){toast('Nothing to collect yet. Bills are on their way.');return}
- s.cash+=a;s.earned+=a;o.stored=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
+function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const a=o.stored+(o.safe||0);if(a<1){toast('Nothing to collect yet. Bills are on their way.');return}
+ s.cash+=a;s.earned+=a;o.stored=0;o.safe=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
  const tgt=$('cash').getBoundingClientRect(),bills=[...colEl.children].reverse(),last=bills.length-1;
  bills.forEach((bEl,i)=>{const r=bEl.getBoundingClientRect();const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=r.left+'px';f.style.top=r.top+'px';document.body.appendChild(f);bEl.style.visibility='hidden';
   const dx=tgt.left+tgt.width*.25-r.left,dy=tgt.top-r.top,lift=-60-Math.random()*40,side=(Math.random()-.5)*60;
@@ -619,16 +716,17 @@ function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)ret
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);
  if(!canPay(b,p))return toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
- pay(b,p);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+b.time*1000,total:b.time*1000});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
+ pay(b,p);const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
 function upgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
- pay(b,x.up);if(!gemPay(b))o.inv+=x.up;s.cash+=o.stored;o.stored=0;o.busy='up';o.total=Math.max(1,x.upTime)*1000;o.end=now()+o.total;closeOv();save();upd()}
+ pay(b,x.up);if(!gemPay(b))o.inv+=x.up;s.cash+=o.stored+(o.safe||0);o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
 function step(d){if(s.owned.length<2)return;s.cur=(s.cur+d+s.owned.length)%s.owned.length;upd()}
 
 /* ================= overlays ================= */
 const ovl=$('ovl');let ovKind=null;
-function closeOv(){ovl.innerHTML='';ovKind=null}
+let nextUp=null;
+function closeOv(){ovl.innerHTML='';ovKind=null;if(nextUp){const f=nextUp;nextUp=null;setTimeout(f,250)}}
 function dialog(title,body,btns,kind){ovKind=kind||'dlg';ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dlg"><h3>${title}</h3><div class="body">${body}${btns?`<div class="btns">${btns}</div>`:''}</div></div></div>`}
 function sheet(title,body,kind){ovKind=kind;ovl.innerHTML=`<div class="sheet" data-act="dimclose"><div class="sheet-in"><div class="sheet-h"><svg viewBox="0 0 24 24" style="opacity:.0"><path d="M0 0"/></svg><h3>${title}</h3><button data-act="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div class="sheet-b" id="sb">${body}</div></div></div>`}
 
@@ -657,9 +755,9 @@ function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
  if(!sellable(o))return dialog("Can't sell",`<div class="pic">${art(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> can never be sold.</p><p class="s">${b.threat<0?'Threat reducers stay with you for good.':'Businesses bought with crystals stay with you for good.'}</p>`,`<button class="ok" data-act="close">OK</button>`);
  dialog(`Sell ${esc(b.name)}`,`<div class="pic">${art(b)}</div><p>Sell <span class="hl">${esc(b.name.toUpperCase())}</span> for <span class="hlg num">${COIN} ${money(sellValue(o))}</span>?</p><p class="s">You get back ${b.sellT===3?'5% of its value':b.sellP+'% of what you invested'}, plus anything stored.</p>`,
  `<button class="no" data-act="close">No</button><button class="yes" data-act="dosell">Yes</button>`)}
-function threatDlg(){const th=threatRaw(),risk=100*(1-Math.pow(1-Math.pow(Math.max(0,th)/100,2)*.3,2));
+function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),risk=100*(1-Math.pow(1-Math.pow(Math.max(0,th)/100,2)*.3,2));
  dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(Math.max(0,th))}%</span></p><p class="s">Every 30 seconds the authorities may look into you. Higher threat means higher odds. Get caught and your riskiest business is seized, you pay a 10% fine and go to jail.</p>
- <div class="cmp num"><span>Chance of a raid each minute</span><span></span><span style="color:var(--red)">${risk.toFixed(1)}%</span>${th<0?`<span>Spare cover</span><span></span><span>${Math.round(-th)}%</span>`:''}</div><p class="s">Keep it under 30%. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
+ <div class="cmp num"><span>Chance of a raid each minute</span><span></span><span style="color:var(--red)">${risk.toFixed(1)}%</span>${th<0?`<span>Spare cover</span><span></span><span>${Math.round(-th)}%</span>`:''}</div>${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}<p class="s">Keep it under 30%. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
 function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
  const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
@@ -709,6 +807,103 @@ function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
  `<button class="no" data-act="close">Close</button><button class="yes" data-act="restore">Load code</button>`)}
 function howto(){dialog('How to play',`<p class="s" style="text-align:left;color:var(--ink)">1. Tap the shop button to buy a business.<br><br>2. Tap the building site to speed up construction, or finish it with crystals.<br><br>3. Bills pile up next to your business until it hits max capacity. Tap COLLECT before it fills.<br><br>4. Upgrade to earn more. Sell weak or risky businesses.<br><br>5. Keep threat low or you'll end up in jail.<br><br>6. Grow your net worth to unlock new tiers and climb the rich list.</p>`,`<button class="yes" data-act="close">Let's go</button>`)}
 
+/* ================= daily chance + perk wallet ================= */
+const MGR='<svg class="mg" viewBox="0 0 20 28" shape-rendering="crispEdges"><rect x="6" y="2" width="8" height="8" fill="#F2C99A"/><rect x="6" y="1" width="8" height="3" fill="#3B2A1E"/><rect x="7" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="8" width="4" height="1" fill="#B85C3A"/><rect x="4" y="11" width="12" height="11" fill="#1F3A5F"/><rect x="9" y="11" width="2" height="9" fill="#F5B946"/><rect x="8" y="11" width="1" height="3" fill="#fff"/><rect x="11" y="11" width="1" height="3" fill="#fff"/><rect x="15" y="14" width="4" height="6" fill="#C98A55"/><rect x="16" y="15" width="2" height="1" fill="#fff"/><rect x="16" y="17" width="2" height="1" fill="#fff"/><rect x="5" y="22" width="4" height="5" fill="#16223A"/><rect x="11" y="22" width="4" height="5" fill="#16223A"/></svg>';
+const PICON={
+ cash:'<svg viewBox="0 0 40 30"><rect x="4" y="16" width="32" height="10" rx="2" fill="#2C7526"/><rect x="2" y="10" width="32" height="10" rx="2" fill="#43B14F" stroke="#1E5A1A"/><rect x="6" y="4" width="32" height="10" rx="2" fill="#5DBB4F" stroke="#1E5A1A"/><circle cx="22" cy="9" r="3.4" fill="#B9EBAF"/></svg>',
+ gems:'<svg viewBox="0 0 30 30"><polygon points="7,5 23,5 28,12 15,27 2,12" fill="#4AAFE3"/><polygon points="2,12 28,12 15,27" fill="#2F8DC0"/><polygon points="7,5 12,12 15,5" fill="#9ED6F0"/></svg>',
+ jail:'<svg viewBox="0 0 30 30"><rect x="3" y="6" width="24" height="18" rx="3" fill="#F5B946" stroke="#C98F1E" stroke-width="1.5"/><g fill="#7A4B10"><rect x="8" y="10" width="2" height="10"/><rect x="14" y="10" width="2" height="10"/><rect x="20" y="10" width="2" height="10"/></g><circle cx="22" cy="20" r="5" fill="#3E9B37"/><path d="M19.6 20l1.6 1.6 3-3.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>',
+ boost:'<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#B5D43B"/><path d="M16 4L7 17h7l-1 9 9-13h-7z" fill="#2C7526"/></svg>',
+ crew:'<svg viewBox="0 0 30 30"><path d="M5 19a10 10 0 0 1 20 0z" fill="#F5B946"/><rect x="3" y="19" width="24" height="4" rx="2" fill="#E08A1E"/><rect x="13" y="8" width="4" height="9" fill="#E08A1E"/></svg>',
+ clean:'<svg viewBox="0 0 30 30"><path d="M15 2l11 4v8c0 7-5 12-11 14C9 26 4 21 4 14V6z" fill="#3E9B37"/><path d="M10 15l3.5 3.5L20.5 11" stroke="#fff" stroke-width="3" fill="none"/></svg>',
+ mgr:MGR};
+const BOOST_MIN=30,CLEAN_H=12,CREW_N=3;
+const mgrName=h=>(h>8.01?Math.round(h)+'-hour manager':'Night manager');
+const mgrHours=n=>Math.min(24,8+4*(Math.ceil(n/7)-1)); // week 1: 8h, week 2: 12h ... up to 24h
+function dayKey(t,off=0){const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+const dayStart=(t,off=0)=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getTime()};
+const dcReady=()=>s.dc.last!==dayKey(now());
+// streak so far: still alive if your last pick was today or yesterday
+const dcAlive=()=>s.dc.last===dayKey(now())||s.dc.last===dayKey(now(),-1)?s.dc.streak:0;
+const dcToday=()=>dcReady()?dcAlive()+1:s.dc.streak; // the streak day you're on today
+const perkCount=()=>s.perks.mgr.length+s.perks.jail+s.perks.boost+s.perks.crew+s.perks.clean;
+function crewTime(ms){if(s.crew>0){s.crew--;toast(`Builder's crew on the job: twice as fast${s.crew?` (${s.crew} left)`:''}`,'good');return Math.max(1000,ms/2)}return ms}
+const nextIn=()=>dur((dayStart(now(),1)-now())/1000);
+function prizeInfo(p){switch(p.k){
+ case'cash':return{n:'Cash bundle',sm:$m(p.v),d:'Added to your cash straight away.',r:'c'};
+ case'gems':return{n:'Crystals',sm:'× '+p.v,d:'Added to your crystals straight away.',r:'c'};
+ case'boost':return{n:'2× boost · 30 min',sm:'Double income',d:'Double all income for 30 minutes, whenever you choose.',r:'c'};
+ case'crew':return{n:"Builder's crew",sm:'3 jobs, 2× fast',d:'Your next 3 builds or upgrades finish twice as fast.',r:'c'};
+ case'clean':return{n:'Clean record',sm:'−20% threat',d:'Lowers your threat by 20% for 12 hours.',r:'c'};
+ case'jail':return{n:'Get out of jail free',sm:'Skip one arrest',d:'Used automatically the next time you\'re busted.',r:'r'};
+ case'mgr':return{n:mgrName(p.v),sm:p.v+'-hour shift',d:'Your businesses keep earning past full. Extra cash goes in the safe.',r:'r'}}}
+function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day]].filter(x=>!avoid.includes(x[0]));
+ let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
+ const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?8:1;return{k,v}}
+function dcPick(i){if(!dcReady())return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
+ for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
+ if(pos===7)cards[i]={k:'mgr',v:mgrHours(n),streak:true};
+ const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now())}};s.dcSeen=true;
+ if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems')s.gems+=p.v;else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
+ vib([20,30,20]);save();upd();openDaily()}
+function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7),h=mgrHours(n);
+ let d='';for(let i=1;i<=7;i++){const done=i<pos||(i===pos&&picked),today=i===pos&&!picked,gold=i===7;
+  d+=`<div class="dc-day${done?' done':''}${today&&!gold?' today':''}${gold?' gold':''}">${gold&&!done?MGR:done?'<i>✓</i>':today?'<i>★</i>':''}${today?'TODAY':'DAY '+i}</div>`}
+ return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: ${h}-hour manager</span></div><div class="dc-days">${d}</div></div>`}
+function prizeCard(p,win){const f=prizeInfo(p);
+ if(!win)return`<div class="dc-rc">${PICON[p.k]}<b>${esc(f.n)}</b><small class="num">${esc(f.sm)}</small></div>`;
+ return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
+const wbar=()=>{const n=perkCount();return`<button type="button" class="dc-wbar" data-act="perks">${PICON.cash}<div><b>Your perks</b><span>${n?n+' waiting in your wallet':'Nothing saved yet'}</span></div><span class="go">OPEN</span></button>`};
+function dailyBody(){
+ if(dcReady()){const n=dcToday(),pos=(n-1)%7+1;
+  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your ${mgrHours(n)}-hour manager`:'One card per day. Better odds the longer your streak.'}</span></div>
+  <div class="dc-cards">${[0,1,2].map(i=>`<div class="dc-card" role="button" tabindex="0" aria-label="Card ${i+1}" data-act="dcpick" data-v="${i}"><div class="pat"></div><div class="q">?</div></div>`).join('')}</div>
+  <div class="dc-hint">Could be cash, crystals, a jail-free card… or a manager</div>${wbar()}`}
+ const g=s.dc.got;if(!g||!g.cards)return streakHTML()+`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
+ const p=g.cards[g.pick],o=g.cards.filter((_,j)=>j!==g.pick),f=prizeInfo(p);
+ const head=p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
+ let btns='';
+ if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it before bed from your perk wallet</small></button>`;
+ else if(['boost','crew','clean'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
+ else btns=`<button class="dc-bb" data-act="close">${p.k==='cash'||p.k==='gems'?'Collect':'Got it'}</button>`;
+ return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>The cards you didn't pick are shown too</span></div>
+ <div class="dc-rev">${prizeCard(o[0])}${prizeCard(p,true)}${prizeCard(o[1])}</div>
+ <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
+function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
+function perksBody(){let a='',w='';const t=now();
+ if(mgrOn())a+=`<div class="dc-perk">${MGR}<div><b>${mgrName(s.mgrTotal/36e5)} on duty</b><small>Earning past full · <span id="pt-mgr" class="num">${dur((s.mgrUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-mgr" style="width:${Math.max(0,(s.mgrUntil-t)/s.mgrTotal*100)}%"></i></div></div><div></div></div>`;
+ if(cleanOn())a+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record</b><small>Threat −20% · <span id="pt-clean" class="num">${dur((s.cleanUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-clean" style="width:${Math.max(0,(s.cleanUntil-t)/(CLEAN_H*36e5)*100)}%"></i></div></div><div></div></div>`;
+ if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>2× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
+ if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
+ const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
+ Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h} hours of earning past full.${h<=8?' Start it before bed.':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
+ if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Used automatically the next time you're busted.</small></div><span class="dc-use off">READY</span></div>`;
+ if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
+ if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
+ if(s.perks.clean)w+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record<span class="n">×${s.perks.clean}</span></b><small>Lowers your threat by 20% for 12 hours.</small></div><button class="dc-use" data-act="perkuse" data-v="clean">USE</button></div>`;
+ return(a?`<div class="dc-sec">Active now</div>${a}`:'')+`<div class="dc-sec">In your wallet</div>`+(w||`<div class="dc-perk" style="grid-template-columns:1fr"><div><b>No perks saved</b><small>Pick a card in Daily chance every day to win managers, boosts and more.</small></div></div>`)+
+ `<div class="dc-hint">Perks never expire until you use them</div>`+(dcReady()?`<div class="dc-btns" style="padding-top:0"><button class="dc-bb" data-act="daily">Pick today's card</button></div>`:'')}
+function openPerks(){sheet('Your perks',perksBody(),'perks')}
+function usePerk(v){const t=now();
+ if(v.startsWith('mgr:')){const h=+v.slice(4),i=s.perks.mgr.indexOf(h);if(i<0)return;s.perks.mgr.splice(i,1);
+  if(mgrOn()){s.mgrUntil+=h*36e5;s.mgrTotal+=h*36e5;toast(`Shift extended by ${h} hours`,'good')}else{s.mgrUntil=t+h*36e5;s.mgrTotal=h*36e5;toast(`${mgrName(h)} on duty for ${h} hours`,'good')}}
+ else if(v==='boost'){if(!s.perks.boost)return;s.perks.boost--;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('2× income for 30 minutes!','good')}
+ else if(v==='crew'){if(!s.perks.crew)return;s.perks.crew--;s.crew=(s.crew||0)+CREW_N;toast("Builder's crew hired: your next 3 jobs are twice as fast",'good')}
+ else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
+ vib(15);save();closeOv();upd()}
+function updPerkUI(){if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
+ if(ovKind==='perks'){const t=now();
+  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot)b.style.width=Math.max(0,(end-t)/tot*100)+'%'}}}
+const dcIntroDue=()=>!s.dcSeen&&s.owned.length>0;
+function dcIntro(){const gift=!!s.dcGift;if(gift){s.perks.mgr.push(8);s.dcGift=false}s.dcSeen=true;save();ovKind='dcintro';nextUp=()=>{if(!ovKind)notifyPrompt()};
+ ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dc-modal" role="dialog" aria-label="Daily chance is here"><div class="dc-mh"><div class="dc-new">NEW</div><h2>Daily chance is here</h2><p>A free pick, every day</p></div>
+ <div class="dc-mini">${[0,1,2].map(()=>'<div class="dc-card"><div class="pat"></div><div class="q">?</div></div>').join('')}</div>
+ <div class="dc-feat"><i>1</i><div><b>Pick one card a day</b><span>Cash, crystals, a jail-free card, a 2× boost or a manager.</span></div></div>
+ <div class="dc-feat"><i>2</i><div><b>Keep your streak</b><span>Come back 7 days in a row and day 7 is always a manager. Every week you keep it going, the shift gets longer: 8, 12, 16, 20, then 24 hours.</span></div></div>
+ <div class="dc-feat"><i>3</i><div><b>Save perks for later</b><span>Everything waits in your perk wallet until you use it.</span></div></div>
+ ${gift?`<div class="dc-gift">${MGR}<div><small>WELCOME GIFT · FOR EARLY PLAYERS</small><b>Free Night manager</b><span>Already in your wallet. Start it before bed tonight.</span></div></div>`:''}
+ <div class="dc-btns" style="padding:18px 16px"><button class="dc-bb" data-act="daily">Pick my first card</button></div></div></div>`}
+
 /* jail */
 function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  ovl.innerHTML=`<div class="fullscreen" id="jail"><div class="bars"></div><h2>BUSTED!</h2><p style="margin:0;font-weight:700">Your ${j.th}% threat caught up with you.</p><div class="tm num" id="jt"></div><div id="jbar"><i id="jb"></i></div>
@@ -757,6 +952,10 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'unfriend':{const fr=friends.find(x=>x.user_id===el.dataset.v);if(!fr)break;dialog('Remove friend?',`<p>Remove <span class="hl">${esc(fr.name)}</span>?</p><p class="s">You'll stop seeing each other on the Friends leaderboard. You can reconnect any time with a new invite code.</p>`,`<button class="no" data-act="close">Cancel</button><button class="yes" data-act="dounfriend" data-v="${fr.user_id}">Remove</button>`,'unfriend');break}
   case'dounfriend':{const id=el.dataset.v;supa.rpc('remove_friend',{friend:id}).then(()=>{friends=friends.filter(x=>x.user_id!==id);toast('Friend removed');sheet('Rich list',ranksBody('friends'),'ranks')},()=>toast("Couldn't remove. Try again.",'bad'));break}
   case'mail':sheet('Mailbox',mailBody(),'mail');break;
+  case'daily':if(s.jail)return jailNag();openDaily();break;
+  case'dcpick':dcPick(+el.dataset.v);break;
+  case'perks':openPerks();break;
+  case'perkuse':usePerk(el.dataset.v);break;
   case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
   case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);s.cash+=c;s.gems+=2;s.freeAt=now()+6e5;
    dialog('Free gift!',`<p>You got<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">2 crystals</span></p><p class="s">Come back in 10 minutes for another one.</p>`,`<button class="yes" data-act="close">Thanks</button>`);upd();break}
@@ -782,7 +981,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
    if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
   case'dark':darkOn=!darkOn;try{localStorage.setItem(DKEY,darkOn?'1':'0')}catch(e){}applyDark();el.setAttribute('aria-checked',darkOn);break;
   case'reset':if(el.dataset.arm!=='1'){el.dataset.arm='1';el.textContent='Tap again to wipe everything';return}s=fresh();save();lastRank=null;closeOv();upd();askName();break;
-  case'begin':closeOv();if(s.jail)openJail();else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null}else notifyPrompt();break;
+  case'begin':closeOv();if(s.jail){openJail();if(dcIntroDue())nextUp=dcIntro}else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null;if(dcIntroDue())nextUp=dcIntro}else if(dcIntroDue())dcIntro();else notifyPrompt();break;
   case'notifon':enablePush();break;
   case'notiflater':try{localStorage.setItem(NASK,String(now()))}catch(e){}closeOv();break;
   case'notifoff':disablePush().then(()=>toast('Notifications off'));break;
@@ -862,22 +1061,29 @@ function enablePush(){if(!pushCapable()){closeOv();return toast('Add the game to
 async function disablePush(){try{const sub=await swReg?.pushManager.getSubscription();if(sub){await supa?.from('push_subs').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe()}}catch(e){}pushOn=false;refreshAcct()}
 function notifyPrompt(force){const st=notifState();if(st!=='ask')return false;
  if(!force){let last=0;try{last=+localStorage.getItem(NASK)||0}catch(e){}if(now()-last<3*864e5)return false}
- dialog('Never miss a payday',`<p>Get a notification when:</p><div class="cmp" style="grid-template-columns:1fr"><span>• a business is full and ready to collect</span><span>• construction or an upgrade finishes</span><span>• you're released from jail</span></div><p class="s">You'll get one each time a business fills, so you can empty it straight away.</p>`,
+ dialog('Never miss a payday',`<p>Get a notification when:</p><div class="cmp" style="grid-template-columns:1fr"><span>• a business is full and ready to collect</span><span>• construction or an upgrade finishes</span><span>• you're released from jail</span><span>• your daily chance is ready</span></div><p class="s">You'll get one each time a business fills, so you can empty it straight away.</p>`,
   `<button class="no" data-act="notiflater" style="font-size:16px">Not now</button><button class="yes" data-act="notifon" style="font-size:16px">Turn on</button>`,'notif');return true}
 // When things will happen, so the server knows when to ping. Recomputed on every sync.
 function notifyInfo(){const t=now(),out={away:!!isAway};const jailEnd=s.jail&&s.jail.until>t?s.jail.until:0;if(jailEnd)out.jailAt=jailEnd;
- let build=null;const fulls=[];
+ let build=null,mgrSafe=0;const fulls=[];
  for(const o of s.owned){const b=B[o.bid],x=st(o);
   if(o.busy&&(!build||o.end<build.at))build={at:o.end,name:b.name,kind:o.busy,level:o.level+1};
   if(!(x.rate>0))continue;let start=o.busy?o.end:t;if(jailEnd&&start<jailEnd)start=jailEnd;const stored=o.busy?0:(o.stored||0);
+  const fillAt=start+(x.hold-stored)/x.rate*60000;
+  if(mgrOn()){mgrSafe+=(o.safe||0)+x.rate*Math.max(0,s.mgrUntil-Math.max(fillAt,t))/60000;
+   // a manager keeps it earning, so it only counts as full once the shift ends
+   fulls.push({at:Math.round(Math.max(fillAt,s.mgrUntil)),name:b.name,amount:money(x.hold+(o.safe||0)+x.rate*Math.max(0,s.mgrUntil-Math.max(fillAt,t))/60000)});continue}
   if(!o.busy&&stored>=x.hold-1e-9)continue;
-  fulls.push({at:Math.round(start+(x.hold-stored)/x.rate*60000),name:b.name,amount:money(x.hold)})}
+  fulls.push({at:Math.round(fillAt),name:b.name,amount:money(x.hold)})}
+ if(mgrOn()){out.mgrEndAt=Math.round(s.mgrUntil);out.mgrSafe=money(mgrSafe);out.mgrName=mgrName(s.mgrTotal/36e5)}
+ // daily chance: remind at 8am on the day the next pick is ready
+ out.dailyAt=dayStart(t,dcReady()?0:1)+8*36e5;out.dailyDay=dcReady()?dcAlive()+1:s.dc.streak+1;
  // every business's fill time, soonest first, so the server can name whichever ones fill
  fulls.sort((p,q)=>p.at-q.at);out.fulls=fulls.slice(0,60);
  if(build){out.buildAt=Math.round(build.at);out.buildName=build.name;out.buildKind=build.kind;out.buildLevel=build.level}
  return out}
 function notifRow(){const st=notifState();if(st==='off')return'';
- const txt={unsupported:['Notifications','Open the game from its Home Screen icon to turn these on.'],blocked:['Notifications are blocked','Turn them on in iPhone Settings › Notifications › Trillionaire.'],signin:['Notifications','Sign in above to get notified when cash is ready.'],ask:['Notifications','Get told when cash is full, builds finish or you leave jail.'],on:['Notifications are on',"We'll ping you when cash is ready."]}[st];
+ const txt={unsupported:['Notifications','Open the game from its Home Screen icon to turn these on.'],blocked:['Notifications are blocked','Turn them on in iPhone Settings › Notifications › Trillionaire.'],signin:['Notifications','Sign in above to get notified when cash is ready.'],ask:['Notifications','Get told when cash is full, builds finish, you leave jail or your daily chance is ready.'],on:['Notifications are on',"We'll ping you when cash is ready."]}[st];
  const btn=st==='ask'?`<button class="bigbtn" data-act="notifon" style="padding:10px 14px;font-size:13px;width:auto">Turn on</button>`:st==='on'?`<button class="bigbtn ghost" data-act="notifoff" style="padding:10px 14px;font-size:13px;width:auto">Turn off</button>`:'';
  return`<div class="pad" style="padding-bottom:0;padding-top:8px"><div class="acct"><div style="min-width:0"><b>${txt[0]}</b><small>${txt[1]}</small></div>${btn}</div></div>`}
 
@@ -913,7 +1119,7 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
-function tick(){const wasJ=!!s.jail;advance(now());if(s.jail&&!wasJ){openJail();vib([60,40,60])}if(s.jail)updJail();checkAch();upd()}
+function tick(){const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}if(s.jail)updJail();checkAch();upd()}
 const wasJ0=!!s.jail;const away=advance(now(),true);
 if(s.name&&away.dt>60000&&(away.gained>0||away.done))pendingWelcome=[away,!wasJ0&&!!s.jail];
 lastRank=myRank();upd();splash();
@@ -925,5 +1131,4 @@ cloudInit();
 setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
 const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):start();
 })();
-</script>
-</body></html>
+</script></body></html>

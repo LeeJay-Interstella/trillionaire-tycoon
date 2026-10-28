@@ -176,3 +176,13 @@ Players can connect privately with an invite code and see each other on the **Ri
 4. **Remove** a friend with the ✕ next to their name. **Make a new code** in the invite box stops your old code working.
 
 Only connected friends can see your boss name and net worth. Emails are never shown, and Supabase enforces this, not just the game.
+
+---
+
+## Daily chance and perks
+
+Once a day, players pick 1 of 3 cards from the **Daily chance** button on the side rail. Prizes are cash, crystals, a 2× boost, builder's crew, clean record, a get-out-of-jail-free card or a Night manager. Saved perks wait in **Your perks** until used.
+
+- A 7-day streak always ends in a manager. Each week the streak continues, the shift gets longer: 8, 12, 16, 20, then 24 hours. Missing a day restarts the streak.
+- While a manager is on duty, businesses keep earning past full. The extra cash goes in the safe and is added to the next collect.
+- Notifications: "Your daily chance is ready" at 8am, and "Your manager's shift has ended". These need the latest `notify.ts` deployed in Supabase.
