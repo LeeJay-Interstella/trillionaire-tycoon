@@ -648,7 +648,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=20261029,MUST=20261029;
+/*build*/const BUILD=2026102902,MUST=2026102902;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -973,7 +973,7 @@ const PICON={
  manual:'<svg viewBox="0 0 30 30"><rect x="5" y="3" width="20" height="25" rx="2" fill="#8A6FE0"/><rect x="8" y="6" width="14" height="3" fill="#fff" opacity=".8"/><rect x="8" y="12" width="10" height="2" fill="#fff" opacity=".6"/><rect x="8" y="16" width="12" height="2" fill="#fff" opacity=".6"/><circle cx="21" cy="22" r="5" fill="#F5B946"/><path d="M21 19v6M18 22h6" stroke="#5A3A08" stroke-width="1.6"/></svg>'};
 const BOOST_MIN=30,CLEAN_H=12,CREW_N=3;
 const mgrName=h=>(h>8.01?Math.round(h)+'-hour manager':'Manager');
-const mgrHours=n=>8; // shifts are always 8 hours
+const MGR_H=[2,4,6,8],mgrHours=()=>MGR_H[Math.floor(Math.random()*MGR_H.length)]; // each manager works a random 2, 4, 6 or 8 hours
 function dayKey(t,off=0){const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 const dayStart=(t,off=0)=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getTime()};
 const dayNum=k=>{const p=String(k).split('-').map(Number);return new Date(p[0],p[1]-1,p[2]).getTime()};
@@ -995,17 +995,17 @@ function prizeInfo(p){switch(p.k){
  case'mgr':return{n:mgrName(p.v),sm:p.v+'-hour shift',d:'Your businesses keep earning past full. Extra cash goes in the safe.',r:'r'}}}
 function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day],['manual',4]].filter(x=>!avoid.includes(x[0]));
  let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
- const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?8:1;return{k,v}}
+ const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?mgrHours():1;return{k,v}}
 function dcPick(i){if(!dcReady()||(CLOCK_GUARD&&!clockChecked))return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
  for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
- if(pos===7)cards[i]={k:'mgr',v:mgrHours(n),streak:true};
+ if(pos===7)cards[i]={k:'mgr',v:mgrHours(),streak:true};
  const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};s.dcSeen=true;
  if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems')s.gems+=p.v;else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
  vib([20,30,20]);save();upd();openDaily()}
-function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7),h=mgrHours(n);
+function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7);
  let d='';for(let i=1;i<=7;i++){const done=i<pos||(i===pos&&picked),today=i===pos&&!picked,gold=i===7;
   d+=`<div class="dc-day${done?' done':''}${today&&!gold?' today':''}${gold?' gold':''}">${gold&&!done?MGR:done?'<i>✓</i>':today?'<i>★</i>':''}${today?'TODAY':'DAY '+i}</div>`}
- return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: free manager</span></div><div class="dc-days">${d}</div></div>`}
+ return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: free manager (2–8h)</span></div><div class="dc-days">${d}</div></div>`}
 function prizeCard(p,win){const f=prizeInfo(p);
  if(!win)return`<div class="dc-rc">${PICON[p.k]}<b>${esc(f.n)}</b><small class="num">${esc(f.sm)}</small></div>`;
  return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
