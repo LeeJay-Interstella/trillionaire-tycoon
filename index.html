@@ -723,7 +723,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102909,MUST=2026102909;
+/*build*/const BUILD=2026102910,MUST=2026102910;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1595,7 +1595,7 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
-function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}if(s.jail)updJail();checkAch();upd()}
+function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
 let clockReady=!CLOCK_GUARD;
 function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
