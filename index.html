@@ -525,6 +525,17 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dc-strip .b{gap:10px;font-size:16px;white-space:nowrap}
 .dc-strip .b svg{width:28px;height:26px;flex:none}
 .dc-odds.wrap{flex-wrap:wrap;max-width:300px}
+
+/* ===== police attention ticker (threat popup) ===== */
+.tkr{position:relative;align-self:stretch;margin:-4px -16px 0;height:34px;overflow:hidden;display:flex;align-items:center;color:#fff;--a:#9AA3AE;--b:#8C95A0;background:repeating-linear-gradient(135deg,var(--a) 0 18px,var(--b) 18px 36px)}
+.tkr.l1{--a:#7FD0F2;--b:#9BDCF6;color:#0E4D6B}.tkr.l2{--a:#F5A63A;--b:#F0962A}.tkr.l3{--a:#E04B3A;--b:#CC3E2E}.tkr.l4{--a:#A8231B;--b:#8E1C15}
+.tkt{display:flex;white-space:nowrap;animation:tkr 16s linear infinite;will-change:transform}
+.tkt span{font-weight:900;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;padding:0 14px;display:inline-flex;align-items:center;gap:14px}
+.tkt span:after{content:"";width:6px;height:6px;background:currentColor;opacity:.6;transform:rotate(45deg)}
+@keyframes tkr{to{transform:translateX(-50%)}}
+.tkr.flash:before{content:"";position:absolute;inset:0;background:#fff;opacity:0;animation:tkrflash 1.6s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes tkrflash{0%,100%{opacity:0}50%{opacity:.18}}
+@media (prefers-reduced-motion: reduce){.tkt{animation:none}.tkr.flash:before{animation:none}}
 </style>
 
 <div id="app">
@@ -692,7 +703,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102906,MUST=2026102906;
+/*build*/const BUILD=2026102907,MUST=2026102907;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -956,8 +967,9 @@ function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
 // threat colour bands: 1 very low (blue), 2 low (orange), 3 medium (red), 4 high and very high (dark red)
 const thrLevel=th=>th<=0?0:th<10?1:th<30?2:th<50?3:4;
 function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=[['None','var(--green)'],['Very low','#2F8DC0'],['Low','#E8901E'],['Medium','#E04B3A'],['High','#C8372D'],['Very high','#C8372D']][th<=0?0:th<10?1:th<30?2:th<50?3:th<70?4:5];
- dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(Math.max(0,th))}%</span></p><p class="s">The higher your threat, the more often the police raid you. Get caught and you go to jail, where your businesses stop earning. At 50% threat or more, 90% of your cash is seized too. After you get out, they leave you alone for a while.</p>
- <div class="cmp num"><span>Police attention</span><span></span><span style="color:${heat[1]}">${heat[0]}</span>${th<0?`<span>Spare cover</span><span></span><span>${Math.round(-th)}%</span>`:''}</div>${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}<p class="s">Under 30% you're rarely raided. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
+ const lv=thrLevel(th),tk=`<span>Police attention</span><span>${heat[0]}</span>`.repeat(8);
+ dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(Math.max(0,th))}%</span></p><div class="tkr l${lv}${lv>=4?' flash':''}" role="status" aria-label="Police attention: ${heat[0]}"><div class="tkt">${tk}</div></div><p class="s">The higher your threat, the more often the police raid you. Get caught and you go to jail, where your businesses stop earning. At 50% threat or more, 90% of your cash is seized too. After you get out, they leave you alone for a while.</p>
+ ${th<0?`<div class="cmp num"><span>Spare cover</span><span></span><span>${Math.round(-th)}%</span></div>`:''}${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}<p class="s">Under 30% you're rarely raided. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
 function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
  const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
