@@ -481,6 +481,48 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .collect.pend .amt{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.13) 0 12px,transparent 12px 24px)}
 #csafe.plbl{display:block;font-size:12px;font-weight:900;color:#fff;opacity:1;letter-spacing:.5px;text-transform:uppercase}
 #csafe.plbl:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#F5B946;margin-right:5px;vertical-align:1px}
+
+/* ===== shift slot ===== */
+.dc-rev2{display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px 12px 6px;max-width:440px;margin:0 auto;width:100%;perspective:600px;position:relative}
+.dc-winw{width:66%;max-width:250px}
+.dc-win.nf{animation:none}
+.dc-miss{display:flex;flex-direction:column;align-items:center;gap:6px;width:100%}
+.dc-miss>span{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#888}
+.dc-miss>div{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:72%;max-width:290px}
+.dc-miss .dc-rc{border-style:dashed;background:transparent;filter:grayscale(.6)}
+.dc-miss .dc-rc small{text-decoration:line-through}
+.dc-slot{position:relative;width:140px;max-width:100%;background:#1F3A5F;padding:7px;box-shadow:0 4px 0 #142844;margin-top:4px}
+.dc-slot i{position:absolute;top:50%;transform:translateY(-50%);width:0;height:0;border:8px solid transparent;z-index:3}
+.dc-slot .pl{left:-11px;border-left-color:#F5B946}.dc-slot .pr{right:-11px;border-right-color:#F5B946}
+.dc-reel{position:relative;height:56px;overflow:hidden;background:#16223A}
+.dc-reel:before,.dc-reel:after{content:"";position:absolute;left:0;right:0;height:16px;z-index:2;pointer-events:none}
+.dc-reel:before{top:0;background:linear-gradient(#16223A,#16223A00)}.dc-reel:after{bottom:0;background:linear-gradient(#16223A00,#16223A)}
+.dc-strip{position:absolute;left:0;right:0;top:0;will-change:transform}
+.dc-strip>div{height:56px;display:flex;align-items:center;justify-content:center;gap:5px;color:#fff;font-weight:900;font-size:30px;font-variant-numeric:tabular-nums}
+.dc-strip small{font-size:13px;opacity:.75;margin-top:8px}
+.dc-strip .h8{color:#F5B946}.dc-strip .q{color:#9FB6D6}
+.dc-slot.win{animation:dcslotwin .5s ease-out 2}
+@keyframes dcslotwin{50%{box-shadow:0 4px 0 #142844,0 0 0 7px #F5B946AA}}
+.dc-odds{display:flex;gap:5px;justify-content:center}
+.dc-odds span{font-size:10px;font-weight:800;color:#777;background:#fff;border:1.5px solid #DDD;padding:2px 6px}
+.dc-odds span.on{border-color:#F5B946;color:#5A3A08;background:#FFE7A8}
+.dark .dc-odds span{background:#1C2425;border-color:#2B3637;color:#9AA39D}.dark .dc-odds span.on{border-color:#F5B946;color:#5A3A08;background:#FFE7A8}
+.dark .dc-miss>span{color:#8E9893}
+.dc-bb.gold{background:#F5B946;color:#5A3A08;box-shadow:0 5px 0 #C98F1E;font-size:22px}
+.dc-bb[disabled]{opacity:.7}
+.dc-conf{position:absolute;left:50%;top:35%;width:0;height:0;pointer-events:none;z-index:6}
+.dc-conf i{position:absolute;width:7px;height:11px}
+@media (prefers-reduced-motion: reduce){.dc-slot.win{animation:none}}
+
+/* ===== day 7: fixed 8 hours + streak bonus ===== */
+.dc-fixed{background:#1F3A5F;color:#F5B946;font-weight:900;font-size:26px;padding:6px 16px;box-shadow:0 4px 0 #142844;display:flex;align-items:baseline;gap:6px;margin-top:4px}
+.dc-fixed small{font-size:12px;color:#fff;opacity:.85}
+.dc-bonus{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%}
+.dc-bonus .lbl{font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:#E08A22}
+.dc-slot.wide{width:230px}
+.dc-strip .b{gap:10px;font-size:16px;white-space:nowrap}
+.dc-strip .b svg{width:28px;height:26px;flex:none}
+.dc-odds.wrap{flex-wrap:wrap;max-width:300px}
 </style>
 
 <div id="app">
@@ -648,7 +690,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102902,MUST=2026102902;
+/*build*/const BUILD=2026102904,MUST=2026102904;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -996,29 +1038,39 @@ function prizeInfo(p){switch(p.k){
 function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day],['manual',4]].filter(x=>!avoid.includes(x[0]));
  let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
  const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?mgrHours():1;return{k,v}}
-function dcPick(i){if(!dcReady()||(CLOCK_GUARD&&!clockChecked))return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
+function dcPick(i){if(!dcReady()||(CLOCK_GUARD&&!clockChecked))return openDaily();bonusOwed();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
  for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
- if(pos===7)cards[i]={k:'mgr',v:mgrHours(),streak:true};
- const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};s.dcSeen=true;
+ if(pos===7)cards[i]={k:'mgr',v:8,streak:true,bonus:rollPrize(1,['mgr'])};
+ const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};if(p.k==='mgr')s.dc.got.spin=false;s.dcSeen=true;
  if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems')s.gems+=p.v;else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
  vib([20,30,20]);save();upd();openDaily()}
 function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7);
  let d='';for(let i=1;i<=7;i++){const done=i<pos||(i===pos&&picked),today=i===pos&&!picked,gold=i===7;
   d+=`<div class="dc-day${done?' done':''}${today&&!gold?' today':''}${gold?' gold':''}">${gold&&!done?MGR:done?'<i>✓</i>':today?'<i>★</i>':''}${today?'TODAY':'DAY '+i}</div>`}
- return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: free manager (2–8h)</span></div><div class="dc-days">${d}</div></div>`}
-function prizeCard(p,win){const f=prizeInfo(p);
- if(!win)return`<div class="dc-rc">${PICON[p.k]}<b>${esc(f.n)}</b><small class="num">${esc(f.sm)}</small></div>`;
+ return`<div class="dc-streak"><div class="dc-t"><b>Day ${n} streak${wk>1?` · week ${wk}`:''}</b><span>Day 7: 8h manager + bonus</span></div><div class="dc-days">${d}</div></div>`}
+function prizeCard(p,win,st){const f=prizeInfo(p);
+ if(!win)return`<div class="dc-rc">${PICON[p.k]}<b>${esc(f.n)}</b><small class="num">${p.k==='mgr'?'2–8h shift':esc(f.sm)}</small></div>`;
+ if(p.k==='mgr')return`<div class="dc-win${st==='landed'?' nf':''}"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':'RARE'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>
+  ${p.streak?`<div class="dc-fixed">${p.v}<small>HOUR SHIFT</small></div>`:`<div class="dc-slot" id="dcslot"><i class="pl"></i><i class="pr"></i><div class="dc-reel"><div class="dc-strip" id="dcstrip">${st==='spin'?'<div class="q">?</div>':slotCell(p.v)}</div></div></div>
+  <div class="dc-odds">${MGR_H.map(h=>`<span class="${st!=='spin'&&h===p.v?'on':''}">${h}h</span>`).join('')}</div>`}</div>`;
  return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
 const wbar=()=>{const n=perkCount();return`<button type="button" class="dc-wbar" data-act="perks">${PICON.cash}<div><b>Your perks</b><span>${n?n+' waiting in your wallet':'Nothing saved yet'}</span></div><span class="go">OPEN</span></button>`};
 function dailyBody(){
  if(dcReady()&&CLOCK_GUARD&&!clockChecked)return streakHTML()+`<div class="dc-h" style="padding:28px 20px"><b>Checking the time…</b><span>Your daily card needs the internet to confirm today's date. Connect, then open this again.</span></div>${wbar()}`;
  if(dcReady()){const n=dcToday(),pos=(n-1)%7+1;
-  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your manager`:'One card per day. Better odds the longer your streak.'}</span></div>
+  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your 8-hour manager, plus a bonus`:'One card per day. Better odds the longer your streak.'}</span></div>
   <div class="dc-cards">${[0,1,2].map(i=>`<div class="dc-card" role="button" tabindex="0" aria-label="Card ${i+1}" data-act="dcpick" data-v="${i}"><div class="pat"></div><div class="q">?</div></div>`).join('')}</div>
   <div class="dc-hint">Could be cash, crystals, a jail-free card… or a manager</div>${wbar()}`}
  const g=s.dc.got;if(!g||!g.cards)return streakHTML()+`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
  const p=g.cards[g.pick],o=g.cards.filter((_,j)=>j!==g.pick),f=prizeInfo(p);
- const head=!g.fresh?"Today's pick":p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
+ const unspun=p.k==='mgr'&&g.spin===false;
+ if(unspun&&p.streak)return`<div class="dc-h" style="padding-top:22px"><b>Streak reward!</b><span>An 8-hour manager, plus a bonus perk to spin for</span></div>
+ <div class="dc-rev2"><div class="dc-winw">${prizeCard(p,true,'spin')}</div>${bonusBox(p.bonus,'spin')}<div id="dcconf" class="dc-conf"></div></div>
+ <div class="dc-btns"><button class="dc-bb gold" id="dcspinb" data-act="dcspin">Spin for a bonus<small>One extra perk for keeping your streak</small></button></div>`;
+ if(unspun)return`<div class="dc-h" style="padding-top:22px"><b>You got a manager!</b><span>Spin to find out how long the shift is</span></div>
+ <div class="dc-rev2"><div class="dc-winw">${prizeCard(p,true,'spin')}</div><div id="dcconf" class="dc-conf"></div></div>
+ <div class="dc-btns"><button class="dc-bb gold" id="dcspinb" data-act="dcspin">Spin<small>2, 4, 6 or 8 hours</small></button></div>`;
+ const head=!g.fresh?"Today's pick":p.streak?'Streak reward!':p.k==='mgr'?'You got a manager!':p.k==='cash'?'Cash in hand!':p.k==='gems'?'Shiny crystals!':'You got a perk!';
  let btns='';
  if(!g.fresh){const inWallet=p.k==='mgr'?s.perks.mgr.includes(p.v):p.k==='jail'||(['boost','crew','clean','manual'].includes(p.k)&&s.perks[p.k]>0);
   const txt=p.k==='cash'||p.k==='gems'?'Collected':inWallet?'Saved in your perk wallet':p.k==='mgr'?'Shift started':p.k==='jail'?'Used: you walked free':'Used';
@@ -1026,9 +1078,43 @@ function dailyBody(){
  else if(p.k==='mgr'&&s.perks.mgr.includes(p.v))btns=`<button class="dc-bb" data-act="perkuse" data-v="mgr:${p.v}">${mgrOn()?'Add to current shift':'Start shift now'}<small>Runs for ${p.v} hours from ${mgrOn()?'the end of the current shift':'now'}</small></button><button class="dc-bb l" data-act="perks">Save for later<small>Start it any time from your perk wallet</small></button>`;
  else if(['boost','crew','clean','manual'].includes(p.k)&&s.perks[p.k]>0)btns=`<button class="dc-bb" data-act="perkuse" data-v="${p.k}">Use it now</button><button class="dc-bb l" data-act="perks">Save for later<small>It waits in your perk wallet</small></button>`;
  else btns=`<button class="dc-bb" data-act="close">${p.k==='cash'||p.k==='gems'?'Collect':'Got it'}</button>`;
- return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>${g.fresh?"The cards you didn't pick are shown too":'Come back tomorrow for another card'}</span></div>
- <div class="dc-rev">${prizeCard(o[0])}${prizeCard(p,true)}${prizeCard(o[1])}</div>
+ return`<div class="dc-h" style="padding-top:22px"><b>${head}</b><span>${g.fresh?(p.bonus?'Bonus: '+bonusText(p.bonus):p.k==='mgr'?`Your manager works ${p.v} hours`:'Here\'s what was under the other two'):'Come back tomorrow for another card'}</span></div>
+ <div class="dc-rev2"><div class="dc-winw">${prizeCard(p,true,p.k==='mgr'?(g.landed?'landed':'done'):'')}</div><div id="dcconf" class="dc-conf"></div>
+ ${p.bonus?bonusBox(p.bonus,'done'):`<div class="dc-miss"><span>You could have got</span><div>${prizeCard(o[0])}${prizeCard(o[1])}</div></div>`}</div>
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
+function bonusOwed(){const g=s.dc&&s.dc.got,p=g&&g.cards&&g.cards[g.pick];if(p&&p.bonus&&!p.bonus.got)grantBonus(p.bonus)}
+function grantBonus(b){b.got=1;if(b.k==='cash'){s.cash+=b.v;s.earned+=b.v}else if(b.k==='gems')s.gems+=b.v;else s.perks[b.k]=(s.perks[b.k]||0)+1}
+const BONUS_W=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['manual',4]];
+const bonusName=k=>({cash:'Cash',gems:'Crystals',boost:'2× boost',crew:"Builder's crew",clean:'Clean record',jail:'Jail-free',manual:'Manual'})[k];
+function bonusCell(b){return`<div class="b">${PICON[b.k]}<span>${b.k==='cash'?'+'+$m(b.v):b.k==='gems'?'+'+b.v+' crystals':bonusName(b.k)}</span></div>`}
+function bonusText(b){return b.k==='cash'?`+${$m(b.v)} added to your cash`:b.k==='gems'?`+${b.v} crystals added`:b.k==='boost'?'2× boost (30 min) saved to your perk wallet':b.k==='jail'?'Get-out-of-jail-free card saved to your perk wallet':prizeInfo(b).n+' saved to your perk wallet'}
+function bonusBox(b,st){return`<div class="dc-bonus"><span class="lbl">Streak bonus</span>
+  <div class="dc-slot wide" id="dcbslot"><i class="pl"></i><i class="pr"></i><div class="dc-reel"><div class="dc-strip" id="dcbstrip">${st==='spin'?'<div class="q">?</div>':bonusCell(b)}</div></div></div>
+  <div class="dc-odds wrap">${BONUS_W.map(([k,w])=>`<span class="${st!=='spin'&&k===b.k?'on':''}">${bonusName(k)} ${w}%</span>`).join('')}</div></div>`}
+function slotCell(h){return`<div class="c${h===8?' h8':''}">${h}<small>HRS</small></div>`}
+function dcSpin(){const g=s.dc.got;if(!g||g.spin!==false||dcSpinning)return;const p=g.cards[g.pick];if(p.bonus)return dcBonusSpin(g,p);const strip=$('dcstrip'),btn=$('dcspinb');if(!strip)return;
+ dcSpinning=true;if(btn){btn.disabled=true;btn.firstChild.textContent='Spinning…'}
+ const R=12,CELL=strip.parentElement.offsetHeight||56;let h='<div class="q">?</div>';for(let r=0;r<R;r++)for(const x of MGR_H)h+=slotCell(x);strip.innerHTML=h;
+ strip.querySelectorAll('div').forEach(d=>d.style.height=CELL+'px');
+ const target=1+(R-2)*MGR_H.length+MGR_H.indexOf(p.v),fast=matchMedia('(prefers-reduced-motion: reduce)').matches,ms=fast?0:2600;
+ void strip.offsetHeight;strip.style.transition=ms?`transform ${ms}ms cubic-bezier(.12,.6,.18,1)`:'none';strip.style.transform=`translateY(${-target*CELL}px)`;
+ setTimeout(()=>{dcSpinning=false;g.spin=true;g.fresh=true;g.landed=1;save();vib([30,40,30]);
+  if(ovKind==='daily'){$('sb').innerHTML=dailyBody();const sl=$('dcslot');if(sl)sl.classList.add('win');if(p.v===8&&!fast)dcConfetti()}
+  g.landed=0},ms+80)}
+let dcSpinning=false;
+function dcBonusSpin(g,p){const strip=$('dcbstrip'),btn=$('dcspinb');if(!strip)return;dcSpinning=true;if(btn){btn.disabled=true;btn.firstChild.textContent='Spinning…'}
+ const R=10,CELL=strip.parentElement.offsetHeight||56,K=BONUS_W.map(x=>x[0]);let h='<div class="q">?</div>';
+ for(let r=0;r<R;r++)for(const k of K)h+=bonusCell(k===p.bonus.k?p.bonus:{k,v:k==='cash'?p.bonus.v||Math.max(2000,Math.round(income()*80)):k==='gems'?11:1});strip.innerHTML=h;
+ strip.querySelectorAll(':scope>div').forEach(d=>d.style.height=CELL+'px');
+ const target=1+(R-2)*K.length+K.indexOf(p.bonus.k),fast=matchMedia('(prefers-reduced-motion: reduce)').matches,ms=fast?0:3000;
+ void strip.offsetHeight;strip.style.transition=ms?`transform ${ms}ms cubic-bezier(.12,.6,.18,1)`:'none';strip.style.transform=`translateY(${-target*CELL}px)`;
+ setTimeout(()=>{dcSpinning=false;if(!p.bonus.got)grantBonus(p.bonus);g.spin=true;g.fresh=true;g.landed=1;save();upd();vib([30,40,30]);
+  if(ovKind==='daily'){$('sb').innerHTML=dailyBody();const sl=$('dcbslot');if(sl)sl.classList.add('win');if(!fast)dcConfetti()}
+  g.landed=0},ms+80)}
+function dcConfetti(){const c=$('dcconf');if(!c)return;const cols=['#F5B946','#3E9B37','#B5D43B','#4AAFE3','#F06B4B'];
+ for(let i=0;i<36;i++){const d=document.createElement('i');d.style.background=cols[i%cols.length];c.appendChild(d);const a=Math.random()*Math.PI*2,r=70+Math.random()*100;
+  d.animate?.([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r-60}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:900+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'})}
+ setTimeout(()=>{c.innerHTML=''},1600)}
 function openDaily(){s.dcSeen=true;sheet('Daily chance',dailyBody(),'daily')}
 function perksBody(){return`<div class="sr-tabs"><button data-act="perkstab" data-v="wallet" class="${perksTab==='wallet'?'on':''}">Wallet${perkCount()?` <i>${perkCount()}</i>`:''}</button><button data-act="perkstab" data-v="shifts" class="${perksTab==='shifts'?'on':''}">Manager shifts</button></div>`+(perksTab==='shifts'?shiftsBody():walletBody())}
 function walletBody(){let a='',w='';const t=now();
@@ -1036,6 +1122,8 @@ function walletBody(){let a='',w='';const t=now();
  if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>2× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
  const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
+ {const g=s.dc.got,p=g&&g.cards&&g.cards[g.pick];if(p&&p.k==='mgr'&&!p.streak&&g.spin===false&&hs[p.v]){if(!--hs[p.v])delete hs[p.v];
+  w+=`<div class="dc-perk">${MGR}<div><b>Manager</b><small>Shift length not revealed yet. Spin in Daily chance to find out.</small></div><button class="dc-use g" data-act="daily">SPIN</button></div>`}}
  Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h}-hour shift · Lv ${s.mgr.level} · ${Math.round(commission()*100)}% commission${s.mgr.train&&!mgrOn()?' · training resumes on shift':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
  if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly.</small></div><span class="dc-use off">READY</span></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
@@ -1231,6 +1319,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'mail':sheet('Mailbox',mailBody(),'mail');break;
   case'daily':if(s.jail)return jailNag();openDaily();break;
   case'dcpick':dcPick(+el.dataset.v);break;
+  case'dcspin':dcSpin();break;
   case'perks':openPerks();break;
   case'perkstab':perksTab=el.dataset.v;if(ovKind!=='perks')sheet('Your perks',perksBody(),'perks');else{$('sb').innerHTML=perksBody();$('sb').scrollTop=0}break;
   case'shiftlive':if(!s.shift)return;openShift('live',ovKind==='perks'&&perksTab==='shifts');break;
