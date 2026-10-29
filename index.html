@@ -543,6 +543,18 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .duty .dl{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px}
 .duty .dl b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .duty .dl small{margin-left:auto;white-space:nowrap;font-size:12px;flex:none}
+
+/* ===== fit: side buttons always fit, smaller business details ===== */
+.tools{top:8px;gap:6px}
+.tools .tool{width:var(--tsz,44px);height:var(--tsz,44px)}
+.tools .tool svg{width:calc(var(--tsz,44px)*.52);height:calc(var(--tsz,44px)*.52)}
+#panel{gap:8px;padding-top:4px;padding-bottom:8px}
+.info{gap:12px}
+.info h2{font-size:clamp(16px,4.7vw,20px);margin-bottom:2px}
+.lines{font-size:12.5px;line-height:1.35}
+.ribbon{width:50px}.ribbon b{font-size:23px;padding:3px 0 11px}.ribbon small{font-size:9px}
+.collect{height:56px}
+.collect .amt{font-size:clamp(22px,7vw,28px)}
 </style>
 
 <div id="app">
@@ -711,7 +723,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102908,MUST=2026102908;
+/*build*/const BUILD=2026102909,MUST=2026102909;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -849,7 +861,8 @@ function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=
 /* ================= stage rendering ================= */
 const stage=$('stage'),artEl=$('art'),colEl=$('column'),layer=$('layer'),panel=$('panel');
 $('city').innerHTML=citySVG();
-function layout(){const w=stage.clientWidth,hh=stage.clientHeight;if(!w||!hh)return;const sc=Math.max(w/VW,hh/VH),ox=w/2,oy=(hh-VH*sc)/2-VY*sc;
+function layout(){const w=stage.clientWidth,hh=stage.clientHeight;if(!w||!hh)return;
+ {const n=document.querySelectorAll('.tools .tool').length||7,sz=Math.max(30,Math.min(44,Math.floor((hh-24-(n-1)*6)/n)-3));stage.style.setProperty('--tsz',sz+'px')}const sc=Math.max(w/VW,hh/VH),ox=w/2,oy=(hh-VH*sc)/2-VY*sc;
  BW=Math.round(Math.min(84,Math.max(54,w*.17)));BH=Math.round(BW*37/64);
  document.documentElement.style.setProperty('--bw',BW+'px');document.documentElement.style.setProperty('--bh',BH+'px');
  VIEW={sc,ox,oy};const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
