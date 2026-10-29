@@ -401,7 +401,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .duty svg{width:16px;height:16px;flex:none}
 .duty b{display:block;font-weight:900;font-size:13px;line-height:1.2}
 .duty small{display:block;font-weight:700;font-size:11px;color:#C9D6EA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#stage.onduty .pager{top:68px}#stage.onduty .boost{top:102px}
+
 .safeb{position:absolute;right:58px;z-index:4;background:var(--gold);color:#5A3A08;font-weight:900;font-size:12px;padding:5px 9px;box-shadow:0 3px 0 #C98F1E;white-space:nowrap;pointer-events:none}
 .mgrfig{position:absolute;z-index:3;width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
 .mgrfig svg{width:36px;height:50px;filter:drop-shadow(0 3px 0 #0002)}
@@ -536,6 +536,13 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .tkr.flash:before{content:"";position:absolute;inset:0;background:#fff;opacity:0;animation:tkrflash 1.6s ease-in-out infinite;pointer-events:none;z-index:1}
 @keyframes tkrflash{0%,100%{opacity:0}50%{opacity:.18}}
 @media (prefers-reduced-motion: reduce){.tkt{animation:none}.tkr.flash:before{animation:none}}
+
+/* ===== manager bar: a full-width strip under the top tiles ===== */
+.duty{position:relative;left:auto;right:auto;top:auto;z-index:6;flex:none;padding:9px max(14px,env(safe-area-inset-left,0px));box-shadow:none;border-bottom:4px solid #142844}
+.duty{padding-block:7px}
+.duty .dl{flex:1;min-width:0;display:flex;align-items:baseline;gap:10px}
+.duty .dl b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.duty .dl small{margin-left:auto;white-space:nowrap;font-size:12px;flex:none}
 </style>
 
 <div id="app">
@@ -551,6 +558,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
       <svg viewBox="0 0 42 34"><rect x="3" y="14" width="36" height="18" fill="#C0392B"/><path d="M3 14 Q3 3 21 3 Q39 3 39 14Z" fill="#E74C3C"/><rect x="3" y="13" width="36" height="4" fill="#F5B946"/><rect x="18" y="12" width="6" height="9" fill="#F5B946"/><rect x="20" y="16" width="2" height="3" fill="#7a4b10"/><rect x="3" y="30" width="36" height="2" fill="#8E2A20"/></svg>
       <small id="chestT"></small></button>
   </header>
+  <div class="duty" id="duty" hidden data-act="shiftlive" role="button" aria-label="See the shift so far"><svg viewBox="0 0 20 20"><rect x="2" y="6" width="16" height="11" rx="2" fill="#F5B946"/><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6" stroke="#F5B946" stroke-width="2" fill="none"/><rect x="2" y="10" width="16" height="1.6" fill="#C98F1E"/></svg><div class="dl"><b id="dutyT">Manager on duty</b><small class="num" id="dutyS"></small></div><span class="chev">›</span></div>
   <section id="stage">
     <div id="city"></div>
     <div id="art"></div>
@@ -703,7 +711,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102907,MUST=2026102907;
+/*build*/const BUILD=2026102908,MUST=2026102908;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -851,7 +859,7 @@ function sigNow(){const o=cur();return o?`${o.bid}|${o.busy||''}|${o.level}|${s.
 function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML='';$('tube').hidden=true;artEl.dataset.p='';
  let L='';
  if(s.owned.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous business"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next business"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><div class="pager num">${s.cur+1} / ${s.owned.length}</div>`;
- L+=`<div class="boost num" id="boostChip" hidden></div><div class="duty" id="duty" hidden data-act="shiftlive" role="button" aria-label="See the shift so far"><svg viewBox="0 0 20 20"><rect x="2" y="6" width="16" height="11" rx="2" fill="#F5B946"/><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6" stroke="#F5B946" stroke-width="2" fill="none"/><rect x="2" y="10" width="16" height="1.6" fill="#C98F1E"/></svg><div style="min-width:0"><b id="dutyT">Manager on duty</b><small class="num" id="dutyS"></small></div><span class="chev">›</span></div>`;
+ L+=`<div class="boost num" id="boostChip" hidden></div>`;
  if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`;
@@ -870,7 +878,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boostOn();if(boostOn())bc.textContent='2X INCOME · '+dur((s.boostUntil-now())/1000)}
- {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=Math.round(commission()*100)+'% commission · '+dur((s.mgrUntil-now())/1000)+' left'}}}
+ {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){if(d.hidden===on)requestAnimationFrame(()=>{layout();stackN=-1;updStage()});d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=dur((s.mgrUntil-now())/1000)+' left'}}}
  if(!o)return;
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
@@ -1540,7 +1548,7 @@ function reconcilePM(real){const p=s.pm;pmWant=false;if(!p)return false;const of
  upd();return true}
 function pmUI(){const on=!!s.pm;let b=$('pbn');
  if(on&&!b){b=document.createElement('div');b.id='pbn';b.className='pbn';b.innerHTML='<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="#F5B946"/></svg><div><b>Offline · earnings are pending</b><span>Keep collecting. It\'s added when you\'re back online.</span></div>';stage.appendChild(b)}
- if(b){b.hidden=!on;if(on){const d=$('duty');b.style.top=(d&&!d.hidden?d.offsetTop+d.offsetHeight+8:12)+'px'}}
+ if(b){b.hidden=!on;if(on){const d=$('duty');b.style.top='12px'}}
  let c=$('pchip');if(on&&!c){c=document.createElement('div');c.id='pchip';c.className='pchip num';document.querySelector('.t-cash').appendChild(c)}
  if(c){c.hidden=!on||!(s.pm.pend>=1);if(!c.hidden)c.textContent='+'+money(s.pm.pend)+' pending'}}
 // an old copy of the game kept running after this update went live: its progress isn't kept
