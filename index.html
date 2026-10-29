@@ -473,6 +473,14 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .dc-win{background:#2A2614}.dark .dc-win p{color:#C9CFC9}.dark .dc-win b{color:#ECEFE9}
 .dark .dc-h span,.dark .dc-perk small,.dark .dc-wbar span,.dark .dc-feat span,.dark .dc-gift span{color:#A3ABA6}
 .dark .dc-use.off,.dark .dc-tm{background:#263031}.dark .dc-wbar span.go{color:var(--green-d)}.dark .dc-mini{background:#0F1415}.dark .dc-gift{background:#2A2614}.dark .dc-feat i{background:#22301F}
+
+/* ===== offline: pending earnings ===== */
+.pbn{position:absolute;left:12px;right:62px;top:12px;z-index:6;background:#1F3A5F;color:#fff;padding:9px 12px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 #142844;pointer-events:none}
+.pbn svg{width:18px;height:18px;flex:none}.pbn b{display:block;font-weight:900;font-size:13px}.pbn span{display:block;font-weight:700;font-size:11px;color:#C9D6EA;line-height:1.3}
+.pchip{display:inline-block;align-self:flex-start;margin-top:3px;font-size:10px;font-weight:900;color:#1F3A5F;background:repeating-linear-gradient(135deg,#fff 0 5px,#E4ECF6 5px 10px);padding:1px 6px;border:1.5px solid #1F3A5F;border-radius:20px;white-space:nowrap}
+.collect.pend .amt{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.13) 0 12px,transparent 12px 24px)}
+#csafe.plbl{display:block;font-size:12px;font-weight:900;color:#fff;opacity:1;letter-spacing:.5px;text-transform:uppercase}
+#csafe.plbl:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#F5B946;margin-right:5px;vertical-align:1px}
 </style>
 
 <div id="app">
@@ -640,11 +648,15 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>Date.now();
+/*build*/const BUILD=20261029,MUST=20261029;
+let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
+const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
+ if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
+ if(!(s.maxT>0)||d>s.maxT)s.maxT=d;else d=s.maxT}return d};
 const fresh=()=>({name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
  dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0},mgr:{level:1,train:null},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
-function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
+function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,b:BUILD,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
 function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
  if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
  const st=Object.assign(fresh(),d,{ach:Object.assign({},d.ach||{})});
@@ -655,11 +667,24 @@ function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch
  const seen=new Set();st.owned=st.owned.filter(o=>!seen.has(o.bid)&&seen.add(o.bid));
  st.cur=Math.max(0,Math.min(st.cur|0,st.owned.length-1));st.tier=Math.max(1,Math.min(11,st.tier|0||1));
  ['cash','gems','earned','taps'].forEach(k=>{if(!isFinite(st[k])||st[k]<0)st[k]=0});return st}
+
+function sanitizeTime(st){const d=Date.now()+clockOff,H=36e5;
+ if(!(st.maxT>0))st.maxT=Math.min(Math.max(st.last||0,st.savedAt||0),d);  // older saves: start the guard from the last real play
+ if(st.maxT>d+10*6e4)st.maxT=Math.max(d,Math.min(st.maxT,d+3*24*H)); // never freeze for more than 3 days
+ const t=Math.max(d,st.maxT),cap=(k,max)=>{if((st[k]||0)>t+max)st[k]=t+max};
+ cap('boostUntil',6*H);cap('boostReady',15*6e4);cap('freeAt',10*6e4);cap('chestAt',4*H);cap('cleanUntil',36*H);cap('nextCheck',30000);
+ if((st.mgrUntil||0)>t+24*H){st.mgrUntil=t+8*H;st.mgrTotal=Math.min(st.mgrTotal||8*H,8*H)}
+ if((st.last||0)>t)st.last=t;
+ if(st.jail&&st.jail.until>t+st.jail.total)st.jail.until=t+st.jail.total;
+ // a daily pick dated in the future counts as today's pick
+ if(st.dc&&st.dc.last){const p=st.dc.last.split('-').map(Number),pd=new Date(p[0],p[1]-1,p[2]).getTime();if(pd>t){const n=new Date(t);st.dc.last=n.getFullYear()+'-'+(n.getMonth()+1)+'-'+n.getDate()}}
+}
 let s=null;
 try{s=unpack(localStorage.getItem(SAVE_KEY));if(!s)for(const k of OLD_KEYS){const r=localStorage.getItem(k);if(r&&(s=unpack(r)))break}}catch(e){}
 if(window.claude?.hot?.data?.s)s=unpack(window.claude.hot.data.s)||s;
 if(!s)s=fresh();
-const bootSavedAt=s.savedAt||0;
+sanitizeTime(s);
+const bootSavedAt=s.savedAt||0,bootBuild=s.b||0;
 const save=()=>{s.savedAt=now();try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}};
 save();
 window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
@@ -794,7 +819,7 @@ function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boos
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
  const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));updTrain();return}
- const sf=o.safe||0;$('camt').textContent=money(o.stored+sf);{const c=$('csafe');c.hidden=!(sf>=1);if(sf>=1)c.textContent='incl. '+$m(sf)+' from the safe'}
+ const sf=o.safe||0;$('camt').textContent=money(o.stored+sf);{const c=$('csafe');c.hidden=!(sf>=1);if(sf>=1)c.textContent='incl. '+$m(sf)+' from the safe';const cl=c.closest('.collect');if(cl)cl.classList.toggle('pend',!!s.pm);c.classList.toggle('plbl',!!s.pm);if(s.pm){c.hidden=false;c.textContent=sf>=1?'Pending · incl. safe':'Pending'}}
  updTrain();{const f=$('mgrfig');f.hidden=!mgrOn();f.classList.toggle('tr',!!s.mgr.train);const tc=$('tcall');if(tc){tc.hidden=!s.mgr.train;if(s.mgr.train)$('tcallT').textContent=dur(s.mgr.train.left/1000)}if(mgrOn()){const[X,Y]=P(-30,50,0);f.style.left=Math.round(VIEW.ox+X*VIEW.sc-28)+'px';f.style.top=Math.round(VIEW.oy+Y*VIEW.sc-62)+'px'}}$('lrate').textContent=$m(x.rate*(boostOn()?2:1))+'/min'+(boostOn()?' (2X)':'');
  const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full||sf>=1;{const sb=$('safeb');sb.hidden=!(sf>=1);if(sf>=1)sb.textContent='+'+$m(sf)+' in the safe'}
  $('upBtn').classList.toggle('can',s.cash>=x.up);
@@ -817,7 +842,7 @@ function rain(){const o=cur();if(!o||o.busy||s.jail||document.hidden)return;cons
 
 /* ================= HUD ================= */
 let shownCash=null,cashTween=0;
-function hud(){$('nw').textContent=money(nw());
+function hud(){pmUI();$('nw').textContent=money(nw());
  {const r=$('nwrate'),inc=income(),jailed=!!(s.jail&&s.jail.until>now());
   r.textContent=jailed?'❚❚ Frozen':inc>0?`▲ ${$m(inc)}/min${boostOn()?' · 2×':''}`:'';
   r.className='rate num'+(jailed?' rfrozen':boostOn()&&inc>0?' rboost':'');
@@ -828,12 +853,12 @@ function hud(){$('nw').textContent=money(nw());
  $('boostTag').hidden=!boostOn();
  const cr=s.chestAt<=now();$('chestT').textContent=cr?'OPEN!':dur((s.chestAt-now())/1000);
  $('mailDot').hidden=!ACH.some(a=>s.ach[a[0]]===1);
- $('dailyDot').hidden=!dcReady();{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
+ $('dailyDot').hidden=!dcReady()||(CLOCK_GUARD&&!clockChecked);{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
 
 /* ================= actions ================= */
 function jailNag(){toast("You're behind bars. Serve your time first.",'bad')}
 function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const a=o.stored+(o.safe||0);if(a<1){toast('Nothing to collect yet. Bills are on their way.');return}
- s.cash+=a;s.earned+=a;o.stored=0;o.safe=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
+ bank(a);s.earned+=a;o.stored=0;o.safe=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
  const tgt=$('cash').getBoundingClientRect(),bills=[...colEl.children].reverse(),last=bills.length-1;
  bills.forEach((bEl,i)=>{const r=bEl.getBoundingClientRect();const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=r.left+'px';f.style.top=r.top+'px';document.body.appendChild(f);bEl.style.visibility='hidden';
   const dx=tgt.left+tgt.width*.25-r.left,dy=tgt.top-r.top,lift=-60-Math.random()*40,side=(Math.random()-.5)*60;
@@ -843,11 +868,11 @@ function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);
- if(!canPay(b,p))return toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
+ if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
  pay(b,p);const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
 function upgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
- if(!canPay(b,x.up))return toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
- pay(b,x.up);if(!gemPay(b))o.inv+=x.up;s.cash+=o.stored+(o.safe||0);o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
+ if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
+ pay(b,x.up);if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
 function step(d){if(s.owned.length<2)return;s.cur=(s.cur+d+s.owned.length)%s.owned.length;upd()}
 
@@ -951,7 +976,8 @@ const mgrName=h=>(h>8.01?Math.round(h)+'-hour manager':'Manager');
 const mgrHours=n=>8; // shifts are always 8 hours
 function dayKey(t,off=0){const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 const dayStart=(t,off=0)=>{const d=new Date(t);d.setHours(0,0,0,0);d.setDate(d.getDate()+off);return d.getTime()};
-const dcReady=()=>s.dc.last!==dayKey(now());
+const dayNum=k=>{const p=String(k).split('-').map(Number);return new Date(p[0],p[1]-1,p[2]).getTime()};
+const dcReady=()=>!s.dc.last||dayNum(s.dc.last)<dayStart(now());
 // streak so far: still alive if your last pick was today or yesterday
 const dcAlive=()=>s.dc.last===dayKey(now())||s.dc.last===dayKey(now(),-1)?s.dc.streak:0;
 const dcToday=()=>dcReady()?dcAlive()+1:s.dc.streak; // the streak day you're on today
@@ -970,7 +996,7 @@ function prizeInfo(p){switch(p.k){
 function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['mgr',3+day],['manual',4]].filter(x=>!avoid.includes(x[0]));
  let r=Math.random()*w.reduce((a,x)=>a+x[1],0),k=w[0][0];for(const[kk,ww]of w){if((r-=ww)<0){k=kk;break}}
  const v=k==='cash'?Math.max(2000,Math.round(income()*(45+Math.random()*75))):k==='gems'?8+Math.floor(Math.random()*8):k==='mgr'?8:1;return{k,v}}
-function dcPick(i){if(!dcReady())return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
+function dcPick(i){if(!dcReady()||(CLOCK_GUARD&&!clockChecked))return openDaily();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
  for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
  if(pos===7)cards[i]={k:'mgr',v:mgrHours(n),streak:true};
  const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};s.dcSeen=true;
@@ -985,6 +1011,7 @@ function prizeCard(p,win){const f=prizeInfo(p);
  return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
 const wbar=()=>{const n=perkCount();return`<button type="button" class="dc-wbar" data-act="perks">${PICON.cash}<div><b>Your perks</b><span>${n?n+' waiting in your wallet':'Nothing saved yet'}</span></div><span class="go">OPEN</span></button>`};
 function dailyBody(){
+ if(dcReady()&&CLOCK_GUARD&&!clockChecked)return streakHTML()+`<div class="dc-h" style="padding:28px 20px"><b>Checking the time…</b><span>Your daily card needs the internet to confirm today's date. Connect, then open this again.</span></div>${wbar()}`;
  if(dcReady()){const n=dcToday(),pos=(n-1)%7+1;
   return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your manager`:'One card per day. Better odds the longer your streak.'}</span></div>
   <div class="dc-cards">${[0,1,2].map(i=>`<div class="dc-card" role="button" tabindex="0" aria-label="Card ${i+1}" data-act="dcpick" data-v="${i}"><div class="pat"></div><div class="q">?</div></div>`).join('')}</div>
@@ -1027,7 +1054,8 @@ function usePerk(v){const t=now();
  else if(v==='manual'){if(!s.perks.manual)return;if(s.mgr.level>=MGR_MAX)return toast('Your manager is already fully trained');s.perks.manual--;if(s.mgr.train)finishTrain();else{s.mgr.level++;toast(`Your manager is now Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good')}}
  else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
  vib(15);save();closeOv();upd()}
-function updPerkUI(){{const e=$('pt-train');if(e&&s.mgr.train)e.textContent=dur(s.mgr.train.left/1000)}
+function updPerkUI(){if(!clockWarned&&!ovKind)clockNote();
+ {const e=$('pt-train');if(e&&s.mgr.train)e.textContent=dur(s.mgr.train.left/1000)}
  if(ovKind==='shiftrep'&&shiftIdx==='live'&&now()-(updPerkUI.last||0)>3000){updPerkUI.last=now();const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shiftBody('live');sb.scrollTop=y}}
  if(s.shiftPending&&!ovKind&&(s.shifts||[]).length){s.shiftPending=0;save();shiftPopup()}
  if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
@@ -1134,7 +1162,7 @@ function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">Thi
 function openShift(i,back){shiftIdx=i;shiftAll=false;sheet('Manager shift',shiftBody(i),'shiftrep');const hd=ovl.querySelector('.sheet-h');hd.classList.add('navy');
  if(back){const b=hd.querySelector('[data-act=close]');b.dataset.act='perkstab';b.dataset.v='shifts';b.setAttribute('aria-label','Back to shifts');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>'}}
 function collectAll(){if(s.jail)return jailNag();let a=0;for(const o of s.owned){if(o.busy||!(st(o).rate>0))continue;a+=o.stored+(o.safe||0);o.stored=0;o.safe=0}
- if(a<1)return closeOv();s.cash+=a;s.earned+=a;s.collects=(s.collects||0)+1;cashTween=performance.now();stackN=-1;colEl.innerHTML='';vib(20);closeOv();toast('Collected '+$m(a)+' from all your businesses','good');save();upd()}
+ if(a<1)return closeOv();bank(a);s.earned+=a;s.collects=(s.collects||0)+1;cashTween=performance.now();stackN=-1;colEl.innerHTML='';vib(20);closeOv();toast('Collected '+$m(a)+' from all your businesses','good');save();upd()}
 function shiftsBody(){const t=now(),list=s.shifts||[],wk=list.filter(r=>r.end>t-7*864e5);let h='';
  const live=s.shift?shiftData('live'):null,lx=live?shiftStats(live):null;
  const tot=wk.reduce((a,r)=>a+r.rows.reduce((b,x)=>b+x.extra-(x.cut||0),0),0)+(lx?lx.keep:0),bus=wk.reduce((a,r)=>a+r.jails.length,0)+(live?live.jails.length:0);
@@ -1216,14 +1244,14 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'mgrtap':{const m=s.mgr.train;if(!m||!mgrOn())return;const cut=Math.max(1300,m.total*.005);m.left-=cut;s.taps++;vib(5);floaty(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'-'+(cut/1000).toFixed(1)+'s','#1F3A5F');if(m.left<=0)finishTrain();upd();break}
   case'perkuse':usePerk(el.dataset.v);break;
   case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
-  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);s.cash+=c;s.gems+=2;s.freeAt=now()+6e5;
+  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);bank(c,1);s.gems+=2;s.freeAt=now()+6e5;
    dialog('Free gift!',`<p>You got<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">2 crystals</span></p><p class="s">Come back in 10 minutes for another one.</p>`,`<button class="yes" data-act="close">Thanks</button>`);upd();break}
   case'boost':{if(boostOn())return toast(`2X income active for ${dur((s.boostUntil-now())/1000)}`);
    if(s.boostReady<=now())dialog('Income boost',`<p>Double all income for <span class="hl">3 minutes</span>.</p><p class="s">Free to use. Recharges 15 minutes after you use it.</p>`,`<button class="no" data-act="close">Later</button><button class="yes" data-act="doboost">Boost</button>`);
    else dialog('Income boost',`<p>Your free boost recharges in <span class="hl">${dur((s.boostReady-now())/1000)}</span>.</p><p>Boost now for <span class="hl">${GEM} 5</span>?</p>`,`<button class="no" data-act="close">No</button><button class="yes" data-act="paidboost" ${s.gems<5?'disabled':''}>Yes</button>`);break}
   case'doboost':s.boostUntil=now()+18e4;s.boostReady=now()+9e5;closeOv();toast('2X income for 3 minutes!','good');upd();break;
   case'paidboost':if(s.gems<5)return;s.gems-=5;s.boostUntil=now()+18e4;closeOv();toast('2X income for 3 minutes!','good');upd();break;
-  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);s.cash+=c;s.gems+=10;s.chestAt=now()+4*36e5;
+  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);bank(c,1);s.gems+=10;s.chestAt=now()+4*36e5;
    dialog('Treasure chest',`<p>Inside you find<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">10 crystals</span></p><p class="s">A new chest arrives every 4 hours.</p>`,`<button class="yes" data-act="close">Awesome</button>`);upd();break}
   case'boss':sheet('Boss',bossBody(),'boss');break;
   case'savename':{const v=$('pn').value.trim();if(v){s.name=v;save();toast('Name saved','good')}closeOv();break}
@@ -1237,7 +1265,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'keeplocal':pendingRemote=null;closeOv();cloudPush().then(()=>{toast('Kept this device. Your account now matches it.','good');setTimeout(()=>notifyPrompt(true),400)});break;
   case'copybk':{const t=$('bk');const done=()=>toast('Save code copied','good');try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();toast('Code selected. Copy it from the box.')})}catch(e){t.select();toast('Code selected. Copy it from the box.')}break}
   case'restore':{const v=($('rs').value||'').trim();if(!v)return toast('Paste a save code first','bad');let st=null;try{st=unpack(decodeURIComponent(escape(atob(v))))}catch(e){}
-   if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
+   if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;sanitizeTime(s);s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
   case'dark':darkOn=!darkOn;try{localStorage.setItem(DKEY,darkOn?'1':'0')}catch(e){}applyDark();el.setAttribute('aria-checked',darkOn);break;
   case'reset':if(el.dataset.arm!=='1'){el.dataset.arm='1';el.textContent='Tap again to wipe everything';return}s=fresh();save();lastRank=null;closeOv();upd();askName();break;
   case'begin':closeOv();if(s.jail){openJail();if(dcIntroDue())nextUp=dcIntro}else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null;if(dcIntroDue())nextUp=dcIntro}else if(dcIntroDue())dcIntro();else notifyPrompt();break;
@@ -1264,31 +1292,43 @@ let supa=null,cloudUser=null,cloudState='idle',lastSync=0,lastPushedAt=0,pending
 const cloudOn=()=>!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 function loadSupabase(){return new Promise((ok,no)=>{if(window.supabase)return ok();const sc=document.createElement('script');
  sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';sc.onload=()=>ok();sc.onerror=no;document.head.appendChild(sc)})}
-async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';return}
+// ask the server what time it really is; the phone's clock can be changed
+async function syncClock(){if(!supa){if(CLOCK_GUARD&&cloudOn())cloudInitClockOnly();return clockGo()}try{const t0=Date.now(),{data,error}=await supa.rpc('server_now'),t1=Date.now();if(error||!data)return clockGo();
+ const sv=Number(data);if(!(sv>1.7e12&&sv<4e12))return clockGo(); // ignore anything that isn't a sensible timestamp
+ const off=sv-(t0+t1)/2;clockOff=Math.abs(off)>60000?off:0;clockAnchor={srv:Date.now()+clockOff,perf:performance.now()};clockChecked=true;
+ const real=Date.now()+clockOff;const rec=s.pm?reconcilePM(real):false;s.verT=Math.max(s.verT||0,Math.min(real,s.maxT||real));sanitizeTime(s);/* if the phone ran ahead, the game simply pauses until real time catches up (at most 2 hours) */clockGo();if(!rec)clockNote()}catch(e){clockGo()}}
+let clockWarned=false;
+function clockNote(){const ahead=(s.maxT||0)-(Date.now()+clockOff);if(ahead>10*6e4&&!clockWarned&&!ovKind){clockWarned=true;
+ dialog('Clock check',`<p>Your phone's date or time was changed.</p><p class="s">The game runs on real time, so it's paused for <span class="hl">${dur(ahead/1000)}</span> until real time catches up. Nothing is lost.</p>`,`<button class="ok" data-act="close">OK</button>`)}}
+let clockLoading=false;
+async function cloudInitClockOnly(){if(clockLoading||supa)return;clockLoading=true;try{await cloudInit()}catch(e){}clockLoading=false} // the first try failed (offline): try again
+async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';clockGo();return}
  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
  supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct()});
+ await syncClock();
  await swInit();
  if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
  setInterval(()=>{if(cloudUser&&!document.hidden)loadFriends()},120000);
  setInterval(()=>{if(cloudUser)cloudPush()},30000);
- addEventListener('online',()=>{if(cloudUser)cloudPush()});refreshAcct()}
-async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote)return;pushing=true;cloudState='syncing';refreshAcct();
+ addEventListener('online',()=>{(CLOCK_GUARD&&!clockChecked?syncClock():Promise.resolve()).then(()=>{if(cloudUser)cloudPush()})});refreshAcct()}
+async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote||s.pm)return;pushing=true;cloudState='syncing';refreshAcct();
  try{s.notify=notifyInfo();save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
   if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';
-  supa.from('profiles').upsert({user_id:cloudUser.id,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;refreshAcct()}
-async function cloudFetch(){const {data,error}=await supa.from('saves').select('data').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;return data?unpack(data.data):null}
+  supa.from('profiles').upsert({user_id:cloudUser.id,build:BUILD,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;refreshAcct()}
+async function cloudFetch(){const {data,error}=await supa.from('saves').select('*').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;if(!data)return null;const r=unpack(data.data);if(r)r._bf=data.blocked_from||null;return r}
 const hasProgress=st=>st.owned.length>0||(st.earned||0)>0;
 const nwOf=st=>st.cash+st.owned.reduce((a,o)=>a+(o.stored||0)+(o.inv||0),0);
 // baseline: the timestamp of the save this device last knew about. A newer cloud save means another device played since.
-async function cloudPull(baseline,askIfBoth){if(!supa||!cloudUser)return;cloudState='syncing';refreshAcct();
- try{const remote=await cloudFetch();
+async function cloudPull(baseline,askIfBoth){if(!supa||!cloudUser)return;await syncClock();cloudState='syncing';refreshAcct();
+ try{const remote=await cloudFetch();const bf=remote&&remote._bf;if(remote)delete remote._bf;
+  if(remote&&bf&&!oldDone&&!bootBuild&&hasProgress(s)&&bootSavedAt>Date.parse(bf)){oldDone=true;oldCopy(remote);return}oldDone=true;
   if(!remote||!hasProgress(remote)){await cloudPush();return}
   if(!hasProgress(s)){adopt(remote,'Loaded your saved game');return}
   if(askIfBoth&&Math.abs((remote.savedAt||0)-(s.savedAt||0))>1000){chooseSave(remote);return}
   if((remote.savedAt||0)>baseline+1000){adopt(remote,'Picked up where you left off on your other device');return}
   await cloudPush()}catch(e){cloudState='error';refreshAcct()}}
-function adopt(remote,msg){s=remote;save();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';lastRank=null;pendingRemote=null;
+function adopt(remote,msg){s=remote;sanitizeTime(s);save();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';lastRank=null;pendingRemote=null;
  if(ovKind!=='jail'&&ovKind!=='splash')closeOv();if(s.jail&&ovKind!=='splash')openJail();upd();toast(msg,'good')}
 function chooseSave(remote){pendingRemote=remote;const ago=t=>t?dur((now()-t)/1000)+' ago':'unknown';
  dialog('Two saves found',`<p class="s">This device and your account have different progress. Choose which one to keep. The other is replaced.</p>
@@ -1375,6 +1415,52 @@ async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||
  catch(err){const t=String(err.message||'');m.textContent=isNet(err)?"Couldn't reach the save server. Check your connection and tap the button again.":/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
 async function signOut(){try{await cloudPush();await disablePush();await supa.auth.signOut()}catch(e){}cloudUser=null;friends=[];friendsLoaded=false;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
 
+
+/* ================= offline: pending earnings ================= */
+// After 2 hours without a confirmed time, the game keeps running, but money earned goes to "pending".
+// A snapshot is kept: if the phone's clock turns out to have been ahead, the game goes back to it.
+let pmToastAt=0,oldDone=false;
+function bank(a,quiet){if(!(a>0))return;if(s.pm){s.pm.pend+=a;if(!quiet&&performance.now()-pmToastAt>1500){pmToastAt=performance.now();toast('+'+$m(a)+' added to pending','good')}}else s.cash+=a}
+function enterPM(){const t=now();advance(t,true);s.pm={at:t,pend:0,snap:pack(s)};pmWant=false;save();upd()}
+function pmShort(b,p){if(gemPay(b)||!s.pm||!(s.pm.pend>0))return false;
+ dialog('Not enough cash yet',`<p>This costs <span class="hl">${$m(p)}</span>. You have <span class="hl">${$m(s.cash)}</span> to spend.</p><p class="s">Your <b>${$m(s.pm.pend)} pending</b> is added when you're back online, and you can buy it then.</p>`,`<button class="ok" data-act="close">OK</button>`);return true}
+function pmNote(title,body,btn){const a=[title,body,`<button class="ok" data-act="close">${btn}</button>`];if(ovKind){pmLater=a;return}dialog(...a)}
+function reconcilePM(real){const p=s.pm;pmWant=false;if(!p)return false;const off=Math.max(0,real-(p.at-OFF_CAP));
+ if((s.maxT||0)<=real+5*6e4){const a=p.pend;delete s.pm;s.cash+=a;save();
+  if(a>=1)pmNote('Back online',`<p>Your pending earnings are confirmed.</p><p style="font-size:30px;font-weight:900;color:var(--green);margin:4px 0">+${$m(a)}</p><p class="s">Added to your cash. You were offline for <span class="hl">${dur(off/1000)}</span>, and every minute counted.</p>`,'Nice!');return true}
+ const snap=unpack(p.snap);if(!snap){delete s.pm;return false}
+ snap.maxT=p.at;s=snap;delete s.pm;clockWarned=true;sanitizeTime(s);const r=advance(now(),true);save();const ahead=(s.maxT||0)-real;
+ pmNote('Clock check',`<p>Your phone's clock was ahead, so only real time counts.</p>${r.gained>=1?`<p style="font-size:30px;font-weight:900;color:var(--green);margin:4px 0">+${$m(r.gained)}</p>`:''}<p class="s">Progress made offline was replaced with what you really earned while away${r.gained>=1?'':' (nothing yet)'}.${ahead>6e4?` The game is paused for <span class="hl">${dur(ahead/1000)}</span> until real time catches up.`:''}</p>`,'OK');
+ upd();return true}
+function pmUI(){const on=!!s.pm;let b=$('pbn');
+ if(on&&!b){b=document.createElement('div');b.id='pbn';b.className='pbn';b.innerHTML='<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="#F5B946"/></svg><div><b>Offline · earnings are pending</b><span>Keep collecting. It\'s added when you\'re back online.</span></div>';stage.appendChild(b)}
+ if(b){b.hidden=!on;if(on){const d=$('duty');b.style.top=(d&&!d.hidden?d.offsetTop+d.offsetHeight+8:12)+'px'}}
+ let c=$('pchip');if(on&&!c){c=document.createElement('div');c.id='pchip';c.className='pchip num';document.querySelector('.t-cash').appendChild(c)}
+ if(c){c.hidden=!on||!(s.pm.pend>=1);if(!c.hidden)c.textContent='+'+money(s.pm.pend)+' pending'}}
+// an old copy of the game kept running after this update went live: its progress isn't kept
+function oldCopy(remote){adopt(remote,'Updated to the latest version');const r=advance(now(),true);save();
+ pmNote('Updated',`<p>You're on the latest version.</p><p class="s">Progress made on the old version after the update went live wasn't saved. Your game carries on from your last saved progress, plus <span class="hl">${$m(r.gained)}</span> earned while you were away.</p>`,'OK');upd();cloudPush()}
+
+/* ================= updates ================= */
+// Checks the live site for a newer version. MUST above this BUILD means the update can't be skipped.
+let updSnooze=0;
+async function checkUpdate(){if(document.hidden||$('updOv')||!/^https?:$/.test(location.protocol))return;
+ try{const r=await fetch(location.pathname+'?u='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+  const m=(await r.text()).match(/\/\*build\*\/const BUILD=(\d+),MUST=(\d+)/);if(!m||+m[1]<=BUILD)return;
+  const forced=+m[2]>BUILD;if(!forced&&Date.now()<updSnooze)return;showUpdate(forced)}catch(e){}}
+function showUpdate(forced){const d=document.createElement('div');d.id='updOv';d.className='dim';d.style.zIndex=10000;
+ d.innerHTML=`<div class="dlg"><h3>Update ready</h3><div class="body"><p>A new version of Trillionaire Tycoon is here.</p><p class="s">${forced?'You need it to keep playing. ':''}Your progress is saved.</p><div class="btns">${forced?'':'<button class="no" id="updLater">Later</button>'}<button class="ok" id="updGo">Update now</button></div></div></div>`;
+ document.body.appendChild(d);$('updGo').onclick=()=>{save();$('updGo').textContent='Updating…';location.reload()};
+ const l=$('updLater');if(l)l.onclick=()=>{updSnooze=Date.now()+30*6e4;d.remove()}}
+setTimeout(checkUpdate,4000);setInterval(checkUpdate,5*6e4);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(checkUpdate,1500)});
+// offline: keep trying to confirm the time, so pending money is added soon after the signal comes back
+setInterval(()=>{if(CLOCK_GUARD&&!clockChecked&&!document.hidden)syncClock()},60000);
+addEventListener('online',()=>{if(CLOCK_GUARD&&!clockChecked)syncClock()});
+// re-check the time every 10 minutes, and whenever the phone's clock and stopwatch disagree (date changed, or the phone slept)
+{let w0=Date.now(),p0=performance.now(),last=performance.now();setInterval(()=>{const w=Date.now(),p=performance.now();
+ if(CLOCK_GUARD&&!document.hidden&&(Math.abs((w-w0)-(p-p0))>60000||p-last>10*6e4)){last=p;syncClock()}w0=w;p0=p},2000)}
+
 /* ================= loop ================= */
 let lastRank=null,pendingWelcome=null;
 function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s.ach[id]=1;got.push(t)}}
@@ -1382,16 +1468,20 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
-function tick(){const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}if(s.jail)updJail();checkAch();upd()}
-const wasJ0=!!s.jail;const away=advance(now(),true);
-if(s.name&&away.dt>60000&&(away.gained>0||away.done))pendingWelcome=[away,!wasJ0&&!!s.jail];
+function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}if(s.jail)updJail();checkAch();upd()}
+// with an account, catch up only once the server has said what time it really is (or after 6s if offline)
+let clockReady=!CLOCK_GUARD;
+function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
+ if(s.name&&away.dt>60000&&(away.gained>0||away.done)){pendingWelcome=[away,!wasJ0&&!!s.jail];if(!boot&&!ovKind){welcome(...pendingWelcome);pendingWelcome=null}}}
+function clockGo(){clockWait=false;if(clockReady)return;clockReady=true;catchUp();upd()}
+if(clockReady)catchUp(true);else setTimeout(clockGo,6000);
 lastRank=myRank();upd();splash();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
 addEventListener('resize',()=>{layout();stackN=-1;updStage()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)cloudPull(lastPushedAt)}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)cloudPull(lastPushedAt)}});
 addEventListener('pagehide',()=>{isAway=true;if(cloudUser)cloudPush()});
 cloudInit();
 setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
 const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):start();
 })();
-</script></body></html>
+</script>
