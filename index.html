@@ -47,6 +47,8 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .t-cash b{color:var(--green-d)}
 .t-thr{background:var(--grey);transition:background .3s}
 .t-thr.hot{background:var(--orange)}
+.t-thr.l1{background:#7FD0F2}.t-thr.l1 small,.t-thr.l1 b{color:#0E4D6B}
+.t-thr.l2{background:#F5A63A}.t-thr.l3{background:#E04B3A}.t-thr.l4{background:#A8231B}
 .t-chest{background:var(--green);align-items:center;padding-right:16px;position:relative}
 .t-chest svg{width:42px;height:34px}
 .t-chest small{font-size:9px;color:var(--lime)}
@@ -690,7 +692,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102905,MUST=2026102905;
+/*build*/const BUILD=2026102906,MUST=2026102906;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -891,7 +893,7 @@ function hud(){pmUI();$('nw').textContent=money(nw());
   r.className='rate num'+(jailed?' rfrozen':boostOn()&&inc>0?' rboost':'');
   r.setAttribute('aria-label',jailed?'Income frozen while in jail':`Earning ${$m(inc)} per minute`)}if(shownCash===null||s.cash<shownCash||performance.now()-cashTween>1500)shownCash=s.cash;else shownCash+=(s.cash-shownCash)*.3;$('cash').textContent=money(shownCash);$('gm').textContent=s.gems;
  const fit=(id,t)=>{const e=$(id).parentElement,n=t.length;e.style.fontSize=n>6?'15px':n>4?'18px':''};fit('gm',String(s.gems));fit('cash',money(s.cash));
- const th=threat();$('thr').textContent=Math.round(th)+'%';$('thrT').classList.toggle('hot',th>0);
+ const th=threat();$('thr').textContent=Math.round(th)+'%';{const t=$('thrT'),lv=thrLevel(th);t.classList.toggle('hot',th>0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
  const fr=s.freeAt<=now();$('freeTag').textContent=fr?'FREE':dur((s.freeAt-now())/1000);$('freeTag').className=fr?'tag':'tag sm';
  $('boostTag').hidden=!boostOn();
  const cr=s.chestAt<=now();$('chestT').textContent=cr?'OPEN!':dur((s.chestAt-now())/1000);
@@ -951,7 +953,9 @@ function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
  if(!sellable(o))return dialog("Can't sell",`<div class="pic">${art(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> can never be sold.</p><p class="s">${b.threat<0?'Threat reducers stay with you for good.':'Businesses bought with crystals stay with you for good.'}</p>`,`<button class="ok" data-act="close">OK</button>`);
  dialog(`Sell ${esc(b.name)}`,`<div class="pic">${art(b)}</div><p>Sell <span class="hl">${esc(b.name.toUpperCase())}</span> for <span class="hlg num">${COIN} ${money(sellValue(o))}</span>?</p><p class="s">You get back ${b.sellT===3?'5% of its value':b.sellP+'% of what you invested'}, plus anything stored.</p>`,
  `<button class="no" data-act="close">No</button><button class="yes" data-act="dosell">Yes</button>`)}
-function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=th<=0?['None','var(--green)']:th<10?['Very low','var(--green)']:th<30?['Low','var(--green)']:th<50?['Medium','#E08A22']:th<70?['High','var(--red)']:['Very high','var(--red)'];
+// threat colour bands: 1 very low (blue), 2 low (orange), 3 medium (red), 4 high and very high (dark red)
+const thrLevel=th=>th<=0?0:th<10?1:th<30?2:th<50?3:4;
+function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=[['None','var(--green)'],['Very low','#2F8DC0'],['Low','#E8901E'],['Medium','#E04B3A'],['High','#C8372D'],['Very high','#C8372D']][th<=0?0:th<10?1:th<30?2:th<50?3:th<70?4:5];
  dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(Math.max(0,th))}%</span></p><p class="s">The higher your threat, the more often the police raid you. Get caught and you go to jail, where your businesses stop earning. At 50% threat or more, 90% of your cash is seized too. After you get out, they leave you alone for a while.</p>
  <div class="cmp num"><span>Police attention</span><span></span><span style="color:${heat[1]}">${heat[0]}</span>${th<0?`<span>Spare cover</span><span></span><span>${Math.round(-th)}%</span>`:''}</div>${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}<p class="s">Under 30% you're rarely raided. Gardens, libraries and hospitals bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
