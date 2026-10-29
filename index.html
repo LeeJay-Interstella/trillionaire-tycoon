@@ -247,7 +247,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 @keyframes cardglow{50%{box-shadow:0 5px 0 #C98F1E,0 0 0 7px #F5B94677}}
 #jail .freecard svg{width:34px;height:34px;flex:none}
 #jail .freecard small{display:block;font-weight:700;font-size:12px;color:#5A3A08}
-#jail .row button{flex:1;padding:12px;background:#fff;color:var(--ink);font-weight:900;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px}
+#jail .serve{position:relative;overflow:visible;transition:transform .06s,box-shadow .06s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}#jail .serve:active{transform:translateY(4px);box-shadow:0 1px 0 var(--orange-d)}#jail .tm{font-variant-numeric:tabular-nums}.jpop{position:absolute;top:-6px;transform:translateX(-50%);font-weight:900;font-size:24px;color:#FFD84A;-webkit-text-stroke:1.5px #2A2A2A;paint-order:stroke fill;text-shadow:0 2px 0 #0008;pointer-events:none;animation:jpop .7s ease-out forwards}@keyframes jpop{from{opacity:1;transform:translate(-50%,0) scale(1.15)}to{opacity:0;transform:translate(-50%,-46px) scale(.9)}}#jail .jnote{position:absolute!important;z-index:5!important;top:calc(env(safe-area-inset-top,0px) + 18px);left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));max-width:420px;margin:0 auto;background:#1C2425;color:#ECEFE9;border-left:5px solid var(--red);box-shadow:0 10px 24px #0007;padding:12px 10px 12px 14px;display:flex;gap:8px;align-items:flex-start;text-align:left;font-size:14px;line-height:1.4;font-weight:600;animation:jnin .35s ease-out}#jail .jnote>div{flex:1;display:flex;flex-direction:column;gap:2px}#jail .jnote b{font-weight:900}#jail .jnote>div>b{font-size:15px}#jail .jnote button{background:none;border:0;color:#9AA39D;font-size:18px;font-weight:900;padding:2px 6px;cursor:pointer}#jail .jnote.out{transition:opacity .25s,transform .25s;opacity:0;transform:translateY(-12px)}@keyframes jnin{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}#jail .row button{flex:1;padding:12px;background:#fff;color:var(--ink);font-weight:900;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:3px}
 #jail .row small{font-weight:700;color:var(--green);display:flex;gap:4px;align-items:center}
 #jbar{width:100%;max-width:380px;height:12px;background:#5a5a5a}
 #jbar i{display:block;height:100%;background:var(--lime)}
@@ -723,7 +723,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102910,MUST=2026102910;
+/*build*/const BUILD=2026102912,MUST=2026102910;
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -767,6 +767,8 @@ window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
 /* ================= helpers ================= */
 const $m=n=>'$'+money(n);
 const pct=x=>(Math.round(x*100)/100).toFixed(2)+'%';
+function jdur(sec){sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?`${h}h${String(m).padStart(2,'0')}m${String(x).padStart(2,'0')}s`:dur(sec)}
+function jailPop(){const b=document.querySelector('#jail .serve');if(!b)return;const p=document.createElement('span');p.className='jpop';p.textContent='−3s';p.style.left=(30+Math.random()*40)+'%';b.appendChild(p);setTimeout(()=>p.remove(),700)}
 function dur(sec){sec=Math.max(0,Math.ceil(sec));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),x=sec%60;
  return d?`${d}d${String(h).padStart(2,'0')}h`:h?`${h}h${String(m).padStart(2,'0')}m`:m?`${m}m${String(x).padStart(2,'0')}s`:`${x}s`}
 const $=id=>document.getElementById(id);
@@ -830,7 +832,7 @@ function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw()
  return null}
 function arrest(at){const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
- s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th)};s.arrests++;
+ s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th),at};s.arrests++;
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec})}
 function jailOut(how,end,cost){const j=s.shift&&s.shift.jails[s.shift.jails.length-1];if(j&&j.end==null){j.end=end;j.how=how;if(cost)j.cost=cost}}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
@@ -1306,16 +1308,19 @@ function shiftPopup(){const r=(s.shifts||[])[0];if(!r)return;const tot=r.rows.re
  <div class="bt"><button class="dc-bb" data-act="shiftview" data-v="0">See report</button><button class="dc-bb l" data-act="collectall">Collect</button></div></div></div>`}
 
 /* jail */
+function jailNoteHTML(){const n=jailNote;if(!n||!s.jail)return'';const ago=now()-(s.jail.at||s.jail.until-s.jail.total);
+ const made=n.gained>0?` Your businesses made <b>${$m(n.gained)}</b> before that.`:'';
+ return`<div class="jnote" id="jnote" role="status"><div><b>${n.raided?'🚨 Raided while you were away':'🔒 Still inside'}</b><span>${n.raided?`The police came <b>${dur(ago/1000)}</b> ago.${made}`:`You were away <b>${dur(n.dt/1000)}</b>.${n.gained>0?` Your businesses made <b>${$m(n.gained)}</b>.`:''}`}</span></div><button data-act="jnotex" aria-label="Dismiss">✕</button></div>`}
 function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
- ovl.innerHTML=`<div class="fullscreen" id="jail"><div class="bars"></div><h2>BUSTED!</h2><p style="margin:0;font-weight:700">Your ${j.th}% threat caught up with you.</p><div class="tm num" id="jt"></div><div id="jbar"><i id="jb"></i></div>
+ ovl.innerHTML=`<div class="fullscreen" id="jail"><div class="bars"></div>${jailNoteHTML()}<h2>BUSTED!</h2><p style="margin:0;font-weight:700">Your ${j.th}% threat caught up with you.</p><div class="tm num" id="jt"></div><div id="jbar"><i id="jb"></i></div>
  <div class="card2 num"><b>${j.sev==='high'?'Heavy':j.sev==='mid'?'Medium':'Light'} sentence</b><br>${j.loss?`Cash confiscated: <b>${$m(j.loss)}</b><br>`:''}Your businesses stop earning until you're out.</div>
  <button class="serve" data-act="serve">TAP TO SERVE TIME (−3s)</button>
  ${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <div class="row"><button data-act="lawyer">CALL A LAWYER<small class="num">${GEM} ${lawyerCost()}</small></button><button data-act="bribe">BRIBE THE JUDGE<small class="num">${COIN} ${money(Math.max(100,s.cash*.25))}</small></button></div></div>`;updJail()}
-function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=dur(l);$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
+function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=jdur(l);$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(5,Math.ceil((s.jail.until-now())/120000)):5;
 function closeJail(){if(ovKind==='jail')closeOv()}
-function release(m,how,cost){jailOut(how||'served',now(),cost);if(s.jail&&s.jail.mgr)s.mgrUntil-=Math.max(0,s.jail.until-now());s.jail=null;s.coolUntil=now()+COOL;closeJail();toast(m,'good');save();upd()}
+function release(m,how,cost){jailNote=null;jailOut(how||'served',now(),cost);if(s.jail&&s.jail.mgr)s.mgrUntil-=Math.max(0,s.jail.until-now());s.jail=null;s.coolUntil=now()+COOL;closeJail();toast(m,'good');save();upd()}
 
 /* intro */
 function splash(){ovKind='splash';let rain='';for(let i=0;i<46;i++){const sz=28+Math.random()*44,front=i%5===0;rain+=`<div class="rain${front?' front':''}" style="left:${Math.random()*96-4}%;--s:${sz.toFixed(0)}px;--sw:${(10+Math.random()*30).toFixed(0)}px;--r0:${(Math.random()*360).toFixed(0)}deg;opacity:${front?.95:.55+sz/160};animation-duration:${(3.5+Math.random()*4.5).toFixed(2)}s;animation-delay:${(-Math.random()*8).toFixed(2)}s"><div class="push">${BILL}</div></div>`}
@@ -1401,7 +1406,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'notifoff':disablePush().then(()=>toast('Notifications off'));break;
   case'named':{const v=($('on').value||'').trim()||'Boss';s.name=v;save();closeOv();
    dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${art(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
-  case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);if(now()>=s.jail.until)release('Sentence served. You walked free!','served');else updJail();break;
+  case'jnotex':{jailNote=null;const n=$('jnote');if(n){n.classList.add('out');setTimeout(()=>n.remove(),250)}break}
+  case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);jailPop();if(now()>=s.jail.until)release('Sentence served. You walked free!','served');else updJail();break;
   case'jailcard':if(!s.jail||!(s.perks.jail>0))return;s.perks.jail--;release('Get out of jail free! You walked straight out.','card');break;
   case'lawyer':{const c=lawyerCost();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;release('Your lawyer found a loophole. Free to go!','lawyer',c+' crystals');break}
   case'bribe':{const c=Math.max(100,s.cash*.25);if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.','bribe','$'+money(c));break}
@@ -1589,16 +1595,17 @@ addEventListener('online',()=>{if(CLOCK_GUARD&&!clockChecked)syncClock()});
  if(CLOCK_GUARD&&!document.hidden&&(Math.abs((w-w0)-(p-p0))>60000||p-last>10*6e4)){last=p;syncClock()}w0=w;p0=p},2000)}
 
 /* ================= loop ================= */
-let lastRank=null,pendingWelcome=null;
+let lastRank=null,pendingWelcome=null,jailNote=null;
 function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s.ach[id]=1;got.push(t)}}
  if(got.length===1)toast(`${got[0]} complete! Claim your crystals in the mailbox.`,'good');else if(got.length>1)toast(`${got.length} goals complete! Claim your crystals in the mailbox.`,'good');
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
-function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;advance(now());if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();checkAch();upd()}
+function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
 let clockReady=!CLOCK_GUARD;
 function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
+ if(s.jail&&s.name&&away.dt>60000){jailNote={dt:away.dt,gained:away.gained,raided:!wasJ0};pendingWelcome=null;if(!boot&&!ovKind)openJail();else if(!boot&&ovKind==='jail'){closeOv();openJail()}return}
  if(s.name&&away.dt>60000&&(away.gained>0||away.done)){pendingWelcome=[away,!wasJ0&&!!s.jail];if(!boot&&!ovKind){welcome(...pendingWelcome);pendingWelcome=null}}}
 function clockGo(){clockWait=false;if(clockReady)return;clockReady=true;catchUp();upd()}
 if(clockReady)catchUp(true);else setTimeout(clockGo,6000);
