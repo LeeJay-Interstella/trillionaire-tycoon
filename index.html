@@ -723,8 +723,8 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026103010,MUST=2026102910;
-/*notes*/const NOTES=["Tap any building to earn faster. Each tap adds 1 second of its earnings, up to max capacity. COLLECT still collects."];
+/*build*/const BUILD=2026103011,MUST=2026102910;
+/*notes*/const NOTES=["Tap any building to earn faster. Each tap adds 1 second of its earnings, up to max capacity. COLLECT still collects.", "In jail, the lawyer and the bribe now get cheaper as your sentence goes down, including when you tap."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1327,9 +1327,10 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  <div class="card2 num"><b>${j.sev==='high'?'Heavy':j.sev==='mid'?'Medium':'Light'} sentence</b><br>${j.loss?`Cash confiscated: <b>${$m(j.loss)}</b><br>`:''}Your businesses stop earning until you're out.</div>
  <button class="serve" data-act="serve">TAP TO SERVE TIME (−3s)</button>
  ${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
- <div class="row"><button data-act="lawyer">CALL A LAWYER<small class="num">${GEM} ${lawyerCost()}</small></button><button data-act="bribe">BRIBE THE JUDGE<small class="num">${COIN} ${money(Math.max(100,s.cash*.25))}</small></button></div></div>`;updJail()}
-function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=jdur(l);$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
-const lawyerCost=()=>s.jail?Math.max(5,Math.ceil((s.jail.until-now())/120000)):5;
+ <div class="row"><button data-act="lawyer">CALL A LAWYER<small class="num" id="jlaw">${GEM} ${lawyerCost()}</small></button><button data-act="bribe">BRIBE THE JUDGE<small class="num" id="jbribe">${COIN} ${money(bribeCost())}</small></button></div></div>`;updJail()}
+function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=`${GEM} ${lawyerCost()}`;if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
+const lawyerCost=()=>s.jail?Math.max(1,Math.ceil((s.jail.until-now())/120000)):1; // 1 crystal per 2 minutes left
+const bribeCost=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(100,s.cash*.25*f)}; // 25% of your cash for a full sentence, less as you serve it
 function closeJail(){if(ovKind==='jail')closeOv()}
 function release(m,how,cost){jailNote=null;jailOut(how||'served',now(),cost);if(s.jail&&s.jail.mgr)s.mgrUntil-=Math.max(0,s.jail.until-now());s.jail=null;s.coolUntil=now()+COOL;closeJail();toast(m,'good');save();upd()}
 
@@ -1422,7 +1423,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);jailPop();if(now()>=s.jail.until)release('Sentence served. You walked free!','served');else updJail();break;
   case'jailcard':if(!s.jail||!(s.perks.jail>0))return;s.perks.jail--;release('Get out of jail free! You walked straight out.','card');break;
   case'lawyer':{const c=lawyerCost();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;release('Your lawyer found a loophole. Free to go!','lawyer',c+' crystals');break}
-  case'bribe':{const c=Math.max(100,s.cash*.25);if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.','bribe','$'+money(c));break}
+  case'bribe':{const c=bribeCost();if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.','bribe','$'+money(c));break}
  }});
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
  if(e.key==='Enter'){if($('fcode')){redeem();return}if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
