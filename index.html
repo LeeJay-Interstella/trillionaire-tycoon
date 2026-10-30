@@ -138,7 +138,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .gear svg{width:20px;height:20px;fill:#8A8676}
 .info{padding-right:40px}
 .floaty{position:fixed;z-index:70;pointer-events:none;font-weight:900;font-size:20px;color:var(--green);text-shadow:0 2px 0 #fff,0 -2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff;animation:rise .9s ease-out forwards}
-@keyframes rise{to{transform:translateY(-56px);opacity:0}}
+ul.wnew{margin:0;padding:0 0 0 20px;text-align:left;display:flex;flex-direction:column;gap:8px;font-weight:700;font-size:14px;line-height:1.4;width:100%}ul.wnew li::marker{color:var(--green)}@keyframes rise{to{transform:translateY(-56px);opacity:0}}.tapfloat{position:fixed;z-index:70;pointer-events:none;transform:translateX(-50%);font-family:var(--font);font-weight:900;font-size:26px;letter-spacing:-.5px;white-space:nowrap;color:var(--green);text-shadow:0 2px 0 #fff,0 -2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff,0 4px 8px #0003;animation:tapup 1.1s cubic-bezier(.2,.7,.3,1) forwards}@keyframes tapup{0%{transform:translate(-50%,6px) scale(.8);opacity:0}12%{transform:translate(-50%,0) scale(1.1);opacity:1}60%{opacity:1}100%{transform:translate(-50%,-110px) scale(1);opacity:0}}.dark .tapfloat{text-shadow:0 2px 0 #0B0F10,0 -2px 0 #0B0F10,2px 0 0 #0B0F10,-2px 0 0 #0B0F10,0 4px 8px #0006}
 
 /* overlays */
 #ovl:empty{display:none}
@@ -723,7 +723,8 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026102912,MUST=2026102910;
+/*build*/const BUILD=2026103010,MUST=2026102910;
+/*notes*/const NOTES=["Tap any building to earn faster. Each tap adds 1 second of its earnings, up to max capacity. COLLECT still collects."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -882,7 +883,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   L+=`<div class="callout"><div class="timer num" id="ctimer"></div><div class="lbl">TAP TO SPEED UP</div></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p></div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
- }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(art(b),TOPS[b.vis]);artEl.dataset.act='collect';
+ }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(art(b),TOPS[b.vis]);artEl.dataset.act=x.rate>0?'tapearn':'collect';
   L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
@@ -944,6 +945,16 @@ function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return
   const an=f.animate?.([{transform:'translate(0,0) rotate(0) scale(1)'},{transform:`translate(${dx*.35+side}px,${dy*.35+lift}px) rotate(${-20+Math.random()*40}deg) scale(1.05)`,offset:.4},{transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*30-15}deg) scale(.35)`,opacity:.3}],{duration:560,delay:i*28,easing:'cubic-bezier(.3,.1,.6,1)',fill:'forwards'});
   const done=()=>{f.remove();if(i===last){const t=$('cash').closest('.t');t.classList.add('bump');setTimeout(()=>t.classList.remove('bump'),160)}};if(an)an.onfinish=done;else done()});
  setTimeout(()=>{colEl.innerHTML=''},bills.length*28+40);stackN=0;cashTween=performance.now();const cb=$('cbtn').getBoundingClientRect();floaty(cb.left+cb.width/2,cb.top,'+'+$m(a));upd()}
+// tap a building to earn: each tap adds TAP_SEC seconds of that building's earnings (doubled while a boost runs), up to max capacity
+const TAP_SEC=1,TAP_GAP=90;let tapLast=0;
+const tapFmt=v=>v<10?'$'+v.toFixed(2):$m(v);
+function tapFloat(x,y,txt,col){const f=document.createElement('div');f.className='tapfloat num';f.textContent=txt;if(col)f.style.color=col;f.style.left=(x+(Math.random()*24-12))+'px';f.style.top=(y-28)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1100)}
+function tapEarn(ev){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
+ const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
+ const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
+ artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');
+ const room=x.hold-o.stored;if(room<0.005){tapFloat(px,py,'FULL','#E04B3A');vib(3);return}
+ const v=Math.min(room,x.rate/60*TAP_SEC*(now()<(s.boostUntil||0)?2:1));o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);tapFloat(px,py,'+'+tapFmt(v));upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);
@@ -1040,7 +1051,7 @@ function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
  <button class="bigbtn" data-act="copybk">Copy code</button>
  <p class="s" style="margin-top:6px">Got a code from another device?</p><textarea id="rs" placeholder="Paste a save code here" style="width:100%;height:60px;font:600 11px/1.3 monospace;border:3px solid #ddd;padding:8px;resize:none"></textarea>`,
  `<button class="no" data-act="close">Close</button><button class="yes" data-act="restore">Load code</button>`)}
-function howto(){dialog('How to play',`<p class="s" style="text-align:left;color:var(--ink)">1. Tap the shop button to buy a business.<br><br>2. Tap the building site to speed up construction, or finish it with crystals.<br><br>3. Bills pile up next to your business until it hits max capacity. Tap COLLECT before it fills.<br><br>4. Upgrade to earn more. Sell weak or risky businesses.<br><br>5. Keep threat low or you'll end up in jail.<br><br>6. Grow your net worth to unlock new tiers and climb the rich list.</p>`,`<button class="yes" data-act="close">Let's go</button>`)}
+function howto(){dialog('How to play',`<p class="s" style="text-align:left;color:var(--ink)">1. Tap the shop button to buy a business.<br><br>2. Tap the building site to speed up construction, or finish it with crystals.<br><br>3. Bills pile up next to your business until it hits max capacity. Tap COLLECT before it fills. Tap the building itself to earn a little faster.<br><br>4. Upgrade to earn more. Sell weak or risky businesses.<br><br>5. Keep threat low or you'll end up in jail.<br><br>6. Grow your net worth to unlock new tiers and climb the rich list.</p>`,`<button class="yes" data-act="close">Let's go</button>`)}
 
 /* ================= daily chance + perk wallet ================= */
 const MGR='<svg class="mg" viewBox="0 0 20 28" shape-rendering="crispEdges"><rect x="6" y="2" width="8" height="8" fill="#F2C99A"/><rect x="6" y="1" width="8" height="3" fill="#3B2A1E"/><rect x="7" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="8" width="4" height="1" fill="#B85C3A"/><rect x="4" y="11" width="12" height="11" fill="#1F3A5F"/><rect x="9" y="11" width="2" height="9" fill="#F5B946"/><rect x="8" y="11" width="1" height="3" fill="#fff"/><rect x="11" y="11" width="1" height="3" fill="#fff"/><rect x="15" y="14" width="4" height="6" fill="#C98A55"/><rect x="16" y="15" width="2" height="1" fill="#fff"/><rect x="16" y="17" width="2" height="1" fill="#fff"/><rect x="5" y="22" width="4" height="5" fill="#16223A"/><rect x="11" y="22" width="4" height="5" fill="#16223A"/></svg>';
@@ -1339,6 +1350,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'close':if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'site':tapSite(e);break;
+  case'tapearn':tapEarn(e);break;
   case'collect':collect();break;
   case'finish':{const o=cur();if(!o||!o.busy)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
   case'shop':if(s.jail)return jailNag();if(!s.seenShop){s.seenShop=true;$('getmore')?.remove();save()}openShop();break;
@@ -1579,10 +1591,12 @@ function oldCopy(remote){adopt(remote,'Updated to the latest version');const r=a
 let updSnooze=0;
 async function checkUpdate(){if(document.hidden||$('updOv')||!/^https?:$/.test(location.protocol))return;
  try{const r=await fetch(location.pathname+'?u='+Date.now(),{cache:'no-store'});if(!r.ok)return;
-  const m=(await r.text()).match(/\/\*build\*\/const BUILD=(\d+),MUST=(\d+)/);if(!m||+m[1]<=BUILD)return;
+  const tx=await r.text(),m=tx.match(/\/\*build\*\/const BUILD=(\d+),MUST=(\d+)/);if(!m||+m[1]<=BUILD)return;try{const n=tx.match(/\/\*notes\*\/const NOTES=(\[.*?\]);/);updNotes=n?JSON.parse(n[1]):[]}catch(e){updNotes=[]}
   const forced=+m[2]>BUILD;if(!forced&&Date.now()<updSnooze)return;showUpdate(forced)}catch(e){}}
+let updNotes=[];
+const notesHTML=n=>n&&n.length?`<ul class="wnew">${n.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
 function showUpdate(forced){const d=document.createElement('div');d.id='updOv';d.className='dim';d.style.zIndex=10000;
- d.innerHTML=`<div class="dlg"><h3>Update ready</h3><div class="body"><p>A new version of Trillionaire Tycoon is here.</p><p class="s">${forced?'You need it to keep playing. ':''}Your progress is saved.</p><div class="btns">${forced?'':'<button class="no" id="updLater">Later</button>'}<button class="ok" id="updGo">Update now</button></div></div></div>`;
+ d.innerHTML=`<div class="dlg"><h3>Update ready</h3><div class="body"><p>A new version of Trillionaire Tycoon is here.</p>${updNotes.length?`<p class="s" style="margin-bottom:-4px"><b>What's new</b></p>${notesHTML(updNotes)}`:''}<p class="s">${forced?'You need it to keep playing. ':''}Your progress is saved.</p><div class="btns">${forced?'':'<button class="no" id="updLater">Later</button>'}<button class="ok" id="updGo">Update now</button></div></div></div>`;
  document.body.appendChild(d);$('updGo').onclick=()=>{save();$('updGo').textContent='Updating…';location.reload()};
  const l=$('updLater');if(l)l.onclick=()=>{updSnooze=Date.now()+30*6e4;d.remove()}}
 setTimeout(checkUpdate,4000);setInterval(checkUpdate,5*6e4);
@@ -1601,7 +1615,8 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
-function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();checkAch();upd()}
+function whatsNew(){if(s.seenBuild===BUILD)return false;const fresh=s.seenBuild==null&&!(s.earned>0)&&s.owned.length<2;s.seenBuild=BUILD;save();if(fresh||!NOTES.length)return false;dialog("What's new",`<p>Your game just updated.</p>${notesHTML(NOTES)}`,`<button class="yes" data-act="close">Nice</button>`);return true}
+function tick(){if(!clockReady){hud();return}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
 let clockReady=!CLOCK_GUARD;
 function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
