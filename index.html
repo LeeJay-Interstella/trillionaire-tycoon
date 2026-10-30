@@ -262,6 +262,15 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .lines .k{color:#ECEFE9}.dark .lines .g{color:#6CCF5F}.dark .lines .r{color:#FF8A73}
 .dark .gear{background:#263031}.dark .gear svg{fill:#9FA8A3}
 .dark .arrow,.dark .pager{background:#1C2425e6}
+.vtog{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:10px;z-index:6;display:flex;background:#fff;border:3px solid var(--ink);box-shadow:0 3px 0 #0002}
+.vtog button{height:34px;min-width:44px;padding:0 9px;border:0;background:transparent;color:#5C5C57;display:flex;align-items:center;gap:5px;font-family:var(--font);font-weight:900;font-size:13px;font-variant-numeric:tabular-nums}
+.vtog svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linejoin:round}
+.vtog button.on{background:var(--green);color:#fff}
+.vtog button[data-act=vgood].on{background:var(--green-d)}
+.dark .vtog{background:#1C2425;border-color:#ECEFE9}.dark .vtog button{color:#9AA39D}.dark .vtog button.on{color:#fff}
+.pager.low{top:54px}
+#city::after{content:"";position:absolute;inset:0;background:#8FD16A;opacity:0;transition:opacity .3s;pointer-events:none}
+#stage.good #city::after{opacity:.22}
 .dark .floaty{text-shadow:0 2px 0 #0B0F10,0 -2px 0 #0B0F10,2px 0 0 #0B0F10,-2px 0 0 #0B0F10}
 .dark .dlg .body,.dark .sheet-in,.dark .card,.dark .lb,.dark .mail,.dark .statgrid div,.dark .tabs2 button,.dark input.nm,.dark #jail .card2,.dark #jail .row button{background:#1C2425;color:#ECEFE9}
 .dark .sheet-b{background:#0F1415}
@@ -723,8 +732,8 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026103012,MUST=2026102910;
-/*notes*/const NOTES=["In jail, Call a lawyer and Bribe the judge have moved to the bottom of the screen, so you won't hit them by accident while tapping to serve time."];
+/*build*/const BUILD=2026103013,MUST=2026102910;
+/*notes*/const NOTES=["Businesses and good causes are now separate. Use the new toggle at the top left of the screen to switch between them."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -874,7 +883,10 @@ let stageSig='',stackN=-1,VIEW={sc:1,ox:0,oy:0};
 function sigNow(){const o=cur();return o?`${o.bid}|${o.busy||''}|${o.level}|${s.owned.length}|${s.cur}`:'none|'+s.owned.length}
 function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML='';$('tube').hidden=true;artEl.dataset.p='';
  let L='';
- if(s.owned.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous business"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next business"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button><div class="pager num">${s.cur+1} / ${s.owned.length}</div>`;
+ {const g=isGood(o),G=grp(g),nb=grp(false).length,ng=grp(true).length,both=nb>0&&ng>0;stage.classList.toggle('good',!!o&&g);
+ if(both)L+=`<div class="vtog" role="group" aria-label="Show businesses or good causes"><button data-act="vbiz" class="${g?'':'on'}" aria-pressed="${!g}" aria-label="Businesses (${nb})"><svg viewBox="0 0 24 24"><path d="M3 21V9l6-3v15M9 21V4l8 3v14M3 21h18"/></svg>${nb}</button><button data-act="vgood" class="${g?'on':''}" aria-pressed="${g}" aria-label="Good causes (${ng})"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>${ng}</button></div>`;
+ if(G.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
+ if(o&&!both&&G.length>1)L+=`<div class="pager num">${G.indexOf(s.cur)+1} / ${G.length}</div>`;}
  L+=`<div class="boost num" id="boostChip" hidden></div>`;
  if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
@@ -964,7 +976,10 @@ function upgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);i
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
  pay(b,x.up);if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
-function step(d){if(s.owned.length<2)return;s.cur=(s.cur+d+s.owned.length)%s.owned.length;upd()}
+const isGood=o=>!!o&&!(B[o.bid].rate>0); // good causes earn nothing and lower threat
+const grp=g=>s.owned.map((o,i)=>i).filter(i=>isGood(s.owned[i])===g);
+function step(d){const o=cur();if(!o)return;const L=grp(isGood(o));if(L.length<2)return;const p=Math.max(0,L.indexOf(s.cur));s.cur=L[(p+d+L.length)%L.length];upd()}
+function showGroup(g){const o=cur();if(o&&isGood(o)===g)return;if(o){s.vLast=s.vLast||{};s.vLast[isGood(o)?'g':'b']=o.bid}const L=grp(g);if(!L.length)return;const w=(s.vLast||{})[g?'g':'b'];const i=s.owned.findIndex(x=>x.bid===w);s.cur=L.includes(i)?i:L[0];vib(8);upd()}
 
 /* ================= overlays ================= */
 const ovl=$('ovl');let ovKind=null;
@@ -1360,7 +1375,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'goto':s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();upd();break;
   case'upgrade':askUpgrade();break;case'doupgrade':upgrade();break;
   case'sell':askSell();break;case'dosell':sell();break;
-  case'prev':step(-1);break;case'next':step(1);break;
+  case'prev':step(-1);break;case'next':step(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
   case'threat':threatDlg();break;
   case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');loadFriends();break;
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
