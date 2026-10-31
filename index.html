@@ -588,7 +588,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dempty{margin:auto 0;font-size:13px;line-height:1.5}
 .dquick{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px max(12px,env(safe-area-inset-left,0px)) 14px}
 .dqr{width:100%;text-align:center;border:2px solid var(--green);background:var(--green);color:#fff;font-weight:800;font-size:14px;padding:9px 8px;border-radius:18px}
-.dqr.no{background:transparent;border-color:#4A5557;color:#C9CFCB}
+.dquick.one{grid-template-columns:1fr}.dqr.cash{background:var(--gold);border-color:var(--gold);color:#3A2604;font-weight:900;font-size:17px;padding:14px 8px;box-shadow:0 4px 0 #C98F1E;animation:cashpulse 1.4s ease-in-out infinite}@keyframes cashpulse{50%{transform:scale(1.03)}}.dpay{align-self:stretch;margin:6px 4px 2px;background:#0E4D24;border:3px solid #58BD6B;outline:2px solid #0E4D24;outline-offset:3px;color:#F8E8C4;text-align:center;padding:14px 10px;display:flex;flex-direction:column;gap:2px}.dpay small{font-size:11px;font-weight:900;letter-spacing:2px;color:#58BD6B}.dpay b{font-size:38px;font-weight:900;line-height:1.1}.dpay span{font-size:13px;font-weight:800;color:#B5D43B}#dealDot.cash{background:var(--gold);color:#3A2604}.dqr.no{background:transparent;border-color:#4A5557;color:#C9CFCB}
 .dqr[disabled]{opacity:.5}
 /* jail: siren lights and the deal at stake */
 #jail:before,#jail:after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;z-index:0}
@@ -771,7 +771,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026103110,MUST=2026103110;/*notes*/const NOTES=["New: Shady deals. Your contacts text you risky offers. Pay in, get up to 3× back in 3–5 minutes, but each deal raises your threat while it runs. Tap the phone on the left of the screen when it buzzes."];
+/*build*/const BUILD=2026103112,MUST=2026103110;/*notes*/const NOTES=["When a shady deal pays out, your contact now texts you and you tap Collect to take the cash. Close the chat and it's collected for you."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -838,7 +838,7 @@ const mgrOn=()=>now()<(s.mgrUntil||0);const cleanOn=()=>now()<(s.cleanUntil||0);
 const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*(boostOn()?2:1);
 const threatRaw=()=>s.owned.reduce((a,o)=>a+st(o).threat,0)+dealHeat();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
-const nw=()=>s.cash+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
+const nw=()=>s.cash+(s.dealPaid||[]).reduce((a,d)=>a+d.pay,0)+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
 let friends=[],friendsLoaded=false;
 const FCOL=['#FF7A3D','#5AB8F0','#8A6FE0','#2FA877','#EF6F9A','#F5B946'];
 function board(){return RIVALS.map(r=>[r[0],r[0],r[1],r[2],r[3]]).concat(friends.map((f,i)=>['@f:'+f.user_id,f.name||'Friend','Friend',+f.net_worth||0,FCOL[i%FCOL.length]]),[['@me',s.name||'You','You',nw(),'#3E9B37']]).sort((a,b)=>b[3]-a[3])}
@@ -1024,7 +1024,7 @@ function showGroup(g){const o=cur();if(o&&isGood(o)===g)return;if(o){s.vLast=s.v
 /* ================= overlays ================= */
 const ovl=$('ovl');let ovKind=null;
 let nextUp=null;
-function closeOv(){if(ovKind==='deals')dealChat=null;ovl.innerHTML='';ovKind=null;if(nextUp){const f=nextUp;nextUp=null;setTimeout(f,250)}}
+function closeOv(){if(ovKind==='deals'){dealChat=null;if((s.dealPaid||[]).length)collectDeals(true)}ovl.innerHTML='';ovKind=null;if(nextUp){const f=nextUp;nextUp=null;setTimeout(f,250)}}
 function dialog(title,body,btns,kind){ovKind=kind||'dlg';ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dlg"><h3>${title}</h3><div class="body">${body}${btns?`<div class="btns">${btns}</div>`:''}</div></div></div>`}
 function sheet(title,body,kind){ovKind=kind;ovl.innerHTML=`<div class="sheet" data-act="dimclose"><div class="sheet-in"><div class="sheet-h"><svg viewBox="0 0 24 24" style="opacity:.0"><path d="M0 0"/></svg><h3>${title}</h3><button data-act="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div class="sheet-b" id="sb">${body}</div></div></div>`}
 
@@ -1384,7 +1384,7 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  <button class="serve" data-act="serve">TAP TO SERVE TIME (−3s)<small id="jhint" hidden>Keep tapping to make it out in time</small></button>
  <div class="jexit">${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <div class="row"><button data-act="lawyer">CALL A LAWYER<small class="num" id="jlaw">${GEM} ${lawyerCost()}</small></button><button data-act="bribe">BRIBE THE JUDGE<small class="num" id="jbribe">${COIN} ${money(bribeCost())}</small></button></div></div></div>`;updJail()}
-function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Still in jail then and it's lost.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=`${GEM} ${lawyerCost()}`;if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
+function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Still in jail then and you lose your <b class="num">${$m(run[0].cost)}</b> stake <b>and</b> the <b class="num">${$m(run[0].pay)}</b> payout.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=`${GEM} ${lawyerCost()}`;if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(1,Math.ceil((s.jail.until-now())/120000)):1; // 1 crystal per 2 minutes left
 const bribeCost=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(100,s.cash*.25*f)}; // 25% of your cash for a full sentence, less as you serve it
 function closeJail(){if(ovKind==='jail')closeOv()}
@@ -1431,7 +1431,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'mail':sheet('Mailbox',mailBody(),'mail');break;
   case'daily':if(s.jail)return jailNag();openDaily();break;
   case'dcpick':dcPick(+el.dataset.v);break;
-  case'deals':openDeals();break;case'dealyes':dealYes();break;case'dealno':dealNo();break;
+  case'deals':openDeals();break;case'dealyes':dealYes();break;case'dealcollect':collectDeals(false);break;case'dealno':dealNo();break;
   case'dcspin':dcSpin();break;
   case'perks':openPerks();break;
   case'perkstab':perksTab=el.dataset.v;if(ovKind!=='perks')sheet('Your perks',perksBody(),'perks');else{$('sb').innerHTML=perksBody();$('sb').scrollTop=0}break;
@@ -1650,10 +1650,10 @@ function dealArrest(at,d){const th=threatAt(at),ms=Math.max(30000,2*(d.end-at));
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
   if(jailed){s.dealLog.unshift({at:d.end,txt:`Lost ${d.who}'s deal: you were in jail`,bad:1});if(!quiet)toast(`🚔 You were in jail when ${d.who}'s deal paid out. The ${$m(d.cost)} is gone.`,'bad')}
-  else{bank(d.pay,1);s.earned+=d.pay;s.dealLog.unshift({at:d.end,txt:`${d.who} paid ${$m(d.pay)}`});if(!quiet)toast(`💰 ${d.who} paid up: +${$m(d.pay)}`,'good')}
+  else{(s.dealPaid=s.dealPaid||[]).push({who:d.who,role:d.role,em:d.em,pay:d.pay,cost:d.cost,at:d.end});s.dealLog.unshift({at:d.end,txt:`${d.who} paid ${$m(d.pay)}`});if(!quiet){vib([40,60,40]);toast(`📱 ${d.who}: your money's ready, boss`,'good');if(ovKind==='deals'){dealChat=null;setTimeout(openDeals,60)}}}
   s.dealLog.length=Math.min(s.dealLog.length,5)}}
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
- b.hidden=!(off||run.length);if(b.hidden)return;$('dealDot').hidden=!off;b.classList.toggle('buzz',off);
+ const paid=(s.dealPaid||[]).length;b.hidden=!(off||run.length||paid);if(b.hidden)return;const dd=$('dealDot');dd.hidden=!(off||paid);dd.textContent=paid?'$':'1';dd.classList.toggle('cash',!!paid);b.classList.toggle('buzz',off||!!paid);
  const tg=$('dealTag');tg.hidden=!run.length;if(run.length)tg.textContent=dur((run[0].end-t)/1000);
  b.style.top=((document.querySelector('#stage .vtog')?20:0)+(boostOn()?80:46))+'px';if(ovKind==='deals'){const r=$('dealRun');if(r)r.innerHTML=dealRunHTML(dealSkip());const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
 const dealSkip=()=>dealChat&&dealChat.reply==='in'?(s.deals||[]).find(x=>x.at===dealChat.offer.at):null;
@@ -1671,7 +1671,20 @@ function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now();
  else h+=`<div class="dsys">Offer expires in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
  const busy=(s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX,poor=s.cash<d.cost;
  return`<div class="dthread"><div id="dealRun">${dealRunHTML(run)}</div>${h}</div>`+(c?'':`<div class="dquick"><button class="dqr no" data-act="dealno">Not this time</button><button class="dqr yes" data-act="dealyes"${busy||poor?' disabled':''}>${busy?'3 deals running':poor?'Not enough cash':`I'm in 💸 ${$m(d.cost)}`}</button></div>`)}
-function openDeals(){const d=dealChat?dealChat.offer:s.deal;sheet(d?esc(d.who):'Burner phone',dealBody(),'deals');const sh=document.querySelector('.sheet-in');if(sh)sh.classList.add('burner');
+const PAID_TXT={Margot:['Funds cleared, boss. Squeaky clean. 🧾','Told you it was easy money.'],Vinnie:['Sold every last one. 😎','Told you I know a guy.'],'Big Tony':['The house paid out. Big night. 🎩','Nobody saw a thing.']};
+function paidBody(){const L=s.dealPaid||[],tot=L.reduce((a,d)=>a+d.pay,0),inc=x=>`<div class="dm in">${x}</div>`;
+ let h='';for(const d of L){const t=PAID_TXT[d.who]||['Pleasure doing business, boss.',''];h+=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(t[0]))+inc(`Here's your <b class="g">${$m(d.pay)}</b>, as promised. ${esc(t[1])}`)}
+ h+=`<div class="dpay"><small>PAYOUT${L.length>1?' · '+L.length+' DEALS':''}</small><b class="num">${$m(tot)}</b><span>+${$m(L.reduce((a,d)=>a+d.pay-d.cost,0))} profit</span></div>`;
+ return`<div class="dthread">${h}</div><div class="dquick one"><button class="dqr cash" data-act="dealcollect" id="dealCollect">COLLECT ${$m(tot)} 💰</button></div>`}
+function collectDeals(auto){const L=s.dealPaid||[];if(!L.length)return;const tot=L.reduce((a,d)=>a+d.pay,0);s.dealPaid=[];bank(tot,1);s.earned+=tot;vib([30,40,30]);
+ if(auto)toast(`💰 Collected ${$m(tot)} from your deal${L.length>1?'s':''}`,'good');
+ else{const btn=$('dealCollect'),r=btn?btn.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0},tg=$('cash').getBoundingClientRect();
+  for(let i=0;i<8;i++){const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=(r.left+r.width/2-30+(Math.random()*60-30))+'px';f.style.top=r.top+'px';f.style.zIndex=90;document.body.appendChild(f);
+   const an=f.animate?.([{transform:'translate(0,0) rotate(0) scale(1)'},{transform:`translate(${(Math.random()-.5)*120}px,${-80-Math.random()*60}px) rotate(${Math.random()*60-30}deg) scale(1.1)`,offset:.35},{transform:`translate(${tg.left-r.left-r.width/2+30}px,${tg.top-r.top}px) rotate(0) scale(.35)`,opacity:.3}],{duration:700,delay:i*45,easing:'cubic-bezier(.3,.1,.6,1)',fill:'forwards'});if(an)an.onfinish=()=>f.remove();else f.remove()}
+  tapFloat(r.left+r.width/2,r.top,'+'+$m(tot));setTimeout(()=>{if(ovKind==='deals')closeOv()},650)}
+ save();upd()}
+function openDeals(){if((s.dealPaid||[]).length){const d=s.dealPaid[0];dealChat=null;sheet(esc(d.who),paidBody(),'deals');const sh=document.querySelector('.sheet-in');if(sh)sh.classList.add('burner');const h=document.querySelector('.sheet-h h3');if(h)h.innerHTML=`<span class="dav">${d.em}</span><span class="dwho">${esc(d.who)}<small>${esc(d.role)}</small></span>`;const th=document.querySelector('.dthread');if(th)th.scrollTop=th.scrollHeight;return}
+ const d=dealChat?dealChat.offer:s.deal;sheet(d?esc(d.who):'Burner phone',dealBody(),'deals');const sh=document.querySelector('.sheet-in');if(sh)sh.classList.add('burner');
  const h=document.querySelector('.sheet-h h3');if(h&&d)h.innerHTML=`<span class="dav">${d.em}</span><span class="dwho">${esc(d.who)}<small>${esc(d.role)}</small></span>`;
  const th=document.querySelector('.dthread');if(th)th.scrollTop=th.scrollHeight}
 function dealYes(){const d=s.deal,t=now();if(!d)return;if(s.cash<d.cost)return toast('Not enough cash for this deal','bad');if((s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX)return toast('You already have 3 deals running','bad');
