@@ -771,7 +771,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026103112,MUST=2026103110;/*notes*/const NOTES=["When a shady deal pays out, your contact now texts you and you tap Collect to take the cash. Close the chat and it's collected for you."];
+/*build*/const BUILD=2026110310,MUST=2026103110;/*notes*/const NOTES=["Raided while a manager is on shift? Your get-out-of-jail-free card is now used for you, so your manager keeps earning. Without a manager, you still choose when to use it."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -871,14 +871,17 @@ const RAID=.03,COOL=30*6e4; // raid odds per 30-second check (was .3), and no ra
 const caught=(th,c)=>th>0&&chance(c)<Math.pow(th/100,2)*RAID;
 const threatAt=c=>Math.max(0,threatRaw()-(c<(s.cleanUntil||0)?20:0));
 function sentence(th,n){let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;const sev=th<20?'low':th<50?'mid':'high';return{sev,sec:sev==='low'?row[1]:sev==='mid'?row[2]:row[3],row}}
-function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0,quiet=s.jail?s.jail.until+COOL:(s.coolUntil||0);
+function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0;let quiet=s.jail?s.jail.until+COOL:(s.coolUntil||0),cards=s.perks.jail||0;
  const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0}));
  for(let c=s.nextCheck;c<t+horizon;c+=30000){if(c<jailEnd||c<quiet)continue;
   const th=Math.max(0,sim.reduce((a,o)=>a+thrAt(o.b,o.level+(o.up&&c>=o.up?1:0)),0)-(c<(s.cleanUntil||0)?20:0));
   if(!caught(th,c))continue;
+  if(cards>0&&c<(s.mgrUntil||0)){cards--;quiet=c+COOL;continue}
   const x=sentence(th,n);return{at:c,until:c+x.sec*1000,sec:x.sec,loss:x.sev==='high'}}
  return null}
-function arrest(at){const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
+// raided while a manager is on shift: a get-out-of-jail-free card is used for you, so the shift keeps earning
+function cardDodge(at){if(!(s.perks.jail>0)||!(at<(s.mgrUntil||0)))return false;s.perks.jail--;s.dodged=(s.dodged||0)+1;s.coolUntil=at+COOL;return true}
+function arrest(at){if(cardDodge(at))return;const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
  s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th),at};s.arrests++;
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec})}
@@ -1231,7 +1234,7 @@ function walletBody(){let a='',w='';const t=now();
  {const g=s.dc.got,p=g&&g.cards&&g.cards[g.pick];if(p&&p.k==='mgr'&&!p.streak&&g.spin===false&&hs[p.v]){if(!--hs[p.v])delete hs[p.v];
   w+=`<div class="dc-perk">${MGR}<div><b>Manager</b><small>Shift length not revealed yet. Spin in Daily chance to find out.</small></div><button class="dc-use g" data-act="daily">SPIN</button></div>`}}
  Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h}-hour shift · Lv ${s.mgr.level} · ${Math.round(commission()*100)}% commission${s.mgr.train&&!mgrOn()?' · training resumes on shift':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
- if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly.</small></div><span class="dc-use off">READY</span></div>`;
+ if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly. If you're raided while a manager is on shift, it's used for you.</small></div><span class="dc-use off">READY</span></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
  if(s.perks.manual)w+=`<div class="dc-perk">${PICON.manual}<div><b>Training manual<span class="n">×${s.perks.manual}</span></b><small>Instantly trains your manager one level.</small></div><button class="dc-use" data-act="perkuse" data-v="manual">USE</button></div>`;
@@ -1645,7 +1648,7 @@ function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1
 // chance of a bust at one 30-second check, so the whole deal has its tier's bust chance
 const dealP=d=>1-Math.pow(1-d.bust,30/d.sec);
 function dealBust(c){for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d))return d}return null}
-function dealArrest(at,d){const th=threatAt(at),ms=Math.max(30000,2*(d.end-at));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th)};s.arrests++;
+function dealArrest(at,d){if(cardDodge(at))return;const th=threatAt(at),ms=Math.max(30000,2*(d.end-at));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th)};s.arrests++;
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
@@ -1747,7 +1750,7 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
 function upd(){hud();if(sigNow()!==stageSig)renderStage();else updStage();
  if(ovKind==='shop'){const sb=$('sb');if(sb)sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
 function whatsNew(){if(s.seenBuild===BUILD)return false;const fresh=s.seenBuild==null&&!(s.earned>0)&&s.owned.length<2;s.seenBuild=BUILD;save();if(fresh||!NOTES.length)return false;dialog("What's new",`<p>Your game just updated.</p>${notesHTML(NOTES)}`,`<button class="yes" data-act="close">Nice</button>`);return true}
-function tick(){if(!clockReady){hud();return}dealTick();if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your get-out-of-jail-free card kept you out!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
+function tick(){if(!clockReady){hud();return}dealTick();if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your manager was on shift, so your get-out-of-jail-free card kept you out and the money kept coming!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){openJail();vib([60,40,60])}else if(s.jail&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
 let clockReady=!CLOCK_GUARD;
 function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
