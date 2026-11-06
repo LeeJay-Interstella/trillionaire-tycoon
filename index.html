@@ -85,7 +85,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
  background:linear-gradient(90deg,#d0d0d066 0,#ffffffd0 22%,#ececece0 50%,#cfcfcfd0 51%,#bdbdbd80 100%);
  -webkit-mask:linear-gradient(0deg,#000 0,#000 55%,#0000 100%);mask:linear-gradient(0deg,#000 0,#000 55%,#0000 100%)}
 #column{position:absolute;left:var(--pilex,62%);bottom:var(--pileb,28%);top:2%;width:var(--bw,62px);pointer-events:none;z-index:3}
-.bill{position:absolute;left:0;width:var(--bw,62px);height:var(--bh,37px);transform-origin:50% 80%}
+.bill{position:absolute;left:0;pointer-events:auto;cursor:pointer;width:var(--bw,62px);height:var(--bh,37px);transform-origin:50% 80%}
 #column:empty::before{display:none}
 #column::before{content:"";position:absolute;left:4px;right:2px;bottom:-6px;height:20px;border-radius:50%;background:#0000001f}
 .bill svg{width:100%;height:100%;display:block}
@@ -219,6 +219,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .pad .bigbtn.danger{background:#fff;color:var(--red);box-shadow:0 4px 0 #e6b3ab}
 
 /* splash, jail */
+#elsewhere{z-index:90;background:rgba(14,40,20,.94);color:#fff;padding:28px;gap:14px}#elsewhere[hidden]{display:none}#elsewhere .ew-i{font-size:54px;line-height:1}#elsewhere h3{font-size:26px;font-weight:900;margin:0}#elsewhere p{margin:0;max-width:320px;font-size:15px;line-height:1.45;opacity:.9}#elsewhere .dc-bb{width:auto;min-width:220px;margin-top:8px;background:var(--lime);color:var(--green-d)}
 .fullscreen{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
 #splash{background:var(--green);cursor:pointer}
 .logo span{font-size:1.25em;color:var(--lime);text-shadow:0 6px 0 var(--lime-d)}
@@ -676,7 +677,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
     <button class="dealbtn" id="dealBtn" data-act="deals" hidden aria-label="Shady deals"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.5h3"/></svg><span class="dot" id="dealDot" hidden>1</span><span class="tag num" id="dealTag" hidden></span></button>
     <div id="city"></div>
     <div id="art"></div>
-    <div class="tube" id="tube" hidden></div><div id="column"></div>
+    <div class="tube" id="tube" hidden></div><div id="column" data-act="collect" aria-label="Collect cash"></div>
     <div id="layer"></div>
     <div class="tools">
       <button class="tool" data-act="shop" aria-label="Buy businesses"><svg viewBox="0 0 24 24"><path d="M3 21h18M4 21V10h6v11M14 21V5h6v16M6 13h2M6 17h2M16 8h2M16 12h2M16 16h2"/></svg></button>
@@ -691,6 +692,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
   <section id="panel"></section>
   <button class="gear" data-act="boss" aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7 7 0 0 0-1.7-1L15 3h-4l-.4 2.9a7 7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.7 7.7 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7 7 0 0 0 1.7 1L11 21h4l.4-2.9a7 7 0 0 0 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
   <div id="ovl"></div>
+  <div id="elsewhere" class="fullscreen" hidden><div class="ew-i">📱</div><h3>Playing somewhere else</h3><p id="ewTxt">Your game is open on another device.</p><button class="dc-bb" data-act="playhere">Play here</button></div>
   <div id="toasts"></div>
 </div>
 <div id="rotate" role="alert"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="20" y="6" width="24" height="52" rx="5" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="50" r="2.5" fill="currentColor"/></svg><b>Turn your phone upright</b><span>Trillionaire Tycoon plays in portrait.</span></div>
@@ -826,7 +828,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110611,MUST=2026103110;/*notes*/const NOTES=["Forgot your password? Tap \"Forgot password?\" on the sign-in screen to get a reset link by email."];
+/*build*/const BUILD=2026110613,MUST=2026103110;/*notes*/const NOTES=["Open the game on your phone and computer at once? The one you're using plays, and the other shows \"Playing somewhere else\" so nothing gets overwritten."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -863,7 +865,8 @@ if(window.claude?.hot?.data?.s)s=unpack(window.claude.hot.data.s)||s;
 if(!s)s=fresh();
 sanitizeTime(s);
 const bootSavedAt=s.savedAt||0,bootBuild=s.b||0;
-const save=()=>{s.savedAt=now();try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}};
+let paused=false;
+const save=()=>{if(paused)return;s.savedAt=now();try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}};
 save();
 window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
 
@@ -1054,7 +1057,7 @@ function collect(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return
   const dx=tgt.left+tgt.width*.25-r.left,dy=tgt.top-r.top,lift=-60-Math.random()*40,side=(Math.random()-.5)*60;
   const an=f.animate?.([{transform:'translate(0,0) rotate(0) scale(1)'},{transform:`translate(${dx*.35+side}px,${dy*.35+lift}px) rotate(${-20+Math.random()*40}deg) scale(1.05)`,offset:.4},{transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*30-15}deg) scale(.35)`,opacity:.3}],{duration:560,delay:i*28,easing:'cubic-bezier(.3,.1,.6,1)',fill:'forwards'});
   const done=()=>{f.remove();if(i===last){const t=$('cash').closest('.t');t.classList.add('bump');setTimeout(()=>t.classList.remove('bump'),160)}};if(an)an.onfinish=done;else done()});
- setTimeout(()=>{colEl.innerHTML=''},bills.length*28+40);stackN=0;cashTween=performance.now();const cb=$('cbtn').getBoundingClientRect();floaty(cb.left+cb.width/2,cb.top,'+'+$m(a));upd()}
+ setTimeout(()=>{bills.forEach(b=>b.remove())},bills.length*28+40);stackN=0;cashTween=performance.now();const cb=$('cbtn').getBoundingClientRect();floaty(cb.left+cb.width/2,cb.top,'+'+$m(a));upd()}
 // tap a building to earn: each tap adds TAP_SEC seconds of that building's earnings (doubled while a boost runs), up to max capacity
 const TAP_SEC=1,TAP_GAP=90;let tapLast=0;
 const tapFmt=v=>v<10?'$'+v.toFixed(2):$m(v);
@@ -1468,6 +1471,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'site':tapSite(e);break;
   case'tapearn':tapEarn(e);break;
   case'collect':collect();break;
+  case'playhere':playHere();break;
   case'finish':{const o=cur();if(!o||!o.busy)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
   case'shop':if(s.jail)return jailNag();if(!s.seenShop){s.seenShop=true;$('getmore')?.remove();save()}openShop();break;
   case'ask':askBuy(bid);break;
@@ -1544,7 +1548,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'lawyer':{const c=lawyerCost();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;release('Your lawyer found a loophole. Free to go!','lawyer',c+' crystals');break}
   case'bribe':{const c=bribeCost();if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way.','bribe','$'+money(c));break}
  }});
-document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!ovKind&&!paused&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||'')){e.preventDefault();if(!e.repeat)collect();return}if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
  if(e.key==='Enter'){if($('fcode')){redeem();return}if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
 
 /* ================= cloud save (Supabase) ================= */
@@ -1567,21 +1571,38 @@ function clockNote(){const ahead=(s.maxT||0)-(Date.now()+clockOff);if(ahead>10*6
  dialog('Clock check',`<p>Your phone's date or time was changed.</p><p class="s">The game runs on real time, so it's paused for <span class="hl">${dur(ahead/1000)}</span> until real time catches up. Nothing is lost.</p>`,`<button class="ok" data-act="close">OK</button>`)}}
 let clockLoading=false;
 async function cloudInitClockOnly(){if(clockLoading||supa)return;clockLoading=true;try{await cloudInit()}catch(e){}clockLoading=false} // the first try failed (offline): try again
-async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';clockGo();return}
+/* ---------- one place at a time: the screen you're using is the one that plays ---------- */
+// Other tabs on this device hear us through BroadcastChannel; your other devices through a Supabase Realtime channel.
+// When one takes over, the other saves, uploads, steps aside and shows "Playing somewhere else".
+const SID=Math.random().toString(36).slice(2,10),DEV=(()=>{const u=navigator.userAgent;return /iPhone/.test(u)?'iPhone':/iPad/.test(u)?'iPad':/Android/.test(u)?'Android phone':/Mac/.test(u)?'Mac':/Windows/.test(u)?'Windows PC':'another device'})();
+let bc=null,rtc=null,handWait=null,bootTaken=false;try{bc=new BroadcastChannel('trillionaire.play');bc.onmessage=e=>lockMsg(e.data,'tab')}catch(e){}
+function lockSend(msg){msg.sid=SID;try{bc&&bc.postMessage(msg)}catch(e){}try{rtc&&rtc.send({type:'broadcast',event:'lock',payload:msg})}catch(e){}}
+async function lockMsg(d,via){if(!d||d.sid===SID)return;
+ if(d.t==='take'){if(handWait&&SID>d.sid)return; // both opened at once: the higher id keeps playing
+  const was=!paused;if(was){save();paused=true;showElsewhere(via==='tab'?'tab':d.dev);if(cloudUser)try{await cloudPush(true)}catch(e){}}lockSend({t:'hand',to:d.sid,fresh:was})}
+ else if(d.t==='hand'&&d.to===SID&&handWait){const f=handWait;handWait=null;f(d)}}
+function showElsewhere(dev){const el=$('elsewhere');if(!el)return;el.querySelector('.ew-i').textContent=/iPhone|Android|iPad/.test(dev)?'📱':'💻';$('ewTxt').textContent=dev==='tab'?'Your game is open in another tab or window. Progress is saved there.':'Your game is open on your '+dev+'. Progress is saved there.';el.hidden=false;try{if(ovKind)closeOv()}catch(e){}}
+// ask any other copy to step aside; resolves once one has handed over (or nobody answered)
+function takeOver(){return new Promise(res=>{handWait=res;lockSend({t:'take',dev:DEV});setTimeout(()=>{if(handWait===res){handWait=null;res(null)}},1800)})}
+async function lockJoin(){if(rtc||!supa||!cloudUser)return;try{rtc=supa.channel('play-'+cloudUser.id,{config:{broadcast:{self:false}}}).on('broadcast',{event:'lock'},({payload})=>lockMsg(payload,'net'));await new Promise(res=>{rtc.subscribe(st=>{if(st==='SUBSCRIBED'||st==='CHANNEL_ERROR'||st==='TIMED_OUT')res()});setTimeout(res,4000)})}catch(e){rtc=null}}
+// coming back to a copy that stepped aside: reload so it starts from the newest save
+async function playHere(){$('ewTxt').textContent='Loading your latest progress…';lockSend({t:'take',dev:DEV});setTimeout(()=>location.reload(),900)}
+async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';clockGo();if(!supa&&!bootTaken){bootTaken=true;tabTake()}return}
  const recovUrl=/type=recovery/.test(location.hash)||(/[?&]code=/.test(location.search)&&!!(()=>{try{return localStorage.getItem('trillionaire.recov')}catch(x){return null}})()),recovErr=/error_description=/.test(location.hash)&&/otp|expired|invalid/i.test(decodeURIComponent(location.hash));
  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
- supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct();if(ev==='PASSWORD_RECOVERY')setTimeout(newPassDlg,300)});
+ supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct();if(cloudUser&&!rtc)lockJoin();if(ev==='PASSWORD_RECOVERY')setTimeout(newPassDlg,300)});
  if(recovUrl||recovErr)try{history.replaceState(null,'',location.pathname)}catch(x){}
  if(recovUrl&&cloudUser)setTimeout(newPassDlg,600);
  if(recovErr)setTimeout(()=>toast('That reset link has expired or was already used. Ask for a new one.'),600);
  await syncClock();
  await swInit();
- if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
+ if(!bootTaken&&!cloudUser){bootTaken=true;tabTake()}
+ if(cloudUser){bootTaken=true;await lockJoin();await takeOver();await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
  setInterval(()=>{if(cloudUser&&!document.hidden)loadFriends()},120000);
  setInterval(()=>{if(cloudUser)cloudPush()},30000);
  addEventListener('online',()=>{(CLOCK_GUARD&&!clockChecked?syncClock():Promise.resolve()).then(()=>{if(cloudUser)cloudPush()})});refreshAcct()}
-async function cloudPush(){if(!supa||!cloudUser||pushing||pendingRemote||s.pm)return;pushing=true;cloudState='syncing';refreshAcct();
+async function cloudPush(force){if(!supa||!cloudUser||pushing||pendingRemote||s.pm||(paused&&!force))return;pushing=true;cloudState='syncing';refreshAcct();
  try{s.notify=notifyInfo();save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
   if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';
   supa.from('profiles').upsert({user_id:cloudUser.id,build:BUILD,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;refreshAcct()}
@@ -1851,9 +1872,10 @@ function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
 function clockGo(){clockWait=false;if(clockReady)return;clockReady=true;catchUp();upd()}
 if(clockReady)catchUp(true);else setTimeout(clockGo,6000);
 lastRank=myRank();upd();splash();
+const tabTake=()=>takeOver().then(d=>{if(d&&d.fresh){paused=true;location.reload()}});if(!cloudOn())tabTake();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
 addEventListener('resize',()=>{if(WIDEQ.matches!==wideNow){wideNow=WIDEQ.matches;renderStage()}layout();stackN=-1;updStage()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)cloudPull(lastPushedAt)}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else if(paused){playHere();return}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)takeOver().then(()=>cloudPull(lastPushedAt));else takeOver().then(d=>{if(d&&d.fresh){paused=true;location.reload()}})}});
 addEventListener('pagehide',()=>{isAway=true;if(cloudUser)cloudPush()});
 cloudInit();
 setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
