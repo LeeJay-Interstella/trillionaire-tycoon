@@ -826,7 +826,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110610,MUST=2026103110;/*notes*/const NOTES=["You can now play on a computer: on a wide screen the game fills the window, with the menu down the left side.","Turned your phone sideways? You'll see a reminder to rotate back to portrait."];
+/*build*/const BUILD=2026110611,MUST=2026103110;/*notes*/const NOTES=["Forgot your password? Tap \"Forgot password?\" on the sign-in screen to get a reset link by email."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1520,6 +1520,9 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'backup':backupDlg();break;
   case'auth':authDlg(el.dataset.v);break;
   case'authgo':authGo(el.dataset.v);break;
+  case'forgot':forgotDlg();break;
+  case'forgotgo':forgotGo();break;
+  case'newpassgo':newPassGo();break;
   case'syncnow':cloudPull(lastPushedAt);break;
   case'signout':signOut();break;
   case'useremote':if(pendingRemote){adopt(pendingRemote,'Loaded your account save');setTimeout(()=>notifyPrompt(true),400)}break;
@@ -1565,9 +1568,13 @@ function clockNote(){const ahead=(s.maxT||0)-(Date.now()+clockOff);if(ahead>10*6
 let clockLoading=false;
 async function cloudInitClockOnly(){if(clockLoading||supa)return;clockLoading=true;try{await cloudInit()}catch(e){}clockLoading=false} // the first try failed (offline): try again
 async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e){cloudState='error';clockGo();return}
+ const recovUrl=/type=recovery/.test(location.hash)||(/[?&]code=/.test(location.search)&&!!(()=>{try{return localStorage.getItem('trillionaire.recov')}catch(x){return null}})()),recovErr=/error_description=/.test(location.hash)&&/otp|expired|invalid/i.test(decodeURIComponent(location.hash));
  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
- supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct()});
+ supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct();if(ev==='PASSWORD_RECOVERY')setTimeout(newPassDlg,300)});
+ if(recovUrl||recovErr)try{history.replaceState(null,'',location.pathname)}catch(x){}
+ if(recovUrl&&cloudUser)setTimeout(newPassDlg,600);
+ if(recovErr)setTimeout(()=>toast('That reset link has expired or was already used. Ask for a new one.'),600);
  await syncClock();
  await swInit();
  if(cloudUser){await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
@@ -1662,7 +1669,7 @@ function authDlg(mode){const up=mode==='up';
  <input class="nm" id="ae" type="email" aria-label="Email" placeholder="Email" autocomplete="email" autocapitalize="off" style="text-align:left;font-size:16px">
  <input class="nm" id="ap" type="password" aria-label="Password" placeholder="Password, 6+ characters" autocomplete="${up?'new-password':'current-password'}" style="text-align:left;font-size:16px">
  <p class="s" id="amsg" role="status"></p>
- <button type="button" class="linkbtn" data-act="auth" data-v="${up?'in':'up'}">${up?'Already have an account? Sign in':'New here? Create an account'}</button>`,
+ ${up?'':'<button type="button" class="linkbtn" data-act="forgot">Forgot password?</button>'}<button type="button" class="linkbtn" data-act="auth" data-v="${up?'in':'up'}">${up?'Already have an account? Sign in':'New here? Create an account'}</button>`,
  `<button class="no" data-act="close">Cancel</button><button class="yes" data-act="authgo" data-v="${mode}">${up?'Create':'Sign in'}</button>`,'auth');setTimeout(()=>$('ae')?.focus(),60)}
 async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||'',m=$('amsg');
  if(!/^\S+@\S+\.\S+$/.test(e)||p.length<6){m.textContent='Enter your email and a password of at least 6 characters.';return}
@@ -1676,6 +1683,35 @@ async function authGo(mode){const e=($('ae').value||'').trim(),p=$('ap').value||
   if(mode==='up'&&!r.data.session){m.textContent='Account created. Tap the confirmation link we emailed you, then come back and sign in.';return}
   cloudUser=r.data.user;closeOv();toast('Signed in as '+e,'good');loadFriends();await cloudPull(0,true);if(ovKind!=='choose')setTimeout(()=>notifyPrompt(true),400)}
  catch(err){const t=String(err.message||'');m.textContent=isNet(err)?"Couldn't reach the save server. Check your connection and tap the button again.":/invalid login/i.test(t)?'That email and password don’t match.':/already registered/i.test(t)?'That email already has an account. Sign in instead.':/confirm/i.test(t)?'Confirm your email first. Check your inbox for the link.':(t||'Something went wrong. Try again.')}}
+function forgotDlg(){const pre=($('ae')?.value||'').trim();
+ dialog('Reset password',`<p class="s">Enter your account email and we'll send you a link to set a new password.</p>
+ <input class="nm" id="fe" type="email" aria-label="Email" placeholder="Email" autocomplete="email" autocapitalize="off" style="text-align:left;font-size:16px" value="${esc(pre)}">
+ <p class="s" id="fmsg" role="status"></p>
+ <button type="button" class="linkbtn" data-act="auth" data-v="in">Back to sign in</button>`,
+ `<button class="no" data-act="close">Cancel</button><button class="yes" id="fgo" data-act="forgotgo">Send link</button>`,'auth');setTimeout(()=>$('fe')?.focus(),60)}
+async function forgotGo(){const e=($('fe').value||'').trim(),m=$('fmsg');
+ if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent='Enter the email you signed up with.';return}
+ if(!supa){m.textContent="Can't reach the save server right now. Check your connection.";return}
+ m.textContent='Sending…';
+ try{const r=await supa.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(r.error)throw r.error;
+  try{localStorage.setItem('trillionaire.recov',String(Date.now()))}catch(x){}
+  m.innerHTML='Check your inbox. If <b>'+esc(e)+'</b> has an account, a reset link is on its way. Open it, then choose a new password.';const b=$('fgo');if(b){b.textContent='Done';b.dataset.act='close'}}
+ catch(err){const t=String(err.message||'');m.textContent=/rate|security purposes|too many/i.test(t)?'Too many emails sent. Wait a few minutes and try again.':/fetch|network/i.test(t)?"Couldn't reach the save server. Check your connection.":(t||'Something went wrong. Try again.')}}
+let recovShown=false;
+function newPassDlg(){if(recovShown)return;recovShown=true;
+ dialog('Choose a new password',`<p class="s">You're signed in${cloudUser?.email?' as <b>'+esc(cloudUser.email)+'</b>':''}. Pick a new password for your account.</p>
+ <input class="nm" id="np1" type="password" aria-label="New password" placeholder="New password, 6+ characters" autocomplete="new-password" style="text-align:left;font-size:16px">
+ <input class="nm" id="np2" type="password" aria-label="Repeat new password" placeholder="Repeat new password" autocomplete="new-password" style="text-align:left;font-size:16px">
+ <p class="s" id="npmsg" role="status"></p>`,
+ `<button class="yes" data-act="newpassgo">Save password</button>`,'newpass');setTimeout(()=>$('np1')?.focus(),60)}
+async function newPassGo(){const a=$('np1').value||'',b=$('np2').value||'',m=$('npmsg');
+ if(a.length<6){m.textContent='Use at least 6 characters.';return}
+ if(a!==b){m.textContent="The two passwords don't match.";return}
+ m.textContent='Saving…';
+ try{const r=await supa.auth.updateUser({password:a});if(r.error)throw r.error;
+  try{localStorage.removeItem('trillionaire.recov')}catch(x){}
+  closeOv();toast('Password updated. Use it to sign in on any device.','good');cloudPull(0,true).catch(()=>{});loadFriends()}
+ catch(err){const t=String(err.message||'');m.textContent=/different from the old/i.test(t)?'Pick a password you haven\'t used before.':/session|expired|jwt/i.test(t)?'That reset link has expired. Ask for a new one from the sign-in screen.':(t||'Something went wrong. Try again.')}}
 async function signOut(){try{await cloudPush();await disablePush();await supa.auth.signOut()}catch(e){}cloudUser=null;friends=[];friendsLoaded=false;lastSync=0;cloudState='idle';refreshAcct();toast('Signed out. Your game stays on this device.')}
 
 
