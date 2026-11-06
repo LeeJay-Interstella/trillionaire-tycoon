@@ -602,6 +602,60 @@ input.nm:focus{outline:none;border-color:var(--green)}
 #jail .jwarn b{color:#F5B946}
 #jail .serve small{display:block;font-size:12px;font-weight:700;margin-top:3px}
 @media (prefers-reduced-motion: reduce){#jail:before,#jail:after,#jail .siren i,.dealbtn.buzz{animation:none}#jail:before,#jail:after{opacity:.5}}
+
+/* ===== desktop browsers: phone-shaped frame; phones held sideways: rotate prompt ===== */
+#rotate{display:none}
+@media (hover:hover) and (pointer:fine) and (min-width:700px){
+  html,body{height:100%}
+  body{display:grid;place-items:center;background:radial-gradient(120% 90% at 50% 0%,#4FAE46 0%,var(--green) 45%,var(--green-d) 100%)}
+  body.dark{background:radial-gradient(120% 90% at 50% 0%,#1E2A2B 0%,#141A1B 60%,#0B0F10 100%)}
+  #app{width:clamp(360px,calc((100dvh - 40px)*.5),430px);height:min(932px,calc(100dvh - 40px));max-width:none;margin:0;border-radius:28px;padding-bottom:12px;box-shadow:0 0 0 8px #0E1A0D22,0 24px 60px #0007;clip-path:inset(0 round 28px)}
+  .fullscreen{position:absolute;border-radius:28px;overflow:hidden;isolation:isolate}
+}
+@media (hover:hover) and (pointer:fine) and (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
+  body{display:block}
+  #app{width:100vw;height:100vh;height:100dvh;max-width:none;margin:0;border-radius:0;padding:0;clip-path:none;box-shadow:none;display:grid;grid-template-columns:80px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
+  #app::before{content:"";grid-column:1;grid-row:2/4;background:var(--green-d)}
+  .fullscreen{border-radius:0}
+  .hud{grid-column:1/3;grid-row:1;grid-template-columns:2.4fr 1fr 1.25fr .9fr .75fr .75fr}
+  .hud .t-nw{grid-column:auto}
+  .hud .t-boss{order:5}.hud .t-chest{order:6}
+  .hud .t{padding:14px 20px}
+  .hud .t-nw b{font-size:44px}
+  .hud .t b{font-size:30px}
+  #duty{grid-column:2;grid-row:2}
+  #stage{grid-column:2;grid-row:3;overflow:visible}
+  #city,#art,#layer{overflow:hidden}
+  .tools{left:-80px;right:auto;top:0;width:80px;padding:16px 14px;gap:10px;box-sizing:border-box;align-items:center}
+  .tools .tool{width:52px;height:52px;border-color:#ffffff55;box-shadow:none;background:#ffffff14}
+  .tools .tool:hover{background:#ffffff2e}
+  .tools .tool svg{width:26px;height:26px}
+  .dealbtn{left:-66px!important;top:auto!important;bottom:18px;width:52px;height:52px}
+  .gear,.pager{display:none!important}
+  .arrow{width:48px;height:48px}
+  .arrow.l{left:auto;right:84px;top:auto;bottom:28px}
+  .arrow.r{right:24px;top:auto;bottom:28px}
+  .rounds{left:24px;bottom:28px}
+  .round{width:52px;height:52px}
+  #column{bottom:110px}
+  #panel{grid-column:2;grid-row:3;align-self:end;justify-self:center;width:min(520px,calc(100% - 340px));z-index:8;margin-bottom:22px;padding:18px 20px;gap:14px;background:transparent}
+  #panel .info{justify-content:center;padding-right:0}
+  #panel .info h2{font-size:28px}
+  #panel .lines{font-size:15px}
+  #panel .collect{height:54px}
+  #panel .collect .amt{font-size:24px}
+  .sheet{align-items:center;justify-content:center;padding:40px 0}
+  .sheet-in{margin:0;height:auto;max-height:100%;width:min(900px,92vw);box-shadow:0 20px 60px #0006}
+  .sheet .grid{grid-template-columns:repeat(4,1fr)}
+  #toasts{top:120px}
+}
+@media (orientation:landscape) and (max-height:520px) and (pointer:coarse){
+  #rotate{display:flex;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:var(--green);color:var(--cream);font-family:var(--font)}
+  #rotate svg{width:64px;height:64px;animation:rot 2.4s ease-in-out infinite}
+  #rotate b{font-size:22px;font-weight:900}
+  #rotate span{font-size:15px;font-weight:700;opacity:.85}
+  @keyframes rot{0%,20%{transform:rotate(-90deg)}55%,100%{transform:rotate(0)}}
+}
 </style>
 
 <div id="app">
@@ -639,6 +693,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
   <div id="ovl"></div>
   <div id="toasts"></div>
 </div>
+<div id="rotate" role="alert"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="20" y="6" width="24" height="52" rx="5" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="32" cy="50" r="2.5" fill="currentColor"/></svg><b>Turn your phone upright</b><span>Trillionaire Tycoon plays in portrait.</span></div>
 
 <script>
 (()=>{
@@ -720,9 +775,9 @@ function citySVG(){let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return
   if(rnd()<.4)s+=box(x+6,y+6,h,60,60,5,shade(c,-.15))}
  return`<svg viewBox="${VB}" preserveAspectRatio="xMidYMid slice">${s}<rect x="-700" y="-700" width="1400" height="1400" fill="#fff" opacity=".52"/></svg>`}
 const TOPS=[-118,-100,-160,-225,-268,-160,-210,-205];
-const VW=600,VH=500;let VY=-300;
+const VW=600,VH=500;let VY=-300,VWc=VW,VHc=VH;const WIDEQ=matchMedia('(hover:hover) and (pointer:fine) and (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4)');let wideNow=WIDEQ.matches;
 // centre the drawing (top of building to front of plot) in the stage, horizontally on the plot's centre
-function setTop(top,bot=69){VY=Math.round((top+bot)/2-VH/2);const v=`${-VW/2} ${VY} ${VW} ${VH}`;const c=document.querySelector('#city svg');if(c)c.setAttribute('viewBox',v);return v}
+function setTop(top,bot=69){const wide=WIDEQ.matches,Z=wide?1.25:1;VWc=VW*Z;VHc=VH*Z;let cy=(top+bot)/2;if(wide){const st=document.getElementById('stage'),w=st?st.clientWidth:0,h=st?st.clientHeight:0;if(w&&h)cy+=.15*h/Math.max(w/VWc,h/VHc)}VY=Math.round(cy-VHc/2);const v=`${-VWc/2} ${VY} ${VWc} ${VHc}`;const c=document.querySelector('#city svg');if(c)c.setAttribute('viewBox',v);return v}
 let VB=setTop(-118);
 function onStage(svg,top,k=1){VB=setTop(top*k,69*k);layout();return svg.replace(/^<svg[^>]*>/,`<svg viewBox="${VB}" preserveAspectRatio="xMidYMid slice"><g class="hit" transform="scale(${k})"><rect x="-118" y="-290" width="236" height="370" fill="none" pointer-events="all"/>`).replace(/<\/svg>$/,'</g></svg>')}
 const CONE=`<svg viewBox="0 0 46 46"><polygon points="23,3 33,36 13,36" fill="#F5B946"/><polygon points="17,22 29,22 31,28 15,28" fill="#fff"/><rect x="5" y="36" width="36" height="6" fill="#E89A2B"/></svg>`;
@@ -771,7 +826,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110510,MUST=2026103110;/*notes*/const NOTES=["Your available cash and crystals now show at the top of the business shop, so you can see what you can afford without closing it."];
+/*build*/const BUILD=2026110610,MUST=2026103110;/*notes*/const NOTES=["You can now play on a computer: on a wide screen the game fills the window, with the menu down the left side.","Turned your phone sideways? You'll see a reminder to rotate back to portrait."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -917,7 +972,7 @@ function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=
 const stage=$('stage'),artEl=$('art'),colEl=$('column'),layer=$('layer'),panel=$('panel');
 $('city').innerHTML=citySVG();
 function layout(){const w=stage.clientWidth,hh=stage.clientHeight;if(!w||!hh)return;
- {const n=document.querySelectorAll('.tools .tool').length||7,sz=Math.max(30,Math.min(44,Math.floor((hh-24-(n-1)*6)/n)-3));stage.style.setProperty('--tsz',sz+'px')}const sc=Math.max(w/VW,hh/VH),ox=w/2,oy=(hh-VH*sc)/2-VY*sc;
+ {const n=document.querySelectorAll('.tools .tool').length||7,sz=Math.max(30,Math.min(44,Math.floor((hh-24-(n-1)*6)/n)-3));stage.style.setProperty('--tsz',sz+'px')}const sc=Math.max(w/VWc,hh/VHc),ox=w/2,oy=(hh-VHc*sc)/2-VY*sc;
  BW=Math.round(Math.min(84,Math.max(54,w*.17)));BH=Math.round(BW*37/64);
  document.documentElement.style.setProperty('--bw',BW+'px');document.documentElement.style.setProperty('--bh',BH+'px');
  VIEW={sc,ox,oy};const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
@@ -1761,7 +1816,7 @@ function clockGo(){clockWait=false;if(clockReady)return;clockReady=true;catchUp(
 if(clockReady)catchUp(true);else setTimeout(clockGo,6000);
 lastRank=myRank();upd();splash();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
-addEventListener('resize',()=>{layout();stackN=-1;updStage()});
+addEventListener('resize',()=>{if(WIDEQ.matches!==wideNow){wideNow=WIDEQ.matches;renderStage()}layout();stackN=-1;updStage()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)cloudPull(lastPushedAt)}});
 addEventListener('pagehide',()=>{isAway=true;if(cloudUser)cloudPush()});
 cloudInit();
