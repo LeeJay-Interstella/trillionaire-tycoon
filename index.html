@@ -880,7 +880,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110616,MUST=2026103110;/*notes*/const NOTES=["Sentences are a little longer (an hour at most), so your lawyer's −25% and −50% time cuts are worth more."];
+/*build*/const BUILD=2026110617,MUST=2026103110;/*notes*/const NOTES=["Lawyer calls after your free first one now cost 3 crystals.","Your lawyer's fee and the judge's bribe cost less cash."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1505,22 +1505,23 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  <small id="jhint" class="jhint" hidden>Keep tapping to make it out in time</small></div>
  <div id="lawpop" hidden></div></div>`;updJail()}
 // lawyer: spin for a result. First call each conviction is free, then 1 crystal a call
+const LAW_GEMS=3; // crystals per lawyer call after the free first one
 const LAW=[['cut25',40],['cut50',25],['fee',25],['free',10]];
 const lawCell=k=>`<div class="lc ${k}">${k==='cut25'?'−25%<small>TIME</small>':k==='cut50'?'−50%<small>TIME</small>':k==='fee'?'FEE<small>DEAL</small>':'FREE<small>WALK</small>'}</div>`;
-const lawFee=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(100,s.cash*.05*f)}; // half the bribe
+const lawFee=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(100,s.cash*.03*f)}; // half the bribe
 // the lawyer popup: a slot like Daily chance. Reopening it shows your last result (and any fee offer)
-function lawHTML(){const j=s.jail;if(!j)return'';const L=j.law,k=L&&!L.spin?L.k:null,cost=j.calls?1:0;
+function lawHTML(){const j=s.jail;if(!j)return'';const L=j.law,k=L&&!L.spin?L.k:null,cost=j.calls?LAW_GEMS:0;
  const msg=!L?'Spin to see what your lawyer can do.':L.spin?'Your lawyer is on the phone…':k==='cut25'?'Your lawyer knocked <b>25%</b> off your sentence.':k==='cut50'?'Your lawyer knocked <b>50%</b> off your sentence.':k==='fee'?'Your lawyer can get you out for a fee.':'';
  const K=LAW.map(x=>x[0]),n=K.length,ix=k?K.indexOf(k):1,around=k?[K[(ix+n-1)%n],k,K[(ix+1)%n]].map(lawCell).join(''):lawCell(K[3])+'<div class="q">?</div>'+lawCell(K[0]);
  return`<div class="lp" role="dialog" aria-label="Call your lawyer"><div class="lph">${SCALES}<b>YOUR LAWYER</b><button class="lpx" data-act="lawclose" aria-label="Close">✕</button></div>
  <div class="dc-slot law3" id="lawslot"><i class="pl"></i><i class="pr"></i><div class="dc-reel"><div class="dc-strip" id="lawstrip">${around}</div></div></div>
  <p class="lpm"><span>${msg}</span></p>
- <button class="dc-bb" data-act="lawspin" id="lawspinb"${L&&L.spin?' disabled':''}>${L&&L.spin?'SPINNING…':L?'SPIN AGAIN':'SPIN'} <small class="num">${cost?`${GEM} 1 crystal`:'First call free'}</small></button>
+ <button class="dc-bb" data-act="lawspin" id="lawspinb"${L&&L.spin?' disabled':''}>${L&&L.spin?'SPINNING…':L?'SPIN AGAIN':'SPIN'} <small class="num">${cost?`${GEM} ${cost} crystals`:'First call free'}</small></button>
  ${k==='fee'&&L.fee?`<button class="dc-bb gold sec" data-act="lawfee">PAY THE FEE <small class="num">${COIN} ${money(L.fee)}</small></button>`:'<button class="dc-bb l sec" data-act="lawclose">Back to court</button>'}</div>`}
 function lawOpen(){const p=$('lawpop');if(!p)return;const fresh=p.hidden;p.innerHTML=lawHTML();p.hidden=false;if(fresh)p.firstElementChild.classList.add('anim')}
 function lawClose(){if(lawSpinning)return;const p=$('lawpop');if(p){p.hidden=true;p.innerHTML=''}updJail()}
 let lawSpinning=false;
-function lawyerCall(){const j=s.jail;if(!j||lawSpinning)return;const calls=j.calls||0,cost=calls?1:0;
+function lawyerCall(){const j=s.jail;if(!j||lawSpinning)return;const calls=j.calls||0,cost=calls?LAW_GEMS:0;
  if(s.gems<cost)return toast('Not enough crystals','bad');s.gems-=cost;j.calls=calls+1;
  let tot=LAW.reduce((a,x)=>a+x[1],0),rr=Math.random()*tot,k=LAW[0][0];for(const[x,w]of LAW){if((rr-=w)<0){k=x;break}}
  j.law={k,spin:1,fee:k==='fee'?Math.round(lawFee()):0};save();upd();
@@ -1535,12 +1536,12 @@ function lawyerCall(){const j=s.jail;if(!j||lawSpinning)return;const calls=j.cal
  const target=mid-1,fast=matchMedia('(prefers-reduced-motion: reduce)').matches,ms=fast?0:2200;
  void strip.offsetHeight;strip.style.transition=ms?`transform ${ms}ms cubic-bezier(.12,.6,.18,1)`:'none';strip.style.transform=`translateY(${-target*CELL}px)`;
  setTimeout(()=>{lawSpinning=false;if(!s.jail||s.jail!==j)return;j.law.spin=0;vib([30,40,30]);
-  if(k==='free'){const sl=$('lawslot');if(sl)sl.classList.add('win');$('lawpop')&&($('lawpop').querySelector('.lpm').innerHTML='<span><b>Case thrown out!</b></span>');setTimeout(()=>release('Your lawyer got the case thrown out. Free to go!','lawyer',cost?cost+' crystal':'free call'),900);return}
+  if(k==='free'){const sl=$('lawslot');if(sl)sl.classList.add('win');$('lawpop')&&($('lawpop').querySelector('.lpm').innerHTML='<span><b>Case thrown out!</b></span>');setTimeout(()=>release('Your lawyer got the case thrown out. Free to go!','lawyer',cost?cost+' crystals':'free call'),900);return}
   if(k==='cut25'||k==='cut50'){const left=Math.max(0,j.until-now()),cut=left*(k==='cut25'?.25:.5);j.until-=cut}
   j.prevK=k;save();if(ovKind==='jail'){lawOpen();const sl=$('lawslot');if(sl)sl.classList.add('win')}updJail()},ms+80)}
-function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Still in jail then and you lose your <b class="num">${$m(run[0].cost)}</b> stake <b>and</b> the <b class="num">${$m(run[0].pay)}</b> payout.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=(s.jail.calls?`${GEM} 1 per call · try again`:'First call free');if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`;const lb=document.querySelector('#jail .law');if(lb)lb.disabled=false}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
+function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Still in jail then and you lose your <b class="num">${$m(run[0].cost)}</b> stake <b>and</b> the <b class="num">${$m(run[0].pay)}</b> payout.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=(s.jail.calls?`${GEM} ${LAW_GEMS} per call · try again`:'First call free');if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`;const lb=document.querySelector('#jail .law');if(lb)lb.disabled=false}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(1,Math.ceil((s.jail.until-now())/600000)):1; // 1 crystal per 10 minutes left (3 at most)
-const bribeCost=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(200,s.cash*.1*f,(s.jail.law&&s.jail.law.fee||0)*2)}; // 10% of your cash for a full sentence (always more than the lawyer's fee), less as you serve it
+const bribeCost=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(200,s.cash*.06*f,(s.jail.law&&s.jail.law.fee||0)*2)}; // 6% of your cash for a full sentence (always at least double the lawyer's fee), less as you serve it
 function closeJail(){if(ovKind==='jail')closeOv();jailHid=false;updPill()}
 let jailHid=false;
 function updPill(){const p=$('jailpill');if(!p)return;const on=!!(s.jail&&ovKind!=='jail'&&!paused);p.hidden=!on;if(on){$('jpt').textContent=jdur((s.jail.until-now())/1000);const ub=$('upBtn'),pn=$('panel'),ar=$('app').getBoundingClientRect(),r=ub&&ub.offsetParent?ub.getBoundingClientRect():null,pr=pn.getBoundingClientRect();p.style.top=((r&&!WIDEQ.matches?r.top:pr.top)-52)+'px';p.style.left=(WIDEQ.matches?pr.left+pr.width/2:ar.left+ar.width/2)+'px'}}
