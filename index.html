@@ -555,7 +555,9 @@ input.nm:focus{outline:none;border-color:var(--green)}
 #jail #jbar{height:6px;background:#F7D2CB;max-width:none}#jail #jbar i{background:#E04B3A}
 #jail .serve{width:96px;flex:none;max-width:none;padding:6px;background:#F5B946;color:#5A3A08;font-size:20px;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
 #jail .serve small{margin:0;font-size:13px}
-#jail .jsent{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .06s,box-shadow .06s;user-select:none}#jail .jsent:active{transform:translateY(3px);box-shadow:0 1px 0 #0003}#jail .jsent .serve{position:relative}
+#jail .jsent{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .06s,box-shadow .06s;user-select:none}#jail .jsent:active{transform:translateY(3px);box-shadow:0 1px 0 #0003}#jail .jsent .serve{position:relative}#jail .serve .pick{font-style:normal;font-size:22px;line-height:1;display:block;transform-origin:70% 80%}#jail .jsent:active .pick{animation:dig .18s ease-out}@keyframes dig{50%{transform:rotate(-35deg)}}
+#jail .jdig{font-weight:700;font-size:12px;opacity:.92;margin-top:-4px;text-align:center}
+.jpop.loot{-webkit-text-stroke:0;top:-14px;white-space:nowrap;font-size:16px!important;color:#fff!important;background:#2C7526;padding:4px 8px;left:50%!important;transform:translateX(-50%);animation-duration:1.4s!important;z-index:5}.jpop.loot.gem{background:#2A6BC9}
 #jail .jhint{font-weight:700;font-size:12px;margin-top:-6px}
 #jail .jwarn{max-width:380px}
 #jail .lawbox{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;background:#0000001a;padding:12px}
@@ -880,7 +882,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110617,MUST=2026103110;/*notes*/const NOTES=["Lawyer calls after your free first one now cost 3 crystals.","Your lawyer's fee and the judge's bribe cost less cash."];
+/*build*/const BUILD=2026110619,MUST=2026110619;/*notes*/const NOTES=["Fixed: progress made on one device could be lost when you switched to another. Your game now uploads a few seconds after you play and as the app closes, and never overwrites newer progress.","If two devices both have unsynced progress, you'll be asked which one to keep."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -920,6 +922,7 @@ sanitizeTime(s);
 const bootSavedAt=s.savedAt||0,bootBuild=s.b||0;
 let paused=false;
 const save=()=>{if(paused)return;s.savedAt=now();try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}};
+const saveRaw=()=>{try{localStorage.setItem(SAVE_KEY,pack(s))}catch(e){}}; // keep the stored copy's sync info current without counting as play
 save();
 window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
 
@@ -927,7 +930,12 @@ window.claude?.hot?.snapshot?.(()=>({s:pack(s)}));
 const $m=n=>'$'+money(n);
 const pct=x=>(Math.round(x*100)/100).toFixed(2)+'%';
 function jdur(sec){sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),x=sec%60;return h?`${h}h${String(m).padStart(2,'0')}m${String(x).padStart(2,'0')}s`:dur(sec)}
-function jailPop(){const b=document.querySelector('#jail .serve');if(!b)return;const p=document.createElement('span');p.className='jpop';p.textContent='−3s';p.style.left=(30+Math.random()*40)+'%';b.appendChild(p);setTimeout(()=>p.remove(),700)}
+// digging out: every tap takes 3s off, and now and then you turn up loot (a few finds per sentence at most)
+const DIG_MAX=3,DIG_ODDS=.05;
+function digLoot(){const j=s.jail;if(!j||(j.loot||0)>=DIG_MAX||Math.random()>=DIG_ODDS)return;j.loot=(j.loot||0)+1;
+ if(Math.random()<.25){s.gems+=1;jailPop('💎 +1 found!','gem')}else{const v=Math.max(100,Math.round(income()*2));s.cash+=v;s.earned+=v;jailPop('+'+$m(v)+' found!','cash')}
+ vib([20,30,20]);const d=document.querySelector('#jail .jdig');if(d)d.textContent=`Dig your way out. You might find loot in the dirt (${j.loot}/${DIG_MAX} found).`;save();upd()}
+function jailPop(txt,kind){const b=document.querySelector(kind?'#jail .jsent':'#jail .serve');if(!b)return;const p=document.createElement('span');p.className='jpop'+(kind?' loot '+kind:'');p.textContent=txt||'−3s';p.style.left=(30+Math.random()*40)+'%';b.appendChild(p);setTimeout(()=>p.remove(),kind?1500:700)}
 function dur(sec){sec=Math.max(0,Math.ceil(sec));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),x=sec%60;
  return d?`${d}d${String(h).padStart(2,'0')}h`:h?`${h}h${String(m).padStart(2,'0')}m`:m?`${m}m${String(x).padStart(2,'0')}s`:`${x}s`}
 const $=id=>document.getElementById(id);
@@ -1501,7 +1509,8 @@ function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
  <div class="jexit">${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <button class="jb law" data-act="lawyer">${SCALES}<span>CALL LAWYER<small id="jlaw"></small></span></button>
  <button class="jb bribe" data-act="bribe"><b>💰</b><span>BRIBE THE JUDGE<small class="num" id="jbribe"></small></span></button>
- <div class="jsent" data-act="serve" role="button" aria-label="Tap to serve time, 3 seconds off each tap"><div class="jst"><small>${j.sev==='deal'?'Caught in the act':j.sev==='high'?'Heavy sentence':j.sev==='mid'?'Medium sentence':'Light sentence'}</small><b class="num" id="jt"></b><div id="jbar"><i id="jb"></i></div></div><span class="serve">TAP<small>−3s</small></span></div>
+ <div class="jsent" data-act="serve" role="button" aria-label="Dig your way out: 3 seconds off each tap, and you might find loot"><div class="jst"><small>${j.sev==='deal'?'Caught in the act':j.sev==='high'?'Heavy sentence':j.sev==='mid'?'Medium sentence':'Light sentence'}</small><b class="num" id="jt"></b><div id="jbar"><i id="jb"></i></div></div><span class="serve"><i class="pick">⛏️</i>DIG<small>−3s a tap</small></span></div>
+ <small class="jdig">Dig your way out. You might find loot in the dirt${(j.loot||0)?` (${j.loot}/${DIG_MAX} found)`:''}.</small>
  <small id="jhint" class="jhint" hidden>Keep tapping to make it out in time</small></div>
  <div id="lawpop" hidden></div></div>`;updJail()}
 // lawyer: spin for a result. First call each conviction is free, then 1 crystal a call
@@ -1560,6 +1569,7 @@ stage.addEventListener('pointerup',e=>{if(swipeX!=null&&Math.abs(e.clientX-swipe
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;
  if(ovKind==='daily'&&s.dc.got&&s.dc.got.fresh&&['perks','perkuse','close'].includes(el.dataset.act)||(el.dataset.act==='dimclose'&&e.target===el&&ovKind==='daily'&&s.dc.got)){if(s.dc.got)s.dc.got.fresh=false;save()}if(swiped&&stage.contains(el)){swiped=false;return}
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
+ if(!NOCHG.has(a))markChg();
  switch(a){
   case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'close':if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
@@ -1625,7 +1635,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'syncnow':cloudPull(lastPushedAt);break;
   case'signout':signOut();break;
   case'useremote':if(pendingRemote){adopt(pendingRemote,'Loaded your account save');setTimeout(()=>notifyPrompt(true),400)}break;
-  case'keeplocal':pendingRemote=null;closeOv();cloudPush().then(()=>{toast('Kept this device. Your account now matches it.','good');setTimeout(()=>notifyPrompt(true),400)});break;
+  case'keeplocal':pendingRemote=null;closeOv();cloudPush(false,true).then(()=>{toast('Kept this device. Your account now matches it.','good');setTimeout(()=>notifyPrompt(true),400)});break;
   case'copybk':{const t=$('bk');const done=()=>toast('Save code copied','good');try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();toast('Code selected. Copy it from the box.')})}catch(e){t.select();toast('Code selected. Copy it from the box.')}break}
   case'restore':{const v=($('rs').value||'').trim();if(!v)return toast('Paste a save code first','bad');let st=null;try{st=unpack(decodeURIComponent(escape(atob(v))))}catch(e){}
    if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;sanitizeTime(s);s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
@@ -1640,7 +1650,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'jnotex':{jailNote=null;const n=$('jnote');if(n){n.classList.add('out');setTimeout(()=>n.remove(),250)}break}
   case'jailhide':jailHid=true;closeOv();updPill();break;
   case'openjail':if(s.jail){jailHid=false;if(ovKind)closeOv();openJail();updPill()}break;
-  case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);jailPop();if(now()>=s.jail.until)release('Sentence served. Back to business!','served');else updJail();break;
+  case'serve':if(!s.jail)return;s.jail.until-=3000;if(s.jail.mgr)s.mgrUntil-=3000;s.taps++;vib(6);jailPop();digLoot();if(now()>=s.jail.until)release('Sentence served. Back to business!','served');else updJail();break;
   case'jailcard':if(!s.jail||!(s.perks.jail>0))return;s.perks.jail--;release('Get out of jail free! You walked straight out.','card');break;
   case'lawyer':if(s.jail)lawOpen();break;
   case'lawspin':lawyerCall();break;
@@ -1648,7 +1658,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'lawfee':{const j=s.jail;if(!j||!j.law||!j.law.fee)return;const c=j.law.fee;if(s.cash<c)return toast('Not enough cash for the fee','bad');s.cash-=c;release('Fee paid. Your lawyer got you off.','lawyer','$'+money(c)+' fee');break}
   case'bribe':{const c=bribeCost();if(s.cash<c)return toast('Not enough cash for a bribe','bad');s.cash-=c;release('The judge looked the other way. Case dismissed.','bribe','$'+money(c));break}
  }});
-document.addEventListener('keydown',e=>{if(e.code==='Space'&&!ovKind&&!paused&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||'')){e.preventDefault();if(!e.repeat)collect();return}if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!ovKind&&!paused&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||'')){e.preventDefault();if(!e.repeat){collect();markChg()}return}if(e.key==='ArrowLeft'&&!ovKind)step(-1);if(e.key==='ArrowRight'&&!ovKind)step(1);
  if(e.key==='Enter'){if($('fcode')){redeem();return}if($('on'))document.querySelector('[data-act=named]').click();else if($('pn'))document.querySelector('[data-act=savename]').click()}});
 
 /* ================= cloud save (Supabase) ================= */
@@ -1657,6 +1667,24 @@ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!ovKind&&!paused&&!
 const CFG=window.TRILLIONAIRE_CONFIG||{};
 const SUPABASE_URL=String(CFG.supabaseUrl||'').trim();
 const SUPABASE_ANON_KEY=String(CFG.supabaseAnonKey||'').trim();
+// ---- sync safety: every cloud save has a revision number; a push only lands if the cloud is still on the
+// revision this device last saw, so a stale copy can never silently overwrite newer progress.
+// s.rev = cloud revision this save descends from; s.chg / s.chgPushed = player actions made / already uploaded.
+const NOCHG=new Set(['dimclose','close','closeov','playhere','lawclose','openjail','jailhide','begin','acct','signin','signup','forgot','forgotgo','useremote','keeplocal','ranks','friends','settings','help','notifs']);
+let pushTimer=0;
+function markChg(){s.chg=(s.chg||0)+1;if(cloudUser&&!paused){clearTimeout(pushTimer);pushTimer=setTimeout(()=>cloudPush(),2500)}} // upload soon after you do something
+const dirty=()=>(s.chg||0)!==(s.chgPushed||0);
+let pushWait=null,accessToken=null;
+// which device made each recent upload, so a device can tell its background upload made it in even after others built on it
+const DEVID=(()=>{try{let d=localStorage.getItem('trillionaire.dev');if(!d){d=Math.random().toString(36).slice(2,10);localStorage.setItem('trillionaire.dev',d)}return d}catch(e){return SID}})();
+const withHist=(body,rev,c)=>{body.hist=[...(body.hist||[]).slice(-11),[rev,DEVID,c]];return body};
+function pendLanded(remote){if(!s.pendRev)return false;const ok=(remote.hist||[]).some(h=>h[0]===s.pendRev&&h[1]===DEVID);if(ok)s.chgPushed=s.pendChg;delete s.pendRev;delete s.pendChg;return ok}
+function beaconPush(){if(!cloudUser||!accessToken||paused||pendingRemote||!dirty())return false;
+ try{const base=s.rev||0,c=s.chg||0;s.notify=notifyInfo();const body=withHist(JSON.parse(pack(s)),base+1,c);body.rev=base+1;body.chgPushed=c;delete body.pendRev;delete body.pendChg;
+  const f=base?encodeURIComponent('data->>rev')+'=eq.'+base:encodeURIComponent('data->rev')+'=is.null',txt=JSON.stringify({data:body,updated_at:new Date().toISOString()});
+  if(txt.length>60000)return false; // too big for a background upload
+  fetch(SUPABASE_URL+'/rest/v1/saves?user_id=eq.'+cloudUser.id+'&'+f,{method:'PATCH',keepalive:true,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+accessToken,'Content-Type':'application/json',Prefer:'return=minimal'},body:txt}).catch(()=>{});
+  s.pendRev=base+1;s.pendChg=c;save();return true}catch(e){return false}}
 let supa=null,cloudUser=null,cloudState='idle',lastSync=0,lastPushedAt=0,pendingRemote=null,pushing=false;
 const cloudOn=()=>!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
 function loadSupabase(){return new Promise((ok,no)=>{if(window.supabase)return ok();const sc=document.createElement('script');
@@ -1679,8 +1707,8 @@ let bc=null,rtc=null,handWait=null,bootTaken=false;try{bc=new BroadcastChannel('
 function lockSend(msg){msg.sid=SID;try{bc&&bc.postMessage(msg)}catch(e){}try{rtc&&rtc.send({type:'broadcast',event:'lock',payload:msg})}catch(e){}}
 async function lockMsg(d,via){if(!d||d.sid===SID)return;
  if(d.t==='take'){if(handWait&&SID>d.sid)return; // both opened at once: the higher id keeps playing
-  const was=!paused;if(was){save();paused=true;showElsewhere(via==='tab'?'tab':d.dev);if(cloudUser)try{await cloudPush(true)}catch(e){}}lockSend({t:'hand',to:d.sid,fresh:was})}
- else if(d.t==='hand'&&d.to===SID&&handWait){const f=handWait;handWait=null;f(d)}}
+  const was=!paused;if(was){save();paused=true;showElsewhere(via==='tab'?'tab':d.dev);if(cloudUser)try{await cloudPush(true);saveRaw()}catch(e){}}lockSend({t:'hand',to:d.sid,fresh:was})}
+ else if(d.t==='hand'&&d.to===SID&&handWait){const f=handWait;handWait=null;d.via=via;f(d)}}
 function showElsewhere(dev){const el=$('elsewhere');if(!el)return;el.querySelector('.ew-i').textContent=/iPhone|Android|iPad/.test(dev)?'📱':'💻';$('ewTxt').textContent=dev==='tab'?'Your game is open in another tab or window. Progress is saved there.':'Your game is open on your '+dev+'. Progress is saved there.';el.hidden=false;try{if(ovKind)closeOv()}catch(e){}}
 // ask any other copy to step aside; resolves once one has handed over (or nobody answered)
 function takeOver(){return new Promise(res=>{handWait=res;lockSend({t:'take',dev:DEV});setTimeout(()=>{if(handWait===res){handWait=null;res(null)}},1800)})}
@@ -1691,21 +1719,32 @@ async function cloudInit(){if(!cloudOn())return;try{await loadSupabase()}catch(e
  const recovUrl=/type=recovery/.test(location.hash)||(/[?&]code=/.test(location.search)&&!!(()=>{try{return localStorage.getItem('trillionaire.recov')}catch(x){return null}})()),recovErr=/error_description=/.test(location.hash)&&/otp|expired|invalid/i.test(decodeURIComponent(location.hash));
  supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:'trillionaire.auth'}});
  const {data}=await supa.auth.getSession();cloudUser=data?.session?.user||null;
- supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;refreshAcct();if(cloudUser&&!rtc)lockJoin();if(ev==='PASSWORD_RECOVERY')setTimeout(newPassDlg,300)});
+ supa.auth.onAuthStateChange((ev,ses)=>{cloudUser=ses?.user||null;accessToken=ses?.access_token||null;refreshAcct();if(cloudUser&&!rtc)lockJoin();if(ev==='PASSWORD_RECOVERY')setTimeout(newPassDlg,300)});
  if(recovUrl||recovErr)try{history.replaceState(null,'',location.pathname)}catch(x){}
  if(recovUrl&&cloudUser)setTimeout(newPassDlg,600);
  if(recovErr)setTimeout(()=>toast('That reset link has expired or was already used. Ask for a new one.'),600);
  await syncClock();
  await swInit();
  if(!bootTaken&&!cloudUser){bootTaken=true;tabTake()}
- if(cloudUser){bootTaken=true;await lockJoin();await takeOver();await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
+ if(cloudUser){bootTaken=true;await lockJoin();const hd=await takeOver();if(hd&&hd.fresh&&hd.via==='tab')s.chgPushed=s.chg||0;await cloudPull(bootSavedAt);pushSync().catch(()=>{});loadFriends()}
  setInterval(()=>{if(cloudUser&&!document.hidden)loadFriends()},120000);
  setInterval(()=>{if(cloudUser)cloudPush()},30000);
  addEventListener('online',()=>{(CLOCK_GUARD&&!clockChecked?syncClock():Promise.resolve()).then(()=>{if(cloudUser)cloudPush()})});refreshAcct()}
-async function cloudPush(force){if(!supa||!cloudUser||pushing||pendingRemote||s.pm||(paused&&!force))return;pushing=true;cloudState='syncing';refreshAcct();
- try{s.notify=notifyInfo();save();const body=JSON.parse(pack(s));const {error}=await supa.from('saves').upsert({user_id:cloudUser.id,data:body,updated_at:new Date().toISOString()});
-  if(error)throw error;lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';
-  supa.from('profiles').upsert({user_id:cloudUser.id,build:BUILD,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;refreshAcct()}
+async function cloudPush(force,overwrite){if(!supa||!cloudUser||pendingRemote||s.pm||(paused&&!force))return;
+ if(pushing){if(force||overwrite){await pushWait;return cloudPush(force,overwrite)}return}
+ let done;pushing=true;pushWait=new Promise(res=>done=res);cloudState='syncing';refreshAcct();
+ try{if(!paused){s.notify=notifyInfo();save()}const base=s.rev||0,c=s.chg||0,body=withHist(JSON.parse(pack(s)),base+1,c);body.rev=base+1;body.chgPushed=c;delete body.pendRev;delete body.pendChg;
+  const row={data:body,updated_at:new Date().toISOString()};
+  let q=supa.from('saves').update(row).eq('user_id',cloudUser.id);q=base?q.eq('data->>rev',String(base)):q.is('data->rev',null);
+  let {data:upd,error}=await q.select('user_id');if(error)throw error;
+  if(!upd||!upd.length){const remote=await cloudFetch();
+   if(!remote){const r2=await supa.from('saves').insert({user_id:cloudUser.id,...row});if(r2.error)throw r2.error}
+   else if(s.pendRev&&remote.rev===s.pendRev&&pendLanded(remote)){s.rev=remote.rev;s.hist=remote.hist;pushing=false;done();return cloudPush(force,overwrite)}
+   else if(overwrite){s.rev=remote.rev||0;pushing=false;done();return cloudPush(force)} // you chose to keep this device
+   else{pushing=false;done();delete remote._bf;cloudState='ok';refreshAcct();pendLanded(remote);
+    if(dirty()&&hasProgress(s))chooseSave(remote);else adopt(remote,'Picked up where you left off on your other device');return}}
+  s.rev=base+1;s.chgPushed=c;s.hist=body.hist;if(!paused)save();else saveRaw();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';
+  supa.from('profiles').upsert({user_id:cloudUser.id,build:BUILD,name:(s.name||'Boss').slice(0,20),net_worth:nw(),tier:s.tier,businesses:s.owned.length,last_played:new Date().toISOString()}).then(()=>{},()=>{})}catch(e){cloudState='error'}pushing=false;done();refreshAcct()}
 async function cloudFetch(){const {data,error}=await supa.from('saves').select('*').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;if(!data)return null;const r=unpack(data.data);if(r)r._bf=data.blocked_from||null;return r}
 const hasProgress=st=>st.owned.length>0||(st.earned||0)>0;
 const nwOf=st=>st.cash+st.owned.reduce((a,o)=>a+(o.stored||0)+(o.inv||0),0);
@@ -1716,14 +1755,19 @@ async function cloudPull(baseline,askIfBoth){if(!supa||!cloudUser)return;await s
   if(!remote||!hasProgress(remote)){await cloudPush();return}
   if(!hasProgress(s)){adopt(remote,'Loaded your saved game');return}
   if(askIfBoth&&Math.abs((remote.savedAt||0)-(s.savedAt||0))>1000){chooseSave(remote);return}
+  if(remote.rev!=null||s.rev!=null){
+   {const pr=s.pendRev;if(pendLanded(remote)&&remote.rev===pr){s.rev=remote.rev;s.hist=remote.hist}}
+   if((remote.rev||0)===(s.rev||0)){if(dirty())await cloudPush();return} // nothing new in the cloud
+   if(!dirty()||!hasProgress(s)){adopt(remote,'Picked up where you left off on your other device');return}
+   chooseSave(remote);return} // both devices changed: let the player pick
   if((remote.savedAt||0)>baseline+1000){adopt(remote,'Picked up where you left off on your other device');return}
   await cloudPush()}catch(e){cloudState='error';refreshAcct()}}
 function adopt(remote,msg){s=remote;sanitizeTime(s);save();lastPushedAt=s.savedAt;lastSync=now();cloudState='ok';lastRank=null;pendingRemote=null;
  if(ovKind!=='jail'&&ovKind!=='splash')closeOv();if(s.jail&&ovKind!=='splash')openJail();upd();toast(msg,'good')}
 function chooseSave(remote){pendingRemote=remote;const ago=t=>t?dur((now()-t)/1000)+' ago':'unknown';
  dialog('Two saves found',`<p class="s">This device and your account have different progress. Choose which one to keep. The other is replaced.</p>
- <div class="cmp num"><span><b>This device</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(s))}</span><span>Businesses</span><span></span><span>${s.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(s.savedAt)}</span>
- <span style="margin-top:8px"><b>Your account</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(remote))}</span><span>Businesses</span><span></span><span>${remote.owned.length}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(remote.savedAt)}</span></div>`,
+ <div class="cmp num"><span><b>This device</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(s))}</span><span>Businesses</span><span></span><span>${s.owned.length}</span><span>Crystals</span><span></span><span>${s.gems}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(s.savedAt)}</span>
+ <span style="margin-top:8px"><b>Your account</b></span><span></span><span></span><span>Net worth</span><span></span><span>${$m(nwOf(remote))}</span><span>Businesses</span><span></span><span>${remote.owned.length}</span><span>Crystals</span><span></span><span>${remote.gems}</span><span>Last played</span><span></span><span style="color:var(--ink)">${ago(remote.savedAt)}</span></div>`,
  `<button class="no" data-act="keeplocal" style="font-size:16px">Keep this device</button><button class="yes" data-act="useremote" style="font-size:16px">Use account</button>`,'choose')}
 function syncText(){return cloudState==='syncing'?'Syncing…':cloudState==='error'?"Couldn't sync. It retries when you're back online.":lastSync?'Synced '+dur((now()-lastSync)/1000)+' ago':'Not synced yet'}
 /* ================= push notifications ================= */
@@ -1975,7 +2019,7 @@ lastRank=myRank();upd();splash();
 const tabTake=()=>takeOver().then(d=>{if(d&&d.fresh){paused=true;location.reload()}});if(!cloudOn())tabTake();
 setInterval(tick,250);setInterval(()=>{if(shownCash!==null&&shownCash<s.cash)hud()},50);setInterval(rain,900);setInterval(save,3000);
 addEventListener('resize',()=>{if(WIDEQ.matches!==wideNow){wideNow=WIDEQ.matches;renderStage()}layout();stackN=-1;updStage()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser)cloudPush()}else if(paused){playHere();return}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)takeOver().then(()=>cloudPull(lastPushedAt));else takeOver().then(d=>{if(d&&d.fresh){paused=true;location.reload()}})}});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CLOCK_GUARD){clockChecked=false;clockWait=true;setTimeout(()=>{clockWait=false},6000);syncClock()}if(document.hidden){isAway=true;save();if(cloudUser&&!beaconPush())cloudPush()}else if(paused){playHere();return}else{isAway=false;tick();swReg?.getNotifications?.().then(ns=>ns.forEach(n=>n.close())).catch(()=>{});if(cloudUser)takeOver().then(()=>cloudPull(lastPushedAt));else takeOver().then(d=>{if(d&&d.fresh){paused=true;location.reload()}})}});
 addEventListener('pagehide',()=>{isAway=true;if(cloudUser)cloudPush()});
 cloudInit();
 setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
