@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110932,MUST=2026110820;/*notes*/const NOTES=["New: the Store. Reach $1M net worth to open it, then buy crystal packs and perks with your cash, including a 4× income boost you can only get there. Prices grow with your income, and each item costs 50% more every time you buy it in a day.", "Crystal packs for real money are coming with the app.", "Crystal businesses are now fairly priced to upgrade, and good causes are worth upgrading: every level adds 70% of their starting threat cut.", "Finishing a build or upgrade early with crystals now asks you first.", "Fixed: on the world map, locked worlds now show the net worth each one needs, and on wide screens the arrows reach every world."];
+/*build*/const BUILD=2026110933,MUST=2026110820;/*notes*/const NOTES=["New: the Store. Reach $1M net worth to open it, then buy crystal packs and perks with your cash. Prices grow with your income, and each item costs 50% more every time you buy it in a day.", "Crystal packs for real money are coming with the app.", "Crystal businesses are now fairly priced to upgrade, and good causes are worth upgrading: every level adds 70% of their starting threat cut.", "Finishing a build or upgrade early with crystals now asks you first.", "Fixed: on the world map, locked worlds now show the net worth each one needs, and on wide screens the arrows reach every world."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2179,7 +2179,7 @@ const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):star
 // Each time you buy the same item on the same day it costs 50% more; prices reset at midnight, so saved-up cash can't bulk-buy.
 const ST_RATE=4.8,ST_MGR='<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="6" fill="#F2C9A0" stroke="#14191A" stroke-width="1.5"/><path d="M4 28c1-7 5-10 11-10s10 3 11 10z" fill="#2F6DB5" stroke="#14191A" stroke-width="1.5"/><path d="M15 18l-2 5 2 3 2-3z" fill="#F2694B"/></svg>';
 const ST_PACKS=[[25,0,''],[80,10,''],[250,20,'POPULAR'],[1000,30,'BEST VALUE']];
-const ST_PERKS=[['boost4',60,'4× boost · 30 min','Four times all income for 30 minutes, whenever you choose.'],
+const ST_PERKS=[['boost',60,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
  ['crew',40,"Builder's crew",'Your next 3 builds or upgrades finish twice as fast.'],
  ['clean',240,'Clean record','Lowers your threat by 20% for 12 hours.'],
  ['jail',300,'Get out of jail free','Walk free instantly when you get busted.'],
@@ -2194,7 +2194,7 @@ function stTag(){const t=$('storeTag');if(!t||typeof ST_MGR==='undefined')return
 function storeLocked(){const n=window.__stPrev==='locked'?Math.min(nw(),ST_OPEN*.42):nw(),p=Math.min(1,n/ST_OPEN);
  return`<div class="st-lock"><div class="lk">${LKS}</div><h4>Opens at <em>$1M</em></h4><p>Put the work in first. Reach $1M net worth and the store opens, where you can buy crystals and perks with your cash.</p>
  <div class="st-prog"><i style="width:${(p*100).toFixed(1)}%"></i><span class="num">${$m(n)} of $1M</span></div>
- <div class="st-inside"><div>${PICON.gems}Crystal packs, up to 1,300 crystals</div><div>${PICON.boost}4× boosts and builder's crews</div><div>${PICON.jail}Clean records and jail-free cards</div><div>${ST_MGR}Training manuals and managers</div></div></div>`}
+ <div class="st-inside"><div>${PICON.gems}Crystal packs, up to 1,300 crystals</div><div>${PICON.boost}2× boosts and builder's crews</div><div>${PICON.jail}Clean records and jail-free cards</div><div>${ST_MGR}Training manuals and managers</div></div></div>`}
 const stInc=()=>income()/bMul();
 const stCost=min=>Math.max(1000*min,Math.round(stInc()*min)); // new players with almost no income pay at least $1,000 a minute
 const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(stCost(min)*Math.pow(1.5,stCount(v)));
