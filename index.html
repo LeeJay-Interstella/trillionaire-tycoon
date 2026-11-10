@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111041,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111042,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1052,7 +1052,7 @@ function jdur(sec){sec=Math.max(0,Math.ceil(sec));const h=Math.floor(sec/3600),m
 // digging out: every tap takes 3s off, and now and then you turn up loot (a few finds per sentence at most)
 const DIG_MAX=3,DIG_ODDS=.05;
 function digLoot(){const j=s.jail;if(!j||(j.loot||0)>=DIG_MAX||Math.random()>=DIG_ODDS)return;j.loot=(j.loot||0)+1;
- if(Math.random()<.25){s.gems+=1;jailPop('💎 +1 found!','gem')}else{const v=Math.max(100,Math.round(income()*2));s.cash+=v;s.earned+=v;jailPop('+'+$m(v)+' found!','cash')}
+ if(Math.random()<.25){s.gems+=1;gemLog(1,'Found in jail');jailPop('💎 +1 found!','gem')}else{const v=Math.max(100,Math.round(income()*2));s.cash+=v;s.earned+=v;jailPop('+'+$m(v)+' found!','cash')}
  vib([20,30,20]);const d=document.querySelector('#jail .jdig');if(d)d.textContent=`Dig your way out. You might find loot in the dirt (${j.loot}/${DIG_MAX} found).`;save();upd()}
 function jailPop(txt,kind){const b=document.querySelector(kind?'#jail .jsent':'#jail .serve');if(!b)return;const p=document.createElement('span');p.className='jpop'+(kind?' loot '+kind:'');p.textContent=txt||'−3s';p.style.left=(30+Math.random()*40)+'%';b.appendChild(p);setTimeout(()=>p.remove(),kind?1500:700)}
 function dur(sec){sec=Math.max(0,Math.ceil(sec));const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60),x=sec%60;
@@ -1071,7 +1071,7 @@ function st(o){const b=B[o.bid],L=o.level,old=b.pt===1,g=(x,i,l)=>x*Math.pow(UPG
 const gemPay=b=>b.pt===1;
 const priceHTML=(b,v)=>gemPay(b)?`${GEM} ${money(v)}`:`${COIN} ${money(v)}`;
 const canPay=(b,v)=>gemPay(b)?s.gems>=v:s.cash>=v;
-function pay(b,v){if(gemPay(b))s.gems-=v;else s.cash-=v}
+function pay(b,v){if(gemPay(b)){s.gems-=v;gemLog(-v,'Crystal businesses')}else s.cash-=v}
 const buyPrice=b=>b.secret?0:b.price;
 const own=bid=>s.owned.find(o=>o.bid===bid);
 const boostOn=()=>now()<s.boostUntil,bMul=()=>boostOn()?(s.boostX||2):1;
@@ -1124,7 +1124,7 @@ function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw()
 function cardDodge(at){if(!(s.perks.jail>0)||!(at<(s.mgrUntil||0)))return false;s.perks.jail--;s.dodged=(s.dodged||0)+1;s.coolUntil=at+COOL;return true}
 function arrest(at){if(cardDodge(at))return;const th=threatAt(at),n=nw();let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;
  const sev=th<20?'low':th<50?'mid':'high',sec=sev==='low'?row[1]:sev==='mid'?row[2]:row[3],loss=sev==='high'?Math.floor(s.cash*row[4]):0;
- s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th),at};s.arrests++;
+ s.cash-=loss;s.jail={until:at+sec*1000,total:sec*1000,sev,loss,th:Math.round(th),at};s.arrests++;ev('bust',{sev,loss:Math.round(loss),threat:Math.round(th),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec})}
 function jailOut(how,end,cost){const j=s.shift&&s.shift.jails[s.shift.jails.length-1];if(j&&j.end==null){j.end=end;j.how=how;if(cost)j.cost=cost}}
 function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=t;const done=[];
@@ -1259,10 +1259,10 @@ function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)ret
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
  if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
- pay(b,p);const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
+ pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
 function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
- pay(b,x.up);if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
+ pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));{const L=grp(false).concat(grp(true));if(L.length&&!cur())s.cur=L[0]}toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
 const isGood=o=>!!o&&!(B[o.bid].rate>0); // good causes earn nothing and lower threat
 const grp=g=>s.owned.map((o,i)=>i).filter(i=>B[s.owned[i].bid].w===(s.world|0)&&isGood(s.owned[i])===g);
@@ -1403,8 +1403,8 @@ function rollPrize(day,avoid){const w=[['cash',30],['gems',22],['boost',16],['cr
 function dcPick(i){if(!dcReady()||(CLOCK_GUARD&&!clockChecked))return openDaily();bonusOwed();const n=dcAlive()+1,pos=(n-1)%7+1,cards=[];
  for(let j=0;j<3;j++)cards.push(rollPrize(pos,cards.map(c=>c.k)));
  if(pos===7)cards[i]={k:'mgr',v:8,streak:true,bonus:rollPrize(1,['mgr'])};
- const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};if(p.k==='mgr')s.dc.got.spin=false;s.dcSeen=true;
- if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems')s.gems+=p.v;else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
+ const p=cards[i];s.dc={last:dayKey(now()),streak:n,got:{cards,pick:i,day:dayKey(now()),fresh:true}};ev('daily',{k:p.k,v:typeof p.v==='number'?Math.round(p.v):p.v||0,streak:n});if(p.k==='mgr')s.dc.got.spin=false;s.dcSeen=true;
+ if(p.k==='cash'){s.cash+=p.v;s.earned+=p.v}else if(p.k==='gems'){s.gems+=p.v;gemLog(p.v,'Daily chance')}else if(p.k==='mgr')s.perks.mgr.push(p.v);else s.perks[p.k]++;
  vib([20,30,20]);save();upd();openDaily()}
 function streakHTML(){const n=dcToday(),pos=(n-1)%7+1,picked=!dcReady(),wk=Math.ceil(n/7);
  let d='';for(let i=1;i<=7;i++){const done=i<pos||(i===pos&&picked),today=i===pos&&!picked,gold=i===7;
@@ -1445,7 +1445,7 @@ function dailyBody(){
  ${p.bonus?bonusBox(p.bonus,'done'):`<div class="dc-miss"><span>You could have got</span><div>${prizeCard(o[0])}${prizeCard(o[1])}</div></div>`}</div>
  <div class="dc-btns">${btns}</div><div class="dc-hint" style="padding-top:4px">Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></div>`}
 function bonusOwed(){const g=s.dc&&s.dc.got,p=g&&g.cards&&g.cards[g.pick];if(p&&p.bonus&&!p.bonus.got)grantBonus(p.bonus)}
-function grantBonus(b){b.got=1;if(b.k==='cash'){s.cash+=b.v;s.earned+=b.v}else if(b.k==='gems')s.gems+=b.v;else s.perks[b.k]=(s.perks[b.k]||0)+1}
+function grantBonus(b){b.got=1;if(b.k==='cash'){s.cash+=b.v;s.earned+=b.v}else if(b.k==='gems'){s.gems+=b.v;gemLog(b.v,'Daily chance')}else s.perks[b.k]=(s.perks[b.k]||0)+1}
 const BONUS_W=[['cash',30],['gems',22],['boost',16],['crew',12],['clean',10],['jail',6],['manual',4]];
 const bonusName=k=>({cash:'Cash',gems:'Crystals',boost:'2× boost',crew:"Builder's crew",clean:'Clean record',jail:'Jail-free',manual:'Manual'})[k];
 function bonusCell(b){return`<div class="b">${PICON[b.k]}<span>${b.k==='cash'?'+'+$m(b.v):b.k==='gems'?'+'+b.v+' crystals':bonusName(b.k)}</span></div>`}
@@ -1508,7 +1508,7 @@ function usePerk(v){const t=now();
  else if(v==='crew'){if(!s.perks.crew)return;s.perks.crew--;s.crew=(s.crew||0)+CREW_N;toast("Builder's crew hired: your next 3 jobs are twice as fast",'good')}
  else if(v==='manual'){if(!s.perks.manual)return;if(s.mgr.level>=MGR_MAX)return toast('Your manager is already fully trained');s.perks.manual--;if(s.mgr.train)finishTrain();else{s.mgr.level++;toast(`Your manager is now Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good')}}
  else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
- vib(15);save();closeOv();upd()}
+ ev('perk',{k:v});vib(15);save();closeOv();upd()}
 function updPerkUI(){if(!clockWarned&&!ovKind)clockNote();
  {const e=$('pt-train');if(e&&s.mgr.train)e.textContent=dur(s.mgr.train.left/1000)}
  if(ovKind==='shiftrep'&&shiftIdx==='live'&&now()-(updPerkUI.last||0)>3000){updPerkUI.last=now();const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shiftBody('live');sb.scrollTop=y}}
@@ -1668,7 +1668,7 @@ function lawOpen(){const p=$('lawpop');if(!p)return;const fresh=p.hidden;p.inner
 function lawClose(){if(lawSpinning)return;const p=$('lawpop');if(p){p.hidden=true;p.innerHTML=''}updJail()}
 let lawSpinning=false;
 function lawyerCall(){const j=s.jail;if(!j||lawSpinning)return;const calls=j.calls||0,cost=calls?LAW_GEMS:0;
- if(s.gems<cost)return toast('Not enough crystals','bad');s.gems-=cost;j.calls=calls+1;
+ if(s.gems<cost)return toast('Not enough crystals','bad');s.gems-=cost;gemLog(-cost,'Lawyer calls');j.calls=calls+1;
  let tot=LAW.reduce((a,x)=>a+x[1],0),rr=Math.random()*tot,k=LAW[0][0];for(const[x,w]of LAW){if((rr-=w)<0){k=x;break}}
  j.law={k,spin:1,fee:k==='fee'?Math.round(lawFee()):0};save();upd();
  const pop=$('lawpop');if(!pop||pop.hidden)lawOpen();lawSpinning=true;{const lp=pop.querySelector('.lp');lp.querySelectorAll('.dc-bb').forEach(b=>b.disabled=true);const sb=$('lawspinb');if(sb)sb.firstChild.textContent='SPINNING… ';const mm=lp.querySelector('.lpm');if(mm)mm.innerHTML='<span>Your lawyer is on the phone…</span>'}
@@ -1729,7 +1729,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
    // crystals are hard to earn, so finishing early always asks first
    dialog('Finish now?',`<p>Spend <b>${GEM} ${c} crystal${c>1?'s':''}</b> to finish ${o.busy==='up'?'upgrading':'building'} <b>${esc(B[o.bid].name)}</b> right away?</p><p class="s">You have ${s.gems} crystals. It finishes by itself in ${dur((o.end-now())/1000)}.</p>`,
     `<button class="no" data-act="close">Keep waiting</button><button class="yes" data-act="finishok" data-bid="${o.bid}">Spend ${GEM} ${c}</button>`);break}
-  case'finishok':{const o=cur();closeOv();if(!o||!o.busy||o.bid!==+el.dataset.bid)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
+  case'finishok':{const o=cur();closeOv();if(!o||!o.busy||o.bid!==+el.dataset.bid)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;gemLog(-c,'Finish upgrades early');s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
   case'shop':if(!s.seenShop){s.seenShop=true;$('getmore')?.remove();save()}openShop();break;
   case'ask':askBuy(bid);break;
   case'buy':buy(bid);break;
@@ -1762,18 +1762,18 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'train':trainDlg();break;
   case'dotrain':{const c=trainCost();if(s.mgr.train||s.mgr.level>=MGR_MAX||s.cash<c)return;s.cash-=c;s.mgr.train={left:trainTime(),total:trainTime()};closeOv();
    toast(mgrOn()?`Training started: Level ${s.mgr.level+1} in ${hrs(s.mgr.train.total)}`:'Training starts when your manager\'s next shift begins','good');vib(15);save();upd();break}
-  case'trainskip':{if(!s.mgr.train)return;const c=trainSkip();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;closeOv();finishTrain();upd();break}
+  case'trainskip':{if(!s.mgr.train)return;const c=trainSkip();if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;gemLog(-c,'Skip manager training');closeOv();finishTrain();upd();break}
   case'mgrtap':{const m=s.mgr.train;if(!m||!mgrOn())return;const cut=Math.max(1300,m.total*.005);m.left-=cut;s.taps++;vib(5);floaty(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'-'+(cut/1000).toFixed(1)+'s','#1F3A5F');if(m.left<=0)finishTrain();upd();break}
   case'perkuse':usePerk(el.dataset.v);break;
-  case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
-  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);bank(c,1);s.gems+=2;s.freeAt=now()+6e5;
+  case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];gemLog(A[4],'Awards');toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
+  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);bank(c,1);s.gems+=2;gemLog(2,'Free gifts');s.freeAt=now()+6e5;
    dialog('Free gift!',`<p>You got<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">2 crystals</span></p><p class="s">Come back in 10 minutes for another one.</p>`,`<button class="yes" data-act="close">Thanks</button>`);upd();break}
   case'boost':{if(boostOn())return toast(`${s.boostX||2}X income active for ${dur((s.boostUntil-now())/1000)}`);
    if(s.boostReady<=now())dialog('Income boost',`<p>Double all income for <span class="hl">3 minutes</span>.</p><p class="s">Free to use. Recharges 15 minutes after you use it.</p>`,`<button class="no" data-act="close">Later</button><button class="yes" data-act="doboost">Boost</button>`);
    else dialog('Income boost',`<p>Your free boost recharges in <span class="hl">${dur((s.boostReady-now())/1000)}</span>.</p><p>Boost now for <span class="hl">${GEM} 5</span>?</p>`,`<button class="no" data-act="close">No</button><button class="yes" data-act="paidboost" ${s.gems<5?'disabled':''}>Yes</button>`);break}
   case'doboost':s.boostX=2;s.boostUntil=now()+18e4;s.boostReady=now()+9e5;closeOv();toast('2X income for 3 minutes!','good');upd();break;
-  case'paidboost':if(s.gems<5)return;s.gems-=5;s.boostX=2;s.boostUntil=now()+18e4;closeOv();toast('2X income for 3 minutes!','good');upd();break;
-  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);bank(c,1);s.gems+=10;s.chestAt=now()+4*36e5;
+  case'paidboost':if(s.gems<5)return;s.gems-=5;gemLog(-5,'3-min boosts');ev('perk',{k:'boost3'});s.boostX=2;s.boostUntil=now()+18e4;closeOv();toast('2X income for 3 minutes!','good');upd();break;
+  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);bank(c,1);s.gems+=10;gemLog(10,'Treasure chest');s.chestAt=now()+4*36e5;
    dialog('Treasure chest',`<p>Inside you find<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">10 crystals</span></p><p class="s">A new chest arrives every 4 hours.</p>`,`<button class="yes" data-act="close">Awesome</button>`);upd();break}
   case'boss':sheet('Boss',bossBody(),'boss');break;
   case'savename':{const v=$('pn').value.trim();if(v){s.name=v;save();toast('Name saved','good')}closeOv();break}
@@ -1839,6 +1839,23 @@ function beaconPush(){if(!cloudUser||!accessToken||paused||pendingRemote||!dirty
   s.pendRev=base+1;s.pendChg=c;save();return true}catch(e){return false}}
 let supa=null,cloudUser=null,cloudState='idle',lastSync=0,lastPushedAt=0,pendingRemote=null,pushing=false;
 const cloudOn=()=>!!(SUPABASE_URL&&SUPABASE_ANON_KEY);
+
+// ---- gameplay events for the admin page: a small log of check-ins, purchases, crystals, busts and upgrades.
+// Rows go to the Supabase "events" table; each player can only add their own, and only the admin can read them.
+const EV_Q=[];let evSid=null,evAt=0,evT0=0,evC0=0,evHidAt=0,evBeat=null;
+function ev(kind,data){try{if(!cloudOn())return;EV_Q.push({kind,data:data||{},at:new Date().toISOString(),sid:evSid});if(EV_Q.length>400)EV_Q.splice(0,EV_Q.length-400);if(EV_Q.length>=30)evFlush()}catch(e){}}
+function gemLog(n,src){if(n)ev('gem',{n:Math.round(n),src})}
+function evFlush(keep){try{if(!cloudUser||!accessToken||!EV_Q.length)return;const rows=EV_Q.splice(0,EV_Q.length).map(r=>({user_id:cloudUser.id,...r}));
+ fetch(SUPABASE_URL+'/rest/v1/events',{method:'POST',keepalive:!!keep,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+accessToken,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(rows)})
+  .then(r=>{if(!r.ok&&r.status!==404&&!keep)EV_Q.unshift(...rows.map(({user_id,...x})=>x))}).catch(()=>{if(!keep)EV_Q.unshift(...rows.map(({user_id,...x})=>x))})}catch(e){}}
+const evSnap=()=>({nw:Math.round(nw()),cash:Math.round(s.cash),gems:s.gems|0,world:s.world|0,lv:s.owned.length,build:BUILD});
+function evOpen(){evSid=Math.random().toString(36).slice(2,10);evAt=Date.now();evT0=s.taps|0;evC0=s.collects|0;ev('open',{...evSnap(),dev:matchMedia('(pointer:coarse)').matches?'phone':'desktop'});
+ try{ev('portfolio',{list:s.owned.map(o=>{const b=B[o.bid],x=st(o);return[b.name,o.level,Math.round(x.rate||0),b.w|0,b.pt===1?1:0]})})}catch(e){}}
+function evSum(kind){if(!evSid)return;ev(kind,{...evSnap(),dur:Math.round((Date.now()-evAt)/1000),taps:(s.taps|0)-evT0,collects:(s.collects|0)-evC0})}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){evHidAt=Date.now();evSum('close');evFlush(true)}else if(Date.now()-evHidAt>120000){evOpen()}});
+addEventListener('pagehide',()=>{evSum('close');evFlush(true)});
+setTimeout(()=>{evOpen();evBeat=setInterval(()=>{if(!document.hidden)evSum('beat');evFlush()},180000)},2000);
+setInterval(()=>evFlush(),30000);
 function loadSupabase(){return new Promise((ok,no)=>{if(window.supabase)return ok();const sc=document.createElement('script');
  sc.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js';sc.onload=()=>ok();sc.onerror=no;document.head.appendChild(sc)})}
 // ask the server what time it really is; the phone's clock can be changed
@@ -1978,8 +1995,8 @@ function notifRow(){const st=notifState();if(st==='off')return'';
  return`<div class="pad" style="padding-bottom:0;padding-top:8px"><div class="acct"><div style="min-width:0"><b>${txt[0]}</b><small>${txt[1]}</small></div>${btn}</div></div>`}
 
 function acctHTML(){if(!cloudOn())return'';
- if(!cloudUser)return`<div class="pad" style="padding-bottom:0"><div class="acct"><div><b>Save to the cloud</b><small>Sign in to keep your progress synced on every device.</small></div><button class="bigbtn" data-act="auth" data-v="in" style="padding:12px 16px;font-size:15px;width:auto">Sign in</button></div></div>`;
- return`<div class="pad" style="padding-bottom:0"><div class="acct"><div style="min-width:0"><b>${esc(cloudUser.email||'Signed in')}</b><small id="syncst">${syncText()}</small></div><div style="display:flex;gap:6px"><button class="bigbtn ghost" data-act="syncnow" style="padding:10px 12px;font-size:13px;width:auto">Sync now</button><button class="bigbtn ghost" data-act="signout" style="padding:10px 12px;font-size:13px;width:auto">Sign out</button></div></div></div>`}
+ if(!cloudUser)return`<div class="pad" style="padding-bottom:0"><div class="acct"><div><b>Save to the cloud</b><small>Sign in to keep your progress synced on every device. Signed-in players' gameplay stats (visits, taps, purchases) are recorded to help improve the game.</small></div><button class="bigbtn" data-act="auth" data-v="in" style="padding:12px 16px;font-size:15px;width:auto">Sign in</button></div></div>`;
+ return`<div class="pad" style="padding-bottom:0"><div class="acct"><div style="min-width:0"><b>${esc(cloudUser.email||'Signed in')}</b><small id="syncst">${syncText()}</small><small style="opacity:.7">Gameplay stats are recorded to help improve the game.</small></div><div style="display:flex;gap:6px"><button class="bigbtn ghost" data-act="syncnow" style="padding:10px 12px;font-size:13px;width:auto">Sync now</button><button class="bigbtn ghost" data-act="signout" style="padding:10px 12px;font-size:13px;width:auto">Sign out</button></div></div></div>`}
 function refreshAcct(){if(ovKind==='boss'){const el=$('sb');if(el)el.innerHTML=bossBody()}}
 function authDlg(mode){const up=mode==='up';
  dialog(up?'Create account':'Sign in',`<p class="s">${up?'Make an account to save your progress online.':'Sign in to load your progress on this device.'}</p>
@@ -2057,7 +2074,7 @@ function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1
 // chance of a bust at one 30-second check, so the whole deal has its tier's bust chance
 const dealP=d=>1-Math.pow(1-d.bust,30/d.sec);
 function dealBust(c){for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d))return d}return null}
-function dealArrest(at,d){if(cardDodge(at))return;const th=threatAt(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at)));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th)};s.arrests++;
+function dealArrest(at,d){if(cardDodge(at))return;const th=threatAt(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at)));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th)};s.arrests++;ev('bust',{sev:'deal',loss:0,threat:Math.round(th),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
@@ -2246,13 +2263,13 @@ function storeBody(){
   `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. 2× boosts and managers cost crystals (hold up to 3 managers at a time). Double taps: buy as many as you like. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
-function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100)}}}
+function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100);gemLog(n+Math.round(n*bon/100),'Bought with cash')}}}
  const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:pMin(v,p[1]),give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
 function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();if(stFull(v))return toast(`You can hold ${ST_HOLD[v]} managers at a time. Use one to buy another`,'bad');if(stOut(v))return toast(`Sold out today. Back at midnight`,'bad');
  dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:ST_FREE[v]?`Buy as many as you like.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
   `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${stCan(v,c)?'':'disabled'}>Buy</button>`)}
 window.__stRefresh=()=>{stTag();if(ovKind==='store')openStore()};
-function stBuy(v,c){if(!storeOpen()||stOut(v))return;const it=stItem(v);if(!it||!(c>0)||!stCan(v,c))return toast(stGem(v)?'Not enough crystals':'Not enough cash','bad');if(stGem(v))s.gems-=c;else{s.cash-=c;s.storeSpent=(s.storeSpent||0)+c}{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
+function stBuy(v,c){if(!storeOpen()||stOut(v))return;const it=stItem(v);if(!it||!(c>0)||!stCan(v,c))return toast(stGem(v)?'Not enough crystals':'Not enough cash','bad');if(stGem(v)){s.gems-=c;gemLog(-c,v==='mgr8'?'8-hour managers':v==='boost'?'2× boosts (Store)':'Store')}else{s.cash-=c;s.storeSpent=(s.storeSpent||0)+c}ev('buy',{item:it.n,cur:stGem(v)?'gems':'cash',price:Math.round(c)});{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
 
 /* ---------- World map (prototype): swipe between worlds; Downtown is where you are, the rest are locked ---------- */
 const WORLDS=[
@@ -2306,7 +2323,7 @@ function travel(w){if(!worldOpen(w))return;const o=cur();s.wlast=s.wlast||{};if(
 function mapBtnUpd(){const b=document.querySelector('.mapbtn');if(!b)return;b.setAttribute('aria-label','World map: '+WN[s.world|0]);let d=b.querySelector('.wdot');const nu=(s.wopen|0)>(s.wseen|0);if(nu&&!d){d=document.createElement('i');d.className='wdot';b.appendChild(d)}else if(!nu&&d)d.remove()}
 function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'<div class="dio">'+worldLand(WORLDS[w],false)+'</div>'}</div><p>You've reached ${$m(WU[w])}. Buy land in ${WN[w]} and build ${plotsIn(w)} new businesses. Everything you own keeps earning while you're there.</p>`,`<button class="no" data-act="close">Later</button><button class="ok" data-act="travelto" data-w="${w}">Travel there</button>`,'wodlg');const d=document.querySelector('.dlg');if(d)d.classList.add('wodlg')}
 function buyLand(){const w=s.world|0;if(!w)return;if(s.jail)return jailNag();const have=landIn(w);if(have>=plotsIn(w))return;const p=plotPrice(w,have);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
- s.cash-=p;s.landVal=(s.landVal||0)+p;s.land[w]=have+1;vib(20);toast(`Plot ${have+1} of ${plotsIn(w)} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}upd()}
+ s.cash-=p;ev('land',{world:w,price:Math.round(p)});s.landVal=(s.landVal||0)+p;s.land[w]=have+1;vib(20);toast(`Plot ${have+1} of ${plotsIn(w)} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}upd()}
 function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter(o=>B[o.bid].w===i).length;
  if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`+(i?` · ${landIn(i)}/${plotsIn(i)} plots`:''),pct:own/bs.length};
  return{locked:1,label:`$${money(n)} / $${money(w.need)}`,pct:Math.min(1,n/w.need)}}
