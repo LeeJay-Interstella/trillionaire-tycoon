@@ -944,7 +944,7 @@ function setTop(top,bot=69){const wide=WIDEQ.matches,Z=wide?1.25:1;VWc=VW*Z;VHc=
 let VB=setTop(-118);
 // Painted building art: businesses listed here show an image (1024x1024, transparent, island base ~90% down) instead of the drawn building.
 const BIMG={abd:'img/abd.webp'};
-const BIMG_W=245; // how wide the painted art's content shows, in stage units (the drawn buildings are about 214 wide)
+const BIMG_W=258; // how wide the painted art's content shows, in stage units (the drawn buildings are about 214 wide)
 const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher number here moves the building up (desktop sits it lower)
 function bizArt(b){const u=BIMG[b.code];if(!u)return art(b);const k=BIMG_W/804,S=1024*k;
  return `<svg viewBox="0 0 1 1"><image href="${u}" x="${(-512*k).toFixed(1)}" y="${(69-916*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111053,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111056,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1289,8 +1289,8 @@ function tapFX(px,py,txt){
   sp.style.cssText=`position:absolute;left:${cx}px;top:${cy-18*k}px;width:${z}px;height:${z}px;margin:${-z/2}px 0 0 ${-z/2}px`;sp.innerHTML=`<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0L12.4 7.6 20 10 12.4 12.4 10 20 7.6 12.4 0 10 7.6 7.6z" fill="${S.spkCol}"/></svg>`;tfxF.appendChild(sp);
   const ms=S.spkMs*(.8+Math.random()*.4);tfxDrop(sp,tfxAnim(sp,[{transform:'translate(0,0) scale(.2) rotate(0deg)',opacity:1},{transform:`translate(${Math.cos(a)*d*.7}px,${Math.sin(a)*d*.7-20}px) scale(1) rotate(90deg)`,opacity:1,offset:.5},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+10}px) scale(.3) rotate(180deg)`,opacity:0}],ms,'cubic-bezier(.2,.8,.4,1)'),ms)}
  // cash pop where you tapped
- if(S.popOn&&txt){const p=document.createElement('div');p.className='num tfxpop';p.textContent=txt;const o=Math.max(2,Math.round(S.popSize/12));p.style.cssText=`position:absolute;left:${px-sr.left}px;top:${py-sr.top-20}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;letter-spacing:-.5px;white-space:nowrap;transform:translate(-50%,-50%);z-index:6;--o:${o}px`;tfxF.appendChild(p);
-  tfxDrop(p,tfxAnim(p,[{transform:'translate(-50%,calc(-50% + 6px)) scale(.8)',opacity:0},{transform:'translate(-50%,-50%) scale(1.1)',opacity:1,offset:.12},{transform:`translate(-50%,calc(-50% - ${S.popRise*.75}px)) scale(1)`,opacity:1,offset:.75},{transform:`translate(-50%,calc(-50% - ${S.popRise}px)) scale(1)`,opacity:0}],1300,'cubic-bezier(.2,.7,.3,1)'),1300)}
+ if(S.popOn&&txt){const p=document.createElement('div');p.className='num tfxpop';p.textContent=txt;const o=Math.max(2,Math.round(S.popSize/12));const top=r.top-sr.top+r.height*(img?.11:.02),rise=Math.max(S.popRise,cy-top+S.popSize*1.6);p.style.cssText=`position:absolute;left:${cx+(Math.random()*30-15)*k}px;top:${cy}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;letter-spacing:-.5px;white-space:nowrap;transform:translate(-50%,-50%);z-index:6;--o:${o}px`;tfxB.appendChild(p);
+  tfxDrop(p,tfxAnim(p,[{transform:'translate(-50%,-50%) scale(.9)',opacity:1},{transform:`translate(-50%,calc(-50% - ${rise*.8}px)) scale(1.05)`,opacity:1,offset:.75},{transform:`translate(-50%,calc(-50% - ${rise}px)) scale(1)`,opacity:0}],1300,'cubic-bezier(.2,.7,.3,1)'),1300)}
 }
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
