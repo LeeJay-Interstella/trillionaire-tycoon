@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111035,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated.", "New: the Store. Reach $1M net worth to open it, then buy crystal packs and perks with your cash. Prices grow with your income, and each item doubles in price every time you buy it in a day.", "Crystal packs for real money are coming with the app.", "Crystal businesses are now fairly priced to upgrade, and good causes are worth upgrading: every level adds 70% of their starting threat cut.", "Finishing a build or upgrade early with crystals now asks you first.", "Fixed: on the world map, locked worlds now show the net worth each one needs, and on wide screens the arrows reach every world."];
+/*build*/const BUILD=2026111035,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2189,13 +2189,14 @@ const ST_PERKS=[['boost',40,'2× boost · 30 min','Double all income for 30 minu
  ['mgr8',390,'8-hour manager','Your businesses keep earning past full for 8 hours.']];
 const ST_REAL=[[100,'£0.99'],[550,'£4.99'],[1200,'£9.99'],[2600,'£19.99']];
 let storeTab='gems';
-// the store opens once you've reached $1M net worth, and stays open from then on
-const ST_OPEN=1e6,LKS='<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
-function storeOpen(){if(window.__stPrev)return window.__stPrev==='open';if(!s.storeOpen&&nw()>=ST_OPEN)s.storeOpen=true;return!!s.storeOpen}
+// (storeOpenB, not the old storeOpen flag: the threshold moved from $1M to $1B, so earlier unlocks don't count)
+// the store opens once you've reached $1B net worth, and stays open from then on
+const ST_OPEN=1e9,LKS='<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function storeOpen(){if(window.__stPrev)return window.__stPrev==='open';if(!s.storeOpenB&&nw()>=ST_OPEN)s.storeOpenB=true;return!!s.storeOpenB}
 function stTag(){const t=$('storeTag');if(!t||typeof ST_MGR==='undefined')return;const o=storeOpen();t.className='tag '+(o?'lime':'lk');t.innerHTML=o?'NEW':LKS;t.hidden=o&&!!s.storeSeen}
 function storeLocked(){const n=window.__stPrev==='locked'?Math.min(nw(),ST_OPEN*.42):nw(),p=Math.min(1,n/ST_OPEN);
- return`<div class="st-lock"><div class="lk">${LKS}</div><h4>Opens at <em>$1M</em></h4><p>Put the work in first. Reach $1M net worth and the store opens, where you can buy crystals and perks with your cash.</p>
- <div class="st-prog"><i style="width:${(p*100).toFixed(1)}%"></i><span class="num">${$m(n)} of $1M</span></div>
+ return`<div class="st-lock"><div class="lk">${LKS}</div><h4>Opens at <em>$1B</em></h4><p>Put the work in first. Reach $1B net worth and the store opens, where you can buy crystals and perks with your cash.</p>
+ <div class="st-prog"><i style="width:${(p*100).toFixed(1)}%"></i><span class="num">${$m(n)} of $1B</span></div>
  <div class="st-inside"><div>${PICON.gems}Crystal packs, up to 1,300 crystals</div><div>${PICON.boost}2× boosts and builder's crews</div><div>${PICON.jail}Clean records and jail-free cards</div><div>${ST_MGR}Training manuals and managers</div></div></div>`}
 const stInc=()=>income()/bMul();
 const ST_X=1; // store-wide price multiplier
