@@ -999,14 +999,14 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111038,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111040,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
  if(!(s.maxT>0)||d>s.maxT)s.maxT=d;else d=s.maxT}return d};
 const fresh=()=>({world:0,wopen:0,land:{},landVal:0,name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
- dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0},mgr:{level:1,train:null},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
+ dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0,tap2:0},mgr:{level:1,train:null},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
 function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,b:BUILD,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
 function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch(e){return null}
  if(!d||typeof d!=='object'||!Array.isArray(d.owned))return null;
@@ -1192,7 +1192,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
-function updStage(){const o=cur();const bc=$('boostChip');if(bc){bc.hidden=!boostOn();if(boostOn())bc.textContent=(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000)}
+function updStage(){const o=cur();const bc=$('boostChip');if(bc){const bo=boostOn(),tp=tapMul()>1;bc.hidden=!bo&&!tp;bc.textContent=[bo?(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000):'',tp?'2X TAPS · '+dur((s.tapUntil-now())/1000):''].filter(Boolean).join('  ·  ')}
  {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){if(d.hidden===on)requestAnimationFrame(()=>{layout();stackN=-1;updStage()});d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=dur((s.mgrUntil-now())/1000)+' left'}}}
  if(!o)return;
  if(o.busy){const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
@@ -1246,6 +1246,7 @@ function collect(){const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return 
  setTimeout(()=>{bills.forEach(b=>b.remove())},bills.length*28+40);stackN=0;cashTween=performance.now();const cb=$('cbtn').getBoundingClientRect();floaty(cb.left+cb.width/2,cb.top,'+'+$m(a));upd()}
 // tap a building to earn: each tap adds TAP_SEC seconds of that building's earnings (doubled while a boost runs), up to max capacity
 const TAP_SEC=1,TAP_GAP=90;let tapLast=0;
+const TAP2_MIN=30,tapMul=()=>now()<(s.tapUntil||0)?2:1; // Double taps perk: every earning tap is worth twice as much
 const tapFmt=v=>v<10?'$'+v.toFixed(2):$m(v);
 function tapFloat(x,y,txt,col){const f=document.createElement('div');f.className='tapfloat num';f.textContent=txt;if(col)f.style.color=col;f.style.left=(x+(Math.random()*24-12))+'px';f.style.top=(y-28)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1100)}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
@@ -1253,7 +1254,7 @@ function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rat
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');
  const room=x.hold-o.stored;if(room<0.005){tapFloat(px,py,'FULL','#E04B3A');vib(3);return}
- const v=Math.min(room,x.rate/60*TAP_SEC*bMul());o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);tapFloat(px,py,'+'+tapFmt(v));upd()}
+ const v=Math.min(room,x.rate/60*TAP_SEC*bMul()*tapMul());o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);tapFloat(px,py,'+'+tapFmt(v));upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
@@ -1368,6 +1369,7 @@ const PICON={
  cash:'<svg viewBox="0 0 40 30"><rect x="4" y="16" width="32" height="10" rx="2" fill="#2C7526"/><rect x="2" y="10" width="32" height="10" rx="2" fill="#43B14F" stroke="#1E5A1A"/><rect x="6" y="4" width="32" height="10" rx="2" fill="#5DBB4F" stroke="#1E5A1A"/><circle cx="22" cy="9" r="3.4" fill="#B9EBAF"/></svg>',
  gems:'<svg viewBox="0 0 30 30"><polygon points="7,5 23,5 28,12 15,27 2,12" fill="#4AAFE3"/><polygon points="2,12 28,12 15,27" fill="#2F8DC0"/><polygon points="7,5 12,12 15,5" fill="#9ED6F0"/></svg>',
  jail:'<svg viewBox="0 0 30 30"><rect x="3" y="6" width="24" height="18" rx="3" fill="#F5B946" stroke="#C98F1E" stroke-width="1.5"/><g fill="#7A4B10"><rect x="8" y="10" width="2" height="10"/><rect x="14" y="10" width="2" height="10"/><rect x="20" y="10" width="2" height="10"/></g><circle cx="22" cy="20" r="5" fill="#3E9B37"/><path d="M19.6 20l1.6 1.6 3-3.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>',
+ tap2:'<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#F5B946"/><circle cx="13" cy="11" r="6.5" fill="none" stroke="#fff" stroke-width="1.6" opacity=".9"/><path d="M11.4 21.5V10.2a1.6 1.6 0 0 1 3.2 0v5.2l4.6 1a2 2 0 0 1 1.5 2.3l-.8 4.3h-6.5z" fill="#7A4B10"/></svg>',
  boost:'<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="#B5D43B"/><path d="M16 4L7 17h7l-1 9 9-13h-7z" fill="#2C7526"/></svg>',
  crew:'<svg viewBox="0 0 30 30"><path d="M5 19a10 10 0 0 1 20 0z" fill="#F5B946"/><rect x="3" y="19" width="24" height="4" rx="2" fill="#E08A1E"/><rect x="13" y="8" width="4" height="9" fill="#E08A1E"/></svg>',
  clean:'<svg viewBox="0 0 30 30"><path d="M15 2l11 4v8c0 7-5 12-11 14C9 26 4 21 4 14V6z" fill="#3E9B37"/><path d="M10 15l3.5 3.5L20.5 11" stroke="#fff" stroke-width="3" fill="none"/></svg>',
@@ -1480,12 +1482,14 @@ function perksBody(){return`<div class="sr-tabs"><button data-act="perkstab" dat
 function walletBody(){let a='',w='';const t=now();
  if(cleanOn())a+=`<div class="dc-perk">${PICON.clean}<div><b>Clean record</b><small>Threat −20% · <span id="pt-clean" class="num">${dur((s.cleanUntil-t)/1000)}</span> left</small><div class="dc-tm"><i id="pb-clean" style="width:${Math.max(0,(s.cleanUntil-t)/(CLEAN_H*36e5)*100)}%"></i></div></div><div></div></div>`;
  if(boostOn())a+=`<div class="dc-perk">${PICON.boost}<div><b>${s.boostX||2}× income</b><small><span id="pt-boost" class="num">${dur((s.boostUntil-t)/1000)}</span> left</small></div><div></div></div>`;
+ if(tapMul()>1)a+=`<div class="dc-perk">${PICON.tap2}<div><b>Double taps</b><small><span id="pt-tap2" class="num">${dur((s.tapUntil-t)/1000)}</span> left</small></div><div></div></div>`;
  if(s.crew>0)a+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew</b><small>Your next ${s.crew} build${s.crew>1?'s or upgrades finish':' or upgrade finishes'} twice as fast</small></div><div></div></div>`;
  const hs={};s.perks.mgr.forEach(h=>hs[h]=(hs[h]||0)+1);
  {const g=s.dc.got,p=g&&g.cards&&g.cards[g.pick];if(p&&p.k==='mgr'&&!p.streak&&g.spin===false&&hs[p.v]){if(!--hs[p.v])delete hs[p.v];
   w+=`<div class="dc-perk">${MGR}<div><b>Manager</b><small>Shift length not revealed yet. Spin in Daily chance to find out.</small></div><button class="dc-use g" data-act="daily">SPIN</button></div>`}}
  Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h}-hour shift · Lv ${s.mgr.level} · ${Math.round(commission()*100)}% commission${s.mgr.train&&!mgrOn()?' · training resumes on shift':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
  if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly. If you're raided while a manager is on shift, it's used for you.</small></div><span class="dc-use off">READY</span></div>`;
+ if(s.perks.tap2)w+=`<div class="dc-perk">${PICON.tap2}<div><b>Double taps · 30 min<span class="n">×${s.perks.tap2}</span></b><small>Every tap on a building earns twice as much.</small></div><button class="dc-use" data-act="perkuse" data-v="tap2">USE</button></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.boost4)w+=`<div class="dc-perk">${PICON.boost}<div><b>4× boost · 30 min<span class="n">×${s.perks.boost4}</span></b><small>Four times all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost4">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
@@ -1500,6 +1504,7 @@ function usePerk(v){const t=now();
   else{if(s.shift)endShift();s.mgrUntil=t+h*36e5;s.mgrTotal=h*36e5;s.shift={start:t,end:s.mgrUntil,hours:h,jails:[],biz:{},salFrom:t};toast(`${mgrName(h)} on duty for ${h} hours`,'good')}}
  else if(v==='boost'){if(!s.perks.boost)return;if(boostOn()&&s.boostX===4)return toast('Your 4× boost is still running. Use this one after it ends','bad');s.perks.boost--;s.boostX=2;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('2× income for 30 minutes!','good')}
  else if(v==='boost4'){if(!s.perks.boost4)return;s.perks.boost4--;s.boostX=4;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('4× income for 30 minutes!','good')}
+ else if(v==='tap2'){if(!s.perks.tap2)return;s.perks.tap2--;s.tapUntil=Math.max(t,s.tapUntil||0)+TAP2_MIN*6e4;toast('Double taps for 30 minutes! Tap your buildings','good')}
  else if(v==='crew'){if(!s.perks.crew)return;s.perks.crew--;s.crew=(s.crew||0)+CREW_N;toast("Builder's crew hired: your next 3 jobs are twice as fast",'good')}
  else if(v==='manual'){if(!s.perks.manual)return;if(s.mgr.level>=MGR_MAX)return toast('Your manager is already fully trained');s.perks.manual--;if(s.mgr.train)finishTrain();else{s.mgr.level++;toast(`Your manager is now Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good')}}
  else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
@@ -1510,7 +1515,7 @@ function updPerkUI(){if(!clockWarned&&!ovKind)clockNote();
  if(s.shiftPending&&!ovKind&&(s.shifts||[]).length){s.shiftPending=0;save();shiftPopup()}
  if(ovKind==='daily'){const e=$('dcnext');if(e)e.textContent=nextIn();if(dcReady()&&e)$('sb').innerHTML=dailyBody()}
  if(ovKind==='perks'){const t=now();
-  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot){const r=Math.min(100,Math.max(0,(end-t)/tot*100));b.style.width=(k==='mgr'?100-r:r)+'%'}}}}
+  for(const[k,end,tot]of[['mgr',s.mgrUntil,s.mgrTotal],['clean',s.cleanUntil,CLEAN_H*36e5],['boost',s.boostUntil,0],['tap2',s.tapUntil||0,0]]){const e=$('pt-'+k);if(!e)continue;if(end<=t){$('sb').innerHTML=perksBody();return}e.textContent=dur((end-t)/1000);const b=$('pb-'+k);if(b&&tot){const r=Math.min(100,Math.max(0,(end-t)/tot*100));b.style.width=(k==='mgr'?100-r:r)+'%'}}}}
 const dcIntroDue=()=>!s.dcSeen&&s.owned.length>0;
 function dcIntro(){const gift=!!s.dcGift;if(gift){s.perks.mgr.push(8);s.dcGift=false}s.dcSeen=true;save();ovKind='dcintro';nextUp=()=>{if(!ovKind)notifyPrompt()};
  ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dc-modal" role="dialog" aria-label="Daily chance is here"><div class="dc-mh"><div class="dc-new">NEW</div><h2>Daily chance is here</h2><p>A free pick, every day</p></div>
@@ -2179,6 +2184,7 @@ const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):star
 const ST_RATE=4.8,ST_MGR='<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="6" fill="#F2C9A0" stroke="#14191A" stroke-width="1.5"/><path d="M4 28c1-7 5-10 11-10s10 3 11 10z" fill="#2F6DB5" stroke="#14191A" stroke-width="1.5"/><path d="M15 18l-2 5 2 3 2-3z" fill="#F2694B"/></svg>';
 const ST_PACKS=[[25,0,''],[80,10,''],[250,20,'POPULAR'],[1000,30,'BEST VALUE']];
 const ST_PERKS=[['boost',40,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
+ ['tap2',0,'Double taps · 30 min','Every tap on a building earns twice as much for 30 minutes.'],
  ['crew',75,"Builder's crew",'Your next 3 builds or upgrades finish twice as fast.'],
  ['clean',300,'Clean record','Lowers your threat by 20% for 12 hours.'],
  ['jail',360,'Get out of jail free','Walk free instantly when you get busted.'],
@@ -2201,10 +2207,12 @@ const stCost=min=>Math.max(1000*min*ST_X,Math.round(stInc()*min*ST_X)); // new p
 // Perks are priced below what they would realistically earn you right now (ST_EDGE), so the first one is a win.
 // Each one bought on the same day costs ST_UP more than the last (supply and demand), and you can buy at most ST_CAP of each a day.
 // So the 2nd of anything is already a small loss: a big cash pile can't buy its way to the top. Counts reset at midnight.
-const ST_EDGE={boost:.8,crew:.85,manual:.85,mgr8:.9,jail:.9,clean:.9},ST_UP=1.25,ST_CAP=3; // price = this share of the value: boost 20% off, crew and manual 15% off, the big perks 10% off
+const TAP2_ASSUME=1200; // taps we assume in 30 minutes (about 4 minutes of steady tapping)
+const ST_EDGE={boost:.8,tap2:.5,crew:.85,manual:.85,mgr8:.9,jail:.9,clean:.9},ST_UP=1.25,ST_CAP=3; // price = this share of the value: boost 20% off, crew and manual 15% off, the big perks 10% off
 const pMin=(k,m)=>m;
 function perkValue(k){const base=stInc(),xs=s.owned.filter(o=>!o.busy).map(o=>st(o)).filter(x=>x.rate>0);
  if(k==='boost')return base*BOOST_MIN; // 30 extra minutes of income, if you collect while it runs
+ if(k==='tap2')return TAP2_ASSUME*TAP_SEC*xs.reduce((m,x)=>Math.max(m,x.rate),0)/60; // a keen tapper's extra: TAP2_ASSUME taps on your best business, each one doubled
  if(k==='mgr8'){const T=8*60,keep=1-commission();let e=0,f=0;for(const x of xs){e+=x.rate*Math.max(0,T-x.hold/x.rate);f+=x.rate*T}
   return keep*(e+f)/2} // halfway between starting with every business empty and every business full
  if(k==='crew'){const v=s.owned.filter(o=>o.level<MAXL).map(o=>{const x=st(o);return x.rate>0?x.upTime/60*x.rate/2:0}).sort((a,b)=>b-a).slice(0,5);
@@ -2215,14 +2223,15 @@ function perkValue(k){const base=stInc(),xs=s.owned.filter(o=>!o.busy).map(o=>st
  if(k==='clean')return jail*.6; // priced the same whatever your threat is now (you can save it for later): a bit less than a jail-free card
  return 0}
 const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0};
-const stPrice=(v,min)=>{if(stGem(v))return ST_GEM[v];const isPack=v[0]==='g'&&v.length===2,b=isPack?stCost(min):Math.max(10000,(ST_EDGE[v]||.85)*perkValue(v));return Math.round(b*Math.pow(ST_UP,stCount(v)))};
+const stPrice=(v,min)=>{if(stGem(v))return ST_GEM[v];const isPack=v[0]==='g'&&v.length===2,b=isPack?stCost(min):Math.max(10000,(ST_EDGE[v]||.85)*perkValue(v));return Math.round(b*(ST_FREE[v]?1:Math.pow(ST_UP,stCount(v))))};
 // The 8-hour manager costs crystals, not cash: flat price, no daily cap, no rise, but you can only hold ST_HOLD at once.
-const ST_GEM={mgr8:100};
+const ST_GEM={mgr8:100,boost:45}; // boost: a bit cheaper than ten 3-minute main-screen boosts (10 x 5 = 50 crystals)
 const stGem=v=>ST_GEM[v]!=null,stCan=(v,c)=>stGem(v)?s.gems>=c:s.cash>=c,stTag$=(v,c)=>stGem(v)?`${GEM} ${c.toLocaleString('en-US')}`:`${COIN} ${money(c)}`;
 const ST_HOLD={mgr8:3}; // you can hold at most this many (3 managers = 24 hours of cover); use one to buy another
 const stHeld=v=>v==='mgr8'?s.perks.mgr.length:(s.perks[v]||0),stFull=v=>ST_HOLD[v]!=null&&stHeld(v)>=ST_HOLD[v];
-const stOut=v=>stFull(v)||(!stGem(v)&&stCount(v)>=ST_CAP);
-const stLine=(v,min)=>stFull(v)?'Wallet full':stGem(v)?'':stOut(v)?'Sold out today':stCount(v)?`${stCount(v)} of ${ST_CAP} today`:'';
+const ST_FREE={tap2:1}; // buy as many as you like: no daily cap and no price rise (it keeps people playing)
+const stOut=v=>stFull(v)||(!stGem(v)&&!ST_FREE[v]&&stCount(v)>=ST_CAP);
+const stLine=(v,min)=>stFull(v)?'Wallet full':stGem(v)||ST_FREE[v]?'':stOut(v)?'Sold out today':stCount(v)?`${stCount(v)} of ${ST_CAP} today`:'';
 const stMins=min=>{min=Math.round(min);return min>=60?(min%60?`${Math.floor(min/60)}h ${min%60}m`:`${min/60}h`):min+'m'};
 const gemStack=n=>(n>=250?PICON.gems:'')+PICON.gems+(n>=80?PICON.gems:'');
 function storeBody(){
@@ -2234,13 +2243,13 @@ function storeBody(){
   <p class="st-note">Each pack costs a bit more every time you buy it in a day, up to 3 a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
  if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,pMin(k,min)),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
   return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num${stGem(k)?' gem':''} ${stCan(k,c)&&!stOut(k)?'':'off'}" data-act="stask" data-v="${k}"><span>${stTag$(k,c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
-  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Managers cost crystals, and you can hold up to 3 at a time. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
+  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. 2× boosts and managers cost crystals (hold up to 3 managers at a time). Double taps: buy as many as you like. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
 function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100)}}}
  const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:pMin(v,p[1]),give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
 function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();if(stFull(v))return toast(`You can hold ${ST_HOLD[v]} managers at a time. Use one to buy another`,'bad');if(stOut(v))return toast(`Sold out today. Back at midnight`,'bad');
- dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
+ dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:ST_FREE[v]?`Buy as many as you like.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
   `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${stCan(v,c)?'':'disabled'}>Buy</button>`)}
 window.__stRefresh=()=>{stTag();if(ovKind==='store')openStore()};
 function stBuy(v,c){if(!storeOpen()||stOut(v))return;const it=stItem(v);if(!it||!(c>0)||!stCan(v,c))return toast(stGem(v)?'Not enough crystals':'Not enough cash','bad');if(stGem(v))s.gems-=c;else{s.cash-=c;s.storeSpent=(s.storeSpent||0)+c}{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
