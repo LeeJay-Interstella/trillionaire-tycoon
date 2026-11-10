@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111052,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111053,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1258,7 +1258,7 @@ function tapFloat(x,y,txt,col){const f=document.createElement('div');f.className
 
 // ---- Tap glow: light pulse, flash, squash, rays, ground ring, sparkles and a cash pop when you tap a business to earn.
 // Settings come from the Tap glow lab.
-const TFX={"glowOn":1,"glowSize":370,"glowStr":1,"glowCol":"#81fd90","glowMs":600,"flash":0.55,"halo":16,"haloCol":"#00ff62","flashMs":300,"squash":0.04,"bounceMs":380,"raysOn":1,"raysStr":0.15,"raysSpin":55,"raysMs":800,"ringOn":0,"ringSize":1,"ringCol":"#b7ffa8","ringMs":600,"spk":12,"spkDist":185,"spkCol":"#b7ffa3","spkMs":800,"popOn":1,"popSize":35,"popRise":115,"stack":0.4};
+const TFX={"glowOn":1,"glowSize":370,"glowStr":1,"glowCol":"#81fd90","glowMs":600,"flash":0.55,"halo":16,"haloCol":"#00ff62","flashMs":300,"squash":0.04,"bounceMs":380,"raysOn":1,"raysStr":0.15,"raysSpin":55,"raysMs":800,"ringOn":0,"ringSize":1,"ringCol":"#b7ffa8","ringMs":600,"spk":12,"spkDist":185,"spkCol":"#b7ffa3","spkMs":800,"popOn":1,"popSize":30,"popRise":150,"stack":0.4};
 let tfxHeat=0,tfxLast=0,tfxB=null,tfxF=null;
 const tfxReduce=matchMedia('(prefers-reduced-motion: reduce)');
 function tfxAnim(el,fr,ms,ez='cubic-bezier(.2,.9,.3,1)'){try{return el.animate(fr,{duration:ms,easing:ez})}catch(e){return null}}
