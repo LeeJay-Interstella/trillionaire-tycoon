@@ -790,7 +790,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .st-buy.off{background:#BDBDB6;color:#fff}
 .st-perk{display:grid;grid-template-columns:44px 1fr 112px;gap:12px;align-items:center;background:#fff;padding:12px 14px;border-bottom:2px solid #E7E7E2}
 .st-perk>svg{width:40px;height:40px}.st-perk b{display:block;font-weight:900;font-size:14px}.st-perk>div>small{display:block;font-weight:600;font-size:12px;color:#6b6b6b;line-height:1.3}
-.st-perk i{font-style:normal;font-weight:800;font-size:11px;color:var(--green)}
+.st-perk>div>i{font-style:normal;font-weight:800;font-size:11px;color:var(--green)}
 .st-note{padding:10px 16px 18px;font-size:12px;color:#6b6b6b;font-weight:600;line-height:1.4;text-align:center}
 .st-real .st-buy{background:#BDBDB6;color:#fff;cursor:default}.st-real .st-pack{opacity:.85}
 .st-lock{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 22px 22px}
@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026110933,MUST=2026110820;/*notes*/const NOTES=["New: the Store. Reach $1M net worth to open it, then buy crystal packs and perks with your cash. Prices grow with your income, and each item costs 50% more every time you buy it in a day.", "Crystal packs for real money are coming with the app.", "Crystal businesses are now fairly priced to upgrade, and good causes are worth upgrading: every level adds 70% of their starting threat cut.", "Finishing a build or upgrade early with crystals now asks you first.", "Fixed: on the world map, locked worlds now show the net worth each one needs, and on wide screens the arrows reach every world."];
+/*build*/const BUILD=2026111035,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated.", "New: the Store. Reach $1M net worth to open it, then buy crystal packs and perks with your cash. Prices grow with your income, and each item doubles in price every time you buy it in a day.", "Crystal packs for real money are coming with the app.", "Crystal businesses are now fairly priced to upgrade, and good causes are worth upgrading: every level adds 70% of their starting threat cut.", "Finishing a build or upgrade early with crystals now asks you first.", "Fixed: on the world map, locked worlds now show the net worth each one needs, and on wide screens the arrows reach every world."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2174,17 +2174,19 @@ const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):star
 
 // ---------- Store (concept): crystals and perks for in-game cash ----------
 // Every price is a number of minutes of your normal income (no 2x boost), so the store is equally steep at every stage.
+// Perks cost about 25% more than they pay back: close to break even, but never free money. Prices aren't shown to players in time.
+// A training manual is priced a bit above training: 25 minutes of income per manager level.
 // One crystal costs 4.8 minutes of income (25 crystals = 2 hours). Each perk is priced a little above what it's worth to you in income
 // (an 8-hour manager earns at most about 5.5 hours of income after commission, so it costs 5 hours).
-// Each time you buy the same item on the same day it costs 50% more; prices reset at midnight, so saved-up cash can't bulk-buy.
+// Each time you buy the same item on the same day its price doubles; prices reset at midnight, so saved-up cash can't bulk-buy.
 const ST_RATE=4.8,ST_MGR='<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="6" fill="#F2C9A0" stroke="#14191A" stroke-width="1.5"/><path d="M4 28c1-7 5-10 11-10s10 3 11 10z" fill="#2F6DB5" stroke="#14191A" stroke-width="1.5"/><path d="M15 18l-2 5 2 3 2-3z" fill="#F2694B"/></svg>';
 const ST_PACKS=[[25,0,''],[80,10,''],[250,20,'POPULAR'],[1000,30,'BEST VALUE']];
-const ST_PERKS=[['boost',60,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
- ['crew',40,"Builder's crew",'Your next 3 builds or upgrades finish twice as fast.'],
- ['clean',240,'Clean record','Lowers your threat by 20% for 12 hours.'],
- ['jail',300,'Get out of jail free','Walk free instantly when you get busted.'],
+const ST_PERKS=[['boost',40,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
+ ['crew',75,"Builder's crew",'Your next 3 builds or upgrades finish twice as fast.'],
+ ['clean',300,'Clean record','Lowers your threat by 20% for 12 hours.'],
+ ['jail',360,'Get out of jail free','Walk free instantly when you get busted.'],
  ['manual',180,'Training manual','Trains your manager one level: 1% less commission for good.'],
- ['mgr8',300,'8-hour manager','Your businesses keep earning past full for 8 hours.']];
+ ['mgr8',390,'8-hour manager','Your businesses keep earning past full for 8 hours.']];
 const ST_REAL=[[100,'£0.99'],[550,'£4.99'],[1200,'£9.99'],[2600,'£19.99']];
 let storeTab='gems';
 // the store opens once you've reached $1M net worth, and stays open from then on
@@ -2196,27 +2198,29 @@ function storeLocked(){const n=window.__stPrev==='locked'?Math.min(nw(),ST_OPEN*
  <div class="st-prog"><i style="width:${(p*100).toFixed(1)}%"></i><span class="num">${$m(n)} of $1M</span></div>
  <div class="st-inside"><div>${PICON.gems}Crystal packs, up to 1,300 crystals</div><div>${PICON.boost}2× boosts and builder's crews</div><div>${PICON.jail}Clean records and jail-free cards</div><div>${ST_MGR}Training manuals and managers</div></div></div>`}
 const stInc=()=>income()/bMul();
-const stCost=min=>Math.max(1000*min,Math.round(stInc()*min)); // new players with almost no income pay at least $1,000 a minute
-const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(stCost(min)*Math.pow(1.5,stCount(v)));
-const stLine=(v,min)=>stCount(v)?`${stCount(v)} bought today`:`${stMins(min)} of income`;
+const ST_X=1; // store-wide price multiplier
+const stCost=min=>Math.max(1000*min*ST_X,Math.round(stInc()*min*ST_X)); // new players with almost no income pay at least $1,000 a minute
+const pMin=(k,m)=>k==='manual'?25*(s.mgr.level||1):m;
+const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(stCost(min)*Math.pow(2,stCount(v)));
+const stLine=(v,min)=>stCount(v)?`${stCount(v)} bought today`:'';
 const stMins=min=>{min=Math.round(min);return min>=60?(min%60?`${Math.floor(min/60)}h ${min%60}m`:`${min/60}h`):min+'m'};
 const gemStack=n=>(n>=250?PICON.gems:'')+PICON.gems+(n>=80?PICON.gems:'');
 function storeBody(){
  const tabs=`<div class="sr-tabs"><button data-act="storetab" data-v="gems" class="${storeTab==='gems'?'on':''}">Crystals</button><button data-act="storetab" data-v="perks" class="${storeTab==='perks'?'on':''}">Perks</button><button data-act="storetab" data-v="real" class="${storeTab==='real'?'on':''}">Real money</button></div>`;
- const rate=`<div class="st-rate">${PICON.gems}<div><b>1 crystal = <em class="num">${$m(stCost(ST_RATE))}</em></b><small>That's ${ST_RATE} minutes of your income. Prices grow with your income, so they're just as steep at every stage.</small></div></div>`;
+ const rate=`<div class="st-rate">${PICON.gems}<div><b>1 crystal = <em class="num">${$m(stCost(ST_RATE))}</em></b><small>Prices grow with your income, so they're just as steep at every stage.</small></div></div>`;
  if(storeTab==='gems')return tabs+rate+`<div class="st-grid">${ST_PACKS.map(([n,bon,tag],i)=>{const c=stPrice('g'+i,n*ST_RATE),got=n+Math.round(n*bon/100);
   return`<div class="st-pack">${tag?`<span class="rib${i===3?' best':''}">${tag}</span>`:bon?`<span class="rib">+${bon}% BONUS</span>`:''}<div class="gm">${gemStack(n)}</div><h4 class="num">${got.toLocaleString('en-US')}<small>${bon?`${n} + ${got-n} bonus`:'crystals'}</small></h4>
-  <button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="g${i}"><span>${COIN} ${money(c)}</span><small>${stLine('g'+i,n*ST_RATE)}</small></button></div>`}).join('')}</div>
-  <p class="st-note">Each pack costs 50% more every time you buy it in a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
- if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,min),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
-  return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="${k}"><span>${COIN} ${money(c)}</span><small>${stLine(k,min)}</small></button></div>`}).join('')+
-  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Each perk costs 50% more every time you buy it in a day, and prices reset at midnight.</p>`;
+  <button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="g${i}"><span>${COIN} ${money(c)}</span>${stLine('g'+i,n*ST_RATE)?`<small>${stLine('g'+i,n*ST_RATE)}</small>`:''}</button></div>`}).join('')}</div>
+  <p class="st-note">Each pack doubles in price every time you buy it in a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
+ if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,pMin(k,min)),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
+  return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="${k}"><span>${COIN} ${money(c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
+  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Each perk doubles in price every time you buy it in a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
 function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100)}}}
- const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:p[1],give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
+ const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:pMin(v,p[1]),give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
 function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();
- dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${COIN} ${money(c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stCount(v)?`You've bought ${stCount(v)>1?stCount(v)+' already':'one already'} today, so it's gone up 50% for each.`:`That's ${stMins(it.min)} of your income.`} The next one today costs 50% more.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}</p>`,
+ dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${COIN} ${money(c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stCount(v)?`You've bought ${stCount(v)>1?stCount(v)+' already':'one already'} today, so the price has doubled for each. `:''}The next one today costs twice as much.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}</p>`,
   `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${s.cash>=c?'':'disabled'}>Buy</button>`)}
 window.__stRefresh=()=>{stTag();if(ovKind==='store')openStore()};
 function stBuy(v,c){if(!storeOpen())return;const it=stItem(v);if(!it||!(c>0)||s.cash<c)return toast('Not enough cash','bad');s.cash-=c;s.storeSpent=(s.storeSpent||0)+c;{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
