@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111035,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111036,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2173,12 +2173,9 @@ setInterval(()=>{const e=$('syncst');if(e)e.textContent=syncText()},1000);
 const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):start();
 
 // ---------- Store (concept): crystals and perks for in-game cash ----------
-// Every price is a number of minutes of your normal income (no 2x boost), so the store is equally steep at every stage.
-// Perks cost about 25% more than they pay back: close to break even, but never free money. Prices aren't shown to players in time.
-// A training manual is priced a bit above training: 25 minutes of income per manager level.
-// One crystal costs 4.8 minutes of income (25 crystals = 2 hours). Each perk is priced a little above what it's worth to you in income
-// (an 8-hour manager earns at most about 5.5 hours of income after commission, so it costs 5 hours).
-// Each time you buy the same item on the same day its price doubles; prices reset at midnight, so saved-up cash can't bulk-buy.
+// Crystal packs: one crystal costs 4.8 minutes of your normal income (25 crystals = 2 hours), so they're equally steep at every stage.
+// Perks: priced at 80–90% of what they'd realistically earn you right now (see perkValue). Prices are never shown to players in time.
+// Buying the same item again on the same day costs 25% more each time, up to 3 a day; counts reset at midnight.
 const ST_RATE=4.8,ST_MGR='<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="6" fill="#F2C9A0" stroke="#14191A" stroke-width="1.5"/><path d="M4 28c1-7 5-10 11-10s10 3 11 10z" fill="#2F6DB5" stroke="#14191A" stroke-width="1.5"/><path d="M15 18l-2 5 2 3 2-3z" fill="#F2694B"/></svg>';
 const ST_PACKS=[[25,0,''],[80,10,''],[250,20,'POPULAR'],[1000,30,'BEST VALUE']];
 const ST_PERKS=[['boost',40,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
@@ -2201,12 +2198,31 @@ function storeLocked(){const n=window.__stPrev==='locked'?Math.min(nw(),ST_OPEN*
 const stInc=()=>income()/bMul();
 const ST_X=1; // store-wide price multiplier
 const stCost=min=>Math.max(1000*min*ST_X,Math.round(stInc()*min*ST_X)); // new players with almost no income pay at least $1,000 a minute
-// Perks also cost at least this share of the cash you're holding, so a big cash pile can't buy them cheaply.
-// The price is worked out again after each buy (on the cash left) and doubles for each repeat that day, so e.g. at most 2 eight-hour managers a day.
-const ST_SHARE={boost:.05,crew:.08,manual:.1,clean:.15,jail:.2,mgr8:.3};
-const pMin=(k,m)=>k==='manual'?25*(s.mgr.level||1):m;
-const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(Math.max(stCost(min),(ST_SHARE[v]||0)*Math.max(0,s.cash))*Math.pow(2,stCount(v)));
-const stLine=(v,min)=>stCount(v)?`${stCount(v)} bought today`:'';
+// Perks are priced below what they would realistically earn you right now (ST_EDGE), so the first one is a win.
+// Each one bought on the same day costs ST_UP more than the last (supply and demand), and you can buy at most ST_CAP of each a day.
+// So the 2nd of anything is already a small loss: a big cash pile can't buy its way to the top. Counts reset at midnight.
+const ST_EDGE={boost:.8,crew:.85,manual:.85,mgr8:.9,jail:.9,clean:.9},ST_UP=1.25,ST_CAP=3; // price = this share of the value: boost 20% off, crew and manual 15% off, the big perks 10% off
+const pMin=(k,m)=>m;
+function perkValue(k){const base=stInc(),xs=s.owned.filter(o=>!o.busy).map(o=>st(o)).filter(x=>x.rate>0);
+ if(k==='boost')return base*BOOST_MIN; // 30 extra minutes of income, if you collect while it runs
+ if(k==='mgr8'){const T=8*60,keep=1-commission();let e=0,f=0;for(const x of xs){e+=x.rate*Math.max(0,T-x.hold/x.rate);f+=x.rate*T}
+  return keep*(e+f)/2} // halfway between starting with every business empty and every business full
+ if(k==='crew'){const v=s.owned.filter(o=>o.level<MAXL).map(o=>{const x=st(o);return x.rate>0?x.upTime/60*x.rate/2:0}).sort((a,b)=>b-a).slice(0,5);
+  return v.length?CREW_N*v.reduce((a,b)=>a+b,0)/v.length:0} // half the downtime of 3 typical upgrades on your bigger businesses
+ if(k==='manual')return s.mgr.level>=MGR_MAX?0:trainCost(); // what training a level yourself costs, without the wait
+ const row=sentence(100,nw()).row,jail=base*row[3]/60*JAIL_RATE+Math.max(0,s.cash)*row[4]; // a heavy bust: time at half pay plus the fine
+ if(k==='jail')return jail;
+ if(k==='clean')return jail*Math.min(1,threatRaw()/50); // worth about one heavy bust when your threat is high, little when it's low
+ return 0}
+const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0};
+const stPrice=(v,min)=>{if(stGem(v))return ST_GEM[v];const isPack=v[0]==='g'&&v.length===2,b=isPack?stCost(min):Math.max(10000,(ST_EDGE[v]||.85)*perkValue(v));return Math.round(b*Math.pow(ST_UP,stCount(v)))};
+// The 8-hour manager costs crystals, not cash: flat price, no daily cap, no rise, but you can only hold ST_HOLD at once.
+const ST_GEM={mgr8:100};
+const stGem=v=>ST_GEM[v]!=null,stCan=(v,c)=>stGem(v)?s.gems>=c:s.cash>=c,stTag$=(v,c)=>stGem(v)?`${GEM} ${c.toLocaleString('en-US')}`:`${COIN} ${money(c)}`;
+const ST_HOLD={mgr8:3}; // you can hold at most this many (3 managers = 24 hours of cover); use one to buy another
+const stHeld=v=>v==='mgr8'?s.perks.mgr.length:(s.perks[v]||0),stFull=v=>ST_HOLD[v]!=null&&stHeld(v)>=ST_HOLD[v];
+const stOut=v=>stFull(v)||(!stGem(v)&&stCount(v)>=ST_CAP);
+const stLine=(v,min)=>stFull(v)?'Wallet full':stGem(v)?'':stOut(v)?'Sold out today':stCount(v)?`${stCount(v)} of ${ST_CAP} today`:'';
 const stMins=min=>{min=Math.round(min);return min>=60?(min%60?`${Math.floor(min/60)}h ${min%60}m`:`${min/60}h`):min+'m'};
 const gemStack=n=>(n>=250?PICON.gems:'')+PICON.gems+(n>=80?PICON.gems:'');
 function storeBody(){
@@ -2214,20 +2230,20 @@ function storeBody(){
  const rate=`<div class="st-rate">${PICON.gems}<div><b>1 crystal = <em class="num">${$m(stCost(ST_RATE))}</em></b><small>Prices grow with your income, so they're just as steep at every stage.</small></div></div>`;
  if(storeTab==='gems')return tabs+rate+`<div class="st-grid">${ST_PACKS.map(([n,bon,tag],i)=>{const c=stPrice('g'+i,n*ST_RATE),got=n+Math.round(n*bon/100);
   return`<div class="st-pack">${tag?`<span class="rib${i===3?' best':''}">${tag}</span>`:bon?`<span class="rib">+${bon}% BONUS</span>`:''}<div class="gm">${gemStack(n)}</div><h4 class="num">${got.toLocaleString('en-US')}<small>${bon?`${n} + ${got-n} bonus`:'crystals'}</small></h4>
-  <button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="g${i}"><span>${COIN} ${money(c)}</span>${stLine('g'+i,n*ST_RATE)?`<small>${stLine('g'+i,n*ST_RATE)}</small>`:''}</button></div>`}).join('')}</div>
-  <p class="st-note">Each pack doubles in price every time you buy it in a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
+  <button class="st-buy num ${s.cash>=c&&!stOut('g'+i)?'':'off'}" data-act="stask" data-v="g${i}"><span>${COIN} ${money(c)}</span>${stLine('g'+i,n*ST_RATE)?`<small>${stLine('g'+i,n*ST_RATE)}</small>`:''}</button></div>`}).join('')}</div>
+  <p class="st-note">Each pack costs a bit more every time you buy it in a day, up to 3 a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
  if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,pMin(k,min)),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
-  return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="${k}"><span>${COIN} ${money(c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
-  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Prices grow with your income and with the cash you're holding. Each perk doubles in price every time you buy it in a day, and prices reset at midnight.</p>`;
+  return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num ${stCan(k,c)&&!stOut(k)?'':'off'}" data-act="stask" data-v="${k}"><span>${stTag$(k,c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
+  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Managers cost crystals, and you can hold up to 3 at a time. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
 function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100)}}}
  const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:pMin(v,p[1]),give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
-function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();
- dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${COIN} ${money(c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stCount(v)?`You've bought ${stCount(v)>1?stCount(v)+' already':'one already'} today, so the price has doubled for each. `:''}The next one today costs twice as much.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}</p>`,
-  `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${s.cash>=c?'':'disabled'}>Buy</button>`)}
+function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();if(stFull(v))return toast(`You can hold ${ST_HOLD[v]} managers at a time. Use one to buy another`,'bad');if(stOut(v))return toast(`Sold out today. Back at midnight`,'bad');
+ dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
+  `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${stCan(v,c)?'':'disabled'}>Buy</button>`)}
 window.__stRefresh=()=>{stTag();if(ovKind==='store')openStore()};
-function stBuy(v,c){if(!storeOpen())return;const it=stItem(v);if(!it||!(c>0)||s.cash<c)return toast('Not enough cash','bad');s.cash-=c;s.storeSpent=(s.storeSpent||0)+c;{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
+function stBuy(v,c){if(!storeOpen()||stOut(v))return;const it=stItem(v);if(!it||!(c>0)||!stCan(v,c))return toast(stGem(v)?'Not enough crystals':'Not enough cash','bad');if(stGem(v))s.gems-=c;else{s.cash-=c;s.storeSpent=(s.storeSpent||0)+c}{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
 
 /* ---------- World map (prototype): swipe between worlds; Downtown is where you are, the rest are locked ---------- */
 const WORLDS=[
