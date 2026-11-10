@@ -667,8 +667,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 }
 @media (hover:hover) and (pointer:fine) and (min-width:1000px) and (min-height:600px) and (min-aspect-ratio:5/4){
   body{display:block}
-  #app{width:100vw;height:100vh;height:100dvh;max-width:none;margin:0;border-radius:0;padding:0;clip-path:none;box-shadow:none;display:grid;grid-template-columns:80px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
-  #app::before{content:"";grid-column:1;grid-row:2/4;background:var(--green-d)}
+  #app{width:100vw;height:100vh;height:100dvh;max-width:none;margin:0;border-radius:0;padding:0;clip-path:none;box-shadow:none;display:grid;grid-template-columns:minmax(0,1fr) 80px;grid-template-rows:auto auto minmax(0,1fr)}
+  #app::before{content:"";grid-column:2;grid-row:2/4;background:var(--green-d)}
   .fullscreen{border-radius:0}
   .hud{grid-column:1/3;grid-row:1;grid-template-columns:2.4fr 1fr 1.25fr .9fr .75fr .75fr}
   .hud .t-nw{grid-column:auto}
@@ -676,14 +676,14 @@ input.nm:focus{outline:none;border-color:var(--green)}
   .hud .t{padding:14px 20px}
   .hud .t-nw b{font-size:44px}
   .hud .t b{font-size:30px}
-  #duty{grid-column:2;grid-row:2}
-  #stage{grid-column:2;grid-row:3;overflow:visible}
+  #duty{grid-column:1;grid-row:2}
+  #stage{grid-column:1;grid-row:3;overflow:visible}
   #city,#art,#layer{overflow:hidden}
-  .tools{left:-80px;right:auto;top:0;width:80px;padding:16px 14px;gap:10px;box-sizing:border-box;align-items:center}
+  .tools{right:-80px;left:auto;top:0;width:80px;padding:16px 14px;gap:10px;box-sizing:border-box;align-items:center}
   .tools .tool{width:52px;height:52px;border-color:#ffffff55;box-shadow:none;background:#ffffff14}
   .tools .tool:hover{background:#ffffff2e}
   .tools .tool svg{width:26px;height:26px}
-  .dealbtn{left:-66px!important;top:auto!important;bottom:18px;width:52px;height:52px}
+  .dealbtn{left:auto!important;right:-66px!important;top:auto!important;bottom:18px;width:52px;height:52px}
   .gear,.pager{display:none!important}
   .arrow{width:48px;height:48px}
   .arrow.l{left:auto;right:84px;top:auto;bottom:28px}
@@ -691,7 +691,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
   .rounds{left:24px;bottom:28px}
   .round{width:52px;height:52px}
   #column{bottom:110px}
-  #panel{grid-column:2;grid-row:3;align-self:end;justify-self:center;width:min(520px,calc(100% - 340px));z-index:8;margin-bottom:22px;padding:18px 20px;gap:14px;background:transparent}
+  #panel{grid-column:1;grid-row:3;align-self:end;justify-self:center;width:min(520px,calc(100% - 340px));z-index:8;margin-bottom:22px;padding:18px 20px;gap:14px;background:transparent}
   #panel .info{justify-content:center;padding-right:0}
   #panel .info h2{font-size:28px}
   #panel .lines{font-size:15px}
@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111040,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111041,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
