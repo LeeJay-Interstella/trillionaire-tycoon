@@ -999,7 +999,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111042,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111043,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1848,7 +1848,7 @@ function gemLog(n,src){if(n)ev('gem',{n:Math.round(n),src})}
 function evFlush(keep){try{if(!cloudUser||!accessToken||!EV_Q.length)return;const rows=EV_Q.splice(0,EV_Q.length).map(r=>({user_id:cloudUser.id,...r}));
  fetch(SUPABASE_URL+'/rest/v1/events',{method:'POST',keepalive:!!keep,headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+accessToken,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(rows)})
   .then(r=>{if(!r.ok&&r.status!==404&&!keep)EV_Q.unshift(...rows.map(({user_id,...x})=>x))}).catch(()=>{if(!keep)EV_Q.unshift(...rows.map(({user_id,...x})=>x))})}catch(e){}}
-const evSnap=()=>({nw:Math.round(nw()),cash:Math.round(s.cash),gems:s.gems|0,world:s.world|0,lv:s.owned.length,build:BUILD});
+const evSnap=()=>({nw:Math.round(nw()),cash:Math.round(s.cash),gems:s.gems|0,world:s.world|0,lv:s.owned.length,th:Math.round(threat()),build:BUILD});
 function evOpen(){evSid=Math.random().toString(36).slice(2,10);evAt=Date.now();evT0=s.taps|0;evC0=s.collects|0;ev('open',{...evSnap(),dev:matchMedia('(pointer:coarse)').matches?'phone':'desktop'});
  try{ev('portfolio',{list:s.owned.map(o=>{const b=B[o.bid],x=st(o);return[b.name,o.level,Math.round(x.rate||0),b.w|0,b.pt===1?1:0]})})}catch(e){}}
 function evSum(kind){if(!evSid)return;ev(kind,{...evSnap(),dur:Math.round((Date.now()-evAt)/1000),taps:(s.taps|0)-evT0,collects:(s.collects|0)-evC0})}
