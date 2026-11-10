@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111049,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111050,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1255,12 +1255,48 @@ const TAP_SEC=1,TAP_GAP=90;let tapLast=0;
 const TAP2_MIN=30,tapMul=()=>now()<(s.tapUntil||0)?2:1; // Double taps perk: every earning tap is worth twice as much
 const tapFmt=v=>v<10?'$'+v.toFixed(2):$m(v);
 function tapFloat(x,y,txt,col){const f=document.createElement('div');f.className='tapfloat num';f.textContent=txt;if(col)f.style.color=col;f.style.left=(x+(Math.random()*24-12))+'px';f.style.top=(y-28)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1100)}
+
+// ---- Tap glow: light pulse, flash, squash, rays, ground ring, sparkles and a cash pop when you tap a business to earn.
+// Settings come from the Tap glow lab.
+const TFX={"glowOn":1,"glowSize":370,"glowStr":1,"glowCol":"#81fd90","glowMs":600,"flash":0.55,"halo":16,"haloCol":"#00ff62","flashMs":300,"squash":0.04,"bounceMs":380,"raysOn":1,"raysStr":0.7,"raysSpin":55,"raysMs":800,"ringOn":1,"ringSize":2.4,"ringCol":"#b7ffa8","ringMs":600,"spk":17,"spkDist":185,"spkCol":"#b7ffa3","spkMs":800,"popOn":1,"popSize":40,"popRise":120,"stack":0.5};
+let tfxHeat=0,tfxLast=0,tfxB=null,tfxF=null;
+const tfxReduce=matchMedia('(prefers-reduced-motion: reduce)');
+function tfxAnim(el,fr,ms,ez='cubic-bezier(.2,.9,.3,1)'){try{return el.animate(fr,{duration:ms,easing:ez})}catch(e){return null}}
+function tfxDrop(el,an,ms){if(an)an.onfinish=()=>el.remove();else setTimeout(()=>el.remove(),ms)}
+function tapFX(px,py,txt){
+ if(!tfxB){artEl.insertAdjacentHTML('beforebegin','<div id="tfxB" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden"></div>');artEl.insertAdjacentHTML('afterend','<div id="tfxF" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:4;overflow:visible"></div>');tfxB=$('tfxB');tfxF=$('tfxF')}
+ const S=TFX,sr=stage.getBoundingClientRect(),img=artEl.querySelector('image'),hg=artEl.querySelector('.hit');if(!hg&&!img)return;
+ let r;if(img)r=img.getBoundingClientRect();else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
+ const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),by=r.top-sr.top+r.height*(img?.895:.9);
+ const k=Math.max(.45,Math.min(1.8,(img?r.width*804/1024:r.width)/266)); // scale effects to the building's size on screen
+ const now=performance.now();tfxHeat=Math.min(1,Math.max(0,tfxHeat-(now-tfxLast)/900)+.25);tfxLast=now;const boost=1+S.stack*tfxHeat;
+ const calm=tfxReduce.matches;
+ // flash + squash the building itself
+ artEl.style.transformOrigin=`${cx}px ${by}px`;
+ const f=Math.min(1.6,S.flash*boost);tfxAnim(artEl,[{filter:`brightness(${1+f}) drop-shadow(0 0 ${S.halo*boost*k}px ${S.haloCol})`},{filter:'brightness(1) drop-shadow(0 0 0 transparent)'}],S.flashMs,'ease-out');
+ if(!calm){const q=S.squash*Math.min(1.5,boost);tfxAnim(artEl,[{transform:'scale(1,1)'},{transform:`scale(${1+q*.6},${1-q})`,offset:.18},{transform:`scale(${1-q*.35},${1+q*.55})`,offset:.45},{transform:`scale(${1+q*.12},${1-q*.12})`,offset:.72},{transform:'scale(1,1)'}],S.bounceMs,'ease-out')}
+ // light pulse behind
+ if(S.glowOn){const g=document.createElement('div'),sz=S.glowSize*k*Math.min(1.6,boost);g.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;margin:${-sz/2}px 0 0 ${-sz/2}px;border-radius:50%;background:radial-gradient(circle,${S.glowCol} 0%,${S.glowCol}00 68%)`;tfxB.appendChild(g);
+  tfxDrop(g,tfxAnim(g,[{opacity:0,transform:'scale(.03)'},{opacity:Math.min(1,S.glowStr*boost),transform:'scale(.8)',offset:.25},{opacity:0,transform:'scale(1)'}],S.glowMs),S.glowMs)}
+ // rays
+ if(S.raysOn&&!calm){const d=560*k,ry=document.createElement('div');ry.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${d}px;height:${d}px;margin:${-d/2}px 0 0 ${-d/2}px;border-radius:50%;background:repeating-conic-gradient(from 0deg,${S.glowCol} 0 7deg,transparent 7deg 22deg);-webkit-mask:radial-gradient(circle,#000 8%,transparent 62%);mask:radial-gradient(circle,#000 8%,transparent 62%)`;tfxB.appendChild(ry);
+  tfxDrop(ry,tfxAnim(ry,[{opacity:0,transform:'rotate(0deg) scale(.6)'},{opacity:S.raysStr*Math.min(1.3,boost),transform:`rotate(${S.raysSpin*.3}deg) scale(1)`,offset:.2},{opacity:0,transform:`rotate(${S.raysSpin}deg) scale(1.15)`}],S.raysMs,'ease-out'),S.raysMs)}
+ // ground ring
+ if(S.ringOn){const w=240*k,h=120*k,rg=document.createElement('div');rg.style.cssText=`position:absolute;left:${cx}px;top:${by-h*.15}px;width:${w}px;height:${h}px;margin:${-h/2}px 0 0 ${-w/2}px;border-radius:50%;border:${Math.max(3,6*k)}px solid ${S.ringCol}`;tfxB.appendChild(rg);
+  tfxDrop(rg,tfxAnim(rg,[{opacity:.9,transform:'scale(.6)'},{opacity:0,transform:`scale(${S.ringSize})`}],S.ringMs,'cubic-bezier(.1,.7,.3,1)'),S.ringMs)}
+ // sparkles
+ if(!calm)for(let i=0;i<Math.round(S.spk*Math.min(1.5,boost));i++){const a=Math.random()*Math.PI*2,d=S.spkDist*k*(.5+Math.random()*.6),sp=document.createElement('div'),z=18*Math.max(.7,k);
+  sp.style.cssText=`position:absolute;left:${cx}px;top:${cy-18*k}px;width:${z}px;height:${z}px;margin:${-z/2}px 0 0 ${-z/2}px`;sp.innerHTML=`<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0L12.4 7.6 20 10 12.4 12.4 10 20 7.6 12.4 0 10 7.6 7.6z" fill="${S.spkCol}"/></svg>`;tfxF.appendChild(sp);
+  const ms=S.spkMs*(.8+Math.random()*.4);tfxDrop(sp,tfxAnim(sp,[{transform:'translate(0,0) scale(.2) rotate(0deg)',opacity:1},{transform:`translate(${Math.cos(a)*d*.7}px,${Math.sin(a)*d*.7-20}px) scale(1) rotate(90deg)`,opacity:1,offset:.5},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+10}px) scale(.3) rotate(180deg)`,opacity:0}],ms,'cubic-bezier(.2,.8,.4,1)'),ms)}
+ // cash pop where you tapped
+ if(S.popOn&&txt){const p=document.createElement('div');p.className='num';p.textContent=txt;p.style.cssText=`position:absolute;left:${px-sr.left}px;top:${py-sr.top-20}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;color:#fff;-webkit-text-stroke:${Math.round(S.popSize/7)}px #14191A;paint-order:stroke fill;white-space:nowrap;transform:translate(-50%,-50%);z-index:6`;tfxF.appendChild(p);
+  tfxDrop(p,tfxAnim(p,[{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-50%) scale(1.15)',opacity:1,offset:.15},{transform:`translate(-50%,calc(-50% - ${S.popRise}px)) scale(1)`,opacity:0}],900,'cubic-bezier(.2,.8,.4,1)'),900)}
+}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
- artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');
  const room=x.hold-o.stored;if(room<0.005){tapFloat(px,py,'FULL','#E04B3A');vib(3);return}
- const v=Math.min(room,x.rate/60*TAP_SEC*bMul()*tapMul());o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);tapFloat(px,py,'+'+tapFmt(v));upd()}
+ const v=Math.min(room,x.rate/60*TAP_SEC*bMul()*tapMul());o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);try{tapFX(px,py,'+'+tapFmt(v))}catch(e){tapFloat(px,py,'+'+tapFmt(v))}upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
