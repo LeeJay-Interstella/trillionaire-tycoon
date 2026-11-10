@@ -2201,8 +2201,11 @@ function storeLocked(){const n=window.__stPrev==='locked'?Math.min(nw(),ST_OPEN*
 const stInc=()=>income()/bMul();
 const ST_X=1; // store-wide price multiplier
 const stCost=min=>Math.max(1000*min*ST_X,Math.round(stInc()*min*ST_X)); // new players with almost no income pay at least $1,000 a minute
+// Perks also cost at least this share of the cash you're holding, so a big cash pile can't buy them cheaply.
+// The price is worked out again after each buy (on the cash left) and doubles for each repeat that day, so e.g. at most 2 eight-hour managers a day.
+const ST_SHARE={boost:.05,crew:.08,manual:.1,clean:.15,jail:.2,mgr8:.3};
 const pMin=(k,m)=>k==='manual'?25*(s.mgr.level||1):m;
-const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(stCost(min)*Math.pow(2,stCount(v)));
+const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0},stPrice=(v,min)=>Math.round(Math.max(stCost(min),(ST_SHARE[v]||0)*Math.max(0,s.cash))*Math.pow(2,stCount(v)));
 const stLine=(v,min)=>stCount(v)?`${stCount(v)} bought today`:'';
 const stMins=min=>{min=Math.round(min);return min>=60?(min%60?`${Math.floor(min/60)}h ${min%60}m`:`${min/60}h`):min+'m'};
 const gemStack=n=>(n>=250?PICON.gems:'')+PICON.gems+(n>=80?PICON.gems:'');
@@ -2215,7 +2218,7 @@ function storeBody(){
   <p class="st-note">Each pack doubles in price every time you buy it in a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
  if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,pMin(k,min)),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
   return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num ${s.cash>=c?'':'off'}" data-act="stask" data-v="${k}"><span>${COIN} ${money(c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
-  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Each perk doubles in price every time you buy it in a day, and prices reset at midnight.</p>`;
+  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. Prices grow with your income and with the cash you're holding. Each perk doubles in price every time you buy it in a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
 function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100)}}}
