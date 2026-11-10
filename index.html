@@ -54,7 +54,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .t-chest small{font-size:9px;color:var(--lime)}
 
 /* stage */
-#stage{flex:1;position:relative;overflow:hidden;min-height:0}
+#stage{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:pan-y}
 #city{position:absolute;inset:0}
 #city svg{width:100%;height:100%;display:block}
 #art{position:absolute;inset:0;pointer-events:none;z-index:2}
@@ -95,7 +95,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 
 .arrow{position:absolute;top:44%;width:38px;height:38px;border-radius:50%;background:#ffffffd9;border:2px solid var(--green);color:var(--green);display:grid;place-items:center;z-index:5;box-shadow:0 3px 0 #0001}
 .arrow svg{width:18px;height:18px;stroke:currentColor;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.arrow.l{left:max(10px,env(safe-area-inset-left,0px))}
+.arrow.l{left:auto;right:110px;top:auto;bottom:4%}
 .arrow.r{right:62px;top:auto;bottom:4%}
 .pager{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:10px;background:#ffffffd9;border:2px solid var(--green);color:var(--green);font-weight:900;font-size:12px;padding:4px 9px;z-index:5}
 .rounds{position:absolute;left:max(14px,env(safe-area-inset-left,0px));bottom:3%;display:flex;gap:10px;z-index:5}
@@ -945,6 +945,7 @@ let VB=setTop(-118);
 // Painted building art: businesses listed here show an image (1024x1024, transparent, island base ~90% down) instead of the drawn building.
 const BIMG={abd:'img/abd.webp'};
 const BIMG_W=245; // how wide the painted art's content shows, in stage units (the drawn buildings are about 214 wide)
+const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher number here moves the building up (desktop sits it lower)
 function bizArt(b){const u=BIMG[b.code];if(!u)return art(b);const k=BIMG_W/804,S=1024*k;
  return `<svg viewBox="0 0 1 1"><image href="${u}" x="${(-512*k).toFixed(1)}" y="${(69-916*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
 function onStage(svg,top,k=1){VB=setTop(top*k,69*k);layout();return svg.replace(/^<svg[^>]*>/,`<svg viewBox="${VB}" preserveAspectRatio="xMidYMid slice"><g class="hit" transform="scale(${k})"><rect x="-118" y="-290" width="236" height="370" fill="none" pointer-events="all"/>`).replace(/<\/svg>$/,'</g></svg>')}
@@ -1004,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111044,MUST=2026110820;/*notes*/const NOTES=["The Store has been updated."];
+/*build*/const BUILD=2026111049,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1187,7 +1188,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   L+=`<div class="callout"><div class="timer num" id="ctimer"></div><div class="lbl">TAP TO SPEED UP</div></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p></div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
- }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),TOPS[b.vis]);artEl.dataset.act=x.rate>0?'tapearn':'collect';
+ }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTop():TOPS[b.vis]);artEl.dataset.act=x.rate>0?'tapearn':'collect';
   L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
@@ -1705,9 +1706,22 @@ function askName(){dialog("What's your name, boss?",`<p class="s">It goes on the
 function welcome(r,arr){dialog('Welcome back, boss',`<p>You were away for <span class="hl">${dur(r.dt/1000)}</span></p><p>Your businesses made<br><span class="hlg num" style="font-size:26px">${COIN} ${money(r.gained)}</span></p>${r.done?`<p class="s">${r.done} construction job${r.done>1?'s':''} finished.</p>`:''}${arr?'<p class="s" style="color:var(--red)">The authorities paid you a visit while you were gone.</p>':''}<p class="s">Businesses stop earning once they hit max capacity.</p>`,`<button class="yes" data-act="close">Collect it</button>`)}
 
 /* ================= events ================= */
-let swipeX=null,swiped=false;
-stage.addEventListener('pointerdown',e=>{swipeX=e.clientX;swiped=false});
-stage.addEventListener('pointerup',e=>{if(swipeX!=null&&Math.abs(e.clientX-swipeX)>60){swiped=true;step(e.clientX<swipeX?1:-1)}swipeX=null});
+// Swiping between properties: the building and its cash stack follow your finger, then slide out while the next one slides in.
+let swipeX=null,swipeY=0,swiped=false,dragDX=0,dragging=false,sliding=false;
+const slideEls=()=>[artEl,colEl];
+const canStep=()=>{const o=cur();return!!o&&grp(isGood(o)).length>1};
+function slideStep(d){if(sliding)return;if(!canStep())return step(d);sliding=true;const W=stage.clientWidth||400;
+ slideEls().forEach(e=>{e.style.transition='transform .2s cubic-bezier(.5,0,.9,.6),opacity .2s';e.style.transform=`translateX(${-d*W*.75}px)`;e.style.opacity=0});
+ setTimeout(()=>{step(d);slideEls().forEach(e=>{e.style.transition='none';e.style.transform=`translateX(${d*W*.75}px)`;e.style.opacity=0;e.getBoundingClientRect();
+  e.style.transition='transform .38s cubic-bezier(.2,1.25,.4,1),opacity .22s';e.style.transform='';e.style.opacity=1});setTimeout(()=>{sliding=false},380)},200)}
+function dragReset(){slideEls().forEach(e=>{e.style.transition='transform .3s cubic-bezier(.2,1.4,.4,1),opacity .2s';e.style.transform='';e.style.opacity=1})}
+stage.addEventListener('pointerdown',e=>{if(sliding)return;swipeX=e.clientX;swipeY=e.clientY;swiped=false;dragDX=0;dragging=false});
+stage.addEventListener('pointermove',e=>{if(swipeX==null||sliding)return;const dx=e.clientX-swipeX,dy=e.clientY-swipeY;
+ if(!dragging&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy))dragging=true;if(!dragging)return;
+ dragDX=canStep()?dx:dx*.25;const W=stage.clientWidth||400;slideEls().forEach(el=>{el.style.transition='none';el.style.transform=`translateX(${dragDX}px)`;el.style.opacity=1-Math.min(.6,Math.abs(dragDX)/W)})});
+function dragEnd(e){if(swipeX==null)return;const dx=(e&&e.clientX!=null?e.clientX:swipeX)-swipeX;swipeX=null;
+ if(dragging&&Math.abs(dx)>60&&canStep()){swiped=true;dragging=false;slideStep(dx<0?1:-1)}else{if(dragging)swiped=Math.abs(dx)>10;dragging=false;dragReset()}}
+stage.addEventListener('pointerup',dragEnd);stage.addEventListener('pointercancel',()=>{swipeX=null;dragging=false;dragReset()});
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;
  if(ovKind==='daily'&&s.dc.got&&s.dc.got.fresh&&['perks','perkuse','close'].includes(el.dataset.act)||(el.dataset.act==='dimclose'&&e.target===el&&ovKind==='daily'&&s.dc.got)){if(s.dc.got)s.dc.got.fresh=false;save()}if(swiped&&stage.contains(el)){swiped=false;return}
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
@@ -1741,7 +1755,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'goto':s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();upd();break;
   case'upgrade':askUpgrade();break;case'doupgrade':upgrade();break;
   case'sell':askSell();break;case'dosell':sell();break;
-  case'prev':step(-1);break;case'next':step(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
+  case'prev':slideStep(-1);break;case'next':slideStep(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
   case'threat':threatDlg();break;
   case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');loadFriends();break;
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
