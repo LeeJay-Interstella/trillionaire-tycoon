@@ -57,8 +57,11 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 #stage{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:pan-y}
 #city{position:absolute;inset:0}
 #city svg{width:100%;height:100%;display:block}
-#city.photo{background:#8EC9F0 url(img/bg-day.webp) no-repeat;background-size:var(--bgw,cover) var(--bgh,auto);background-position:var(--bgx,50%) var(--bgy,60%)}
-.dark #city.photo{background-color:#1D2050;background-image:url(img/bg-night.webp)}
+#city.photo{background:#FFFFFF url(img/bg-day.webp) no-repeat;background-size:cover;background-position:50% 100%}
+.dark #city.photo{background-color:#9097D8;background-image:url(img/bg-night.webp)}
+.seg{display:flex;background:#EDEDED;border-radius:12px;padding:3px;gap:3px;flex:none}.dark .seg{background:#2A3335}
+.seg button{border:0;background:none;font:inherit;font-weight:800;font-size:13px;color:#777;padding:7px 11px;border-radius:9px;cursor:pointer}.seg button[aria-pressed=true]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}.dark .seg button[aria-pressed=true]{background:#46524F}
+.switch small{display:block;font-weight:600;font-size:11px;color:#888;margin-top:2px}
 #art{position:absolute;inset:0;pointer-events:none;z-index:2}
 #art svg{width:100%;height:100%;display:block}
 #art .hit{cursor:pointer}
@@ -947,8 +950,10 @@ let VB=setTop(-118);
 // Painted building art: businesses listed here show an image (1024x1024, transparent, island base ~90% down) instead of the drawn building.
 // Painted building art: one 1024x1024 transparent WebP per business, in img/<code>.webp, used on the city and in every picture of it.
 // The numbers are the box the building actually fills inside the image (left, top, right, bottom), so each one is sized and placed the same way.
-const BIMG={abd:[149,146,871,900],lem:[234,200,775,830],clf:[149,128,874,905],ffr:[108,101,910,916],mdc:[112,132,911,922],plp:[121,60,906,938]};
-const bimgUrl=c=>`img/${c}.webp`;
+// Each also has a night version, img/<code>-n.webp, drawn to the same framing; it shows whenever the game is dark.
+const BIMG={abd:[111,118,913,915],lem:[238,201,787,815],clf:[111,79,911,919],ffr:[108,101,910,916],mdc:[112,132,911,922],plp:[121,60,906,938]};
+const BIMG_N={abd:1,lem:1,clf:1,ffr:1,mdc:1,plp:1};
+const bimgUrl=c=>`img/${c}${BIMG_N[c]&&document.documentElement.classList.contains('dark')?'-n':''}.webp`;
 const BIMG_W=258; // the widest a painted building shows, in stage units (the drawn buildings are about 214 wide)
 const BIMG_H=BIMG_W*797/802; // and the tallest (so tall, narrow buildings aren't blown up past the others)
 const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher number here moves the building up (desktop sits it lower)
@@ -1016,7 +1021,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111070,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111073,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1429,10 +1434,15 @@ function mailRow([id,t,d,,g]){const st_=s.ach[id]||0;return`<div class="mail ${s
  ${st_===1?`<button data-act="claim" data-v="${id}">CLAIM ${GEM}${g}</button>`:st_===2?'<button disabled>CLAIMED</button>':`<button disabled>${GEM}${g}</button>`}</div>`}
 function mailBody(){const mis=MIS.map((_,gi)=>{const steps=ACH.filter(a=>a[5]===gi);return steps.find(a=>s.ach[a[0]]!==2)||steps[steps.length-1]});
  return`<div class="tierh"><b>Side missions</b></div>`+mis.map(mailRow).join('')+`<div class="tierh"><b>Achievements</b></div>`+ACH.filter(a=>a[5]===undefined).map(mailRow).join('')}
-const DKEY='trillionaire.dark';let darkOn=false;try{darkOn=localStorage.getItem(DKEY)==='1'}catch(e){}
-function applyDark(){document.documentElement.classList.toggle('dark',darkOn)}applyDark();
+// Look: 'auto' follows the clock (night 7pm to 7am), or 'light' / 'dark' set by hand. New players start on auto.
+const DKEY='trillionaire.dark',NIGHT_FROM=19,NIGHT_TO=7;let lookMode='auto';try{const v=localStorage.getItem(DKEY);lookMode=v==='1'?'dark':v==='0'?'light':'auto'}catch(e){}
+const isNight=()=>{const h=new Date().getHours();return h>=NIGHT_FROM||h<NIGHT_TO};
+let darkOn=lookMode==='dark'||(lookMode==='auto'&&isNight());
+function applyDark(){darkOn=lookMode==='dark'||(lookMode==='auto'&&isNight());const R=document.documentElement,was=R.classList.contains('dark');R.classList.toggle('dark',darkOn);
+ if(was!==darkOn)document.querySelectorAll('image[href^="img/"],img[src^="img/"]').forEach(el=>{const a=el.tagName.toLowerCase()==='img'?'src':'href',u=el.getAttribute(a),m=u.match(/^img\/([a-z0-9]+)(-n)?\.webp$/);if(m&&BIMG_N[m[1]])el.setAttribute(a,bimgUrl(m[1]))})}
+applyDark();setInterval(()=>{if(lookMode==='auto')applyDark()},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lookMode==='auto')applyDark()});
 function bossBody(){return`${acctHTML()}${notifRow()}<div class="statgrid num"><div><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
- <div class="pad" style="padding-bottom:0"><button type="button" class="switch" role="switch" aria-checked="${darkOn}" data-act="dark">Dark mode<i></i></button></div><div class="pad"><label for="pn" style="font-weight:800;font-size:12px;color:#777">BOSS NAME</label><input class="nm" id="pn" maxlength="20" value="${esc(s.name)}" autocomplete="off">
+ <div class="pad" style="padding-bottom:0"><div class="switch"><span>Day &amp; night<small>${lookMode==='auto'?'Auto follows your clock: night from 7pm to 7am':lookMode==='dark'?'Always night':'Always day'}</small></span><span class="seg">${[['auto','Auto'],['light','Day'],['dark','Night']].map(([k,l])=>`<button type="button" data-act="look" data-look="${k}" aria-pressed="${lookMode===k}">${l}</button>`).join('')}</span></div></div><div class="pad"><label for="pn" style="font-weight:800;font-size:12px;color:#777">BOSS NAME</label><input class="nm" id="pn" maxlength="20" value="${esc(s.name)}" autocomplete="off">
  <button class="bigbtn" data-act="savename">Save name</button><button class="bigbtn ghost" data-act="howto">How to play</button><button class="bigbtn ghost" data-act="backup">Back up or move my save</button><button class="bigbtn danger" data-act="reset" id="rst">Reset all progress</button></div>`}
 function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
  dialog('Back up your save',`<p class="s">Copy this code and keep it somewhere safe. Paste it on another phone or browser to carry on where you left off.</p>
@@ -1720,7 +1730,7 @@ function jailNoteHTML(){const n=jailNote;if(!n||!s.jail)return'';const ago=now()
 const GAVEL=`<svg class="gavel" viewBox="0 0 120 100" aria-hidden="true"><g transform="rotate(-28 60 40)"><rect x="56" y="34" width="56" height="9" rx="4" fill="#8A4A1E"/><rect x="22" y="14" width="44" height="46" rx="5" fill="#E7892E"/><rect x="22" y="14" width="44" height="12" rx="5" fill="#C9681C"/><rect x="22" y="48" width="44" height="12" rx="5" fill="#C9681C"/><rect x="30" y="26" width="14" height="22" fill="#F5D24A"/></g><rect x="30" y="80" width="56" height="9" rx="2" fill="#C9681C"/><rect x="38" y="72" width="40" height="10" rx="2" fill="#E7892E"/><rect x="38" y="72" width="16" height="10" rx="2" fill="#F5D24A"/></svg>`;
 const SCALES=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v17M7 20h10M4 7h16M6 7l-3 7h6zM18 7l-3 7h6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
 function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
- ovl.innerHTML=`<div class="fullscreen" id="jail">${jailNoteHTML()}<div class="jhd">${GAVEL}<h2>CONVICTED!</h2><p>Your ${j.th}% threat caught up with you.${j.loss?` Fined <b class="num">${$m(j.loss)}</b>.`:''}</p></div>
+ ovl.innerHTML=`<div class="fullscreen" id="jail">${jailNoteHTML()}<div class="jhd">${GAVEL}<h2>CONVICTED!</h2><p>${j.sev==='deal'?`Caught in the middle of ${j.who||'a shady'}${j.who?'\'s':''} deal. With your threat at ${j.th}% while it ran, you took ${typeof j.risk==='string'?`a ${j.risk}`:'a'} risk of getting caught.`:`Your ${j.th}% threat caught up with you.`}${j.loss?` Fined <b class="num">${$m(j.loss)}</b>.`:''}</p></div>
  <div class="jwarn" id="jwarn" hidden></div>
  <div class="jexit">${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <button class="jb law" data-act="lawyer">${SCALES}<span>CALL LAWYER<small id="jlaw"></small></span></button>
@@ -1882,7 +1892,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'copybk':{const t=$('bk');const done=()=>toast('Save code copied','good');try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();toast('Code selected. Copy it from the box.')})}catch(e){t.select();toast('Code selected. Copy it from the box.')}break}
   case'restore':{const v=($('rs').value||'').trim();if(!v)return toast('Paste a save code first','bad');let st=null;try{st=unpack(decodeURIComponent(escape(atob(v))))}catch(e){}
    if(!st)return toast("That code doesn't look right. Check you copied all of it.",'bad');s=st;sanitizeTime(s);s.last=now();save();lastRank=null;closeOv();upd();toast('Save loaded. Welcome back, '+(s.name||'boss')+'!','good');break}
-  case'dark':darkOn=!darkOn;try{localStorage.setItem(DKEY,darkOn?'1':'0')}catch(e){}applyDark();el.setAttribute('aria-checked',darkOn);break;
+  case'look':{lookMode=el.dataset.look;try{localStorage.setItem(DKEY,lookMode==='dark'?'1':lookMode==='light'?'0':'auto')}catch(e){}applyDark();const w=el.closest('.switch');if(w){w.querySelectorAll('[data-act=look]').forEach(b=>b.setAttribute('aria-pressed',b===el));const sm=w.querySelector('small');if(sm)sm.textContent=lookMode==='auto'?'Auto follows your clock: night from 7pm to 7am':lookMode==='dark'?'Always night':'Always day'}break}
   case'reset':if(el.dataset.arm!=='1'){el.dataset.arm='1';el.textContent='Tap again to wipe everything';return}s=fresh();save();lastRank=null;closeOv();upd();askName();break;
   case'begin':closeOv();if(s.jail){openJail();if(dcIntroDue())nextUp=dcIntro}else if(!s.name)askName();else if(pendingWelcome){welcome(...pendingWelcome);pendingWelcome=null;if(dcIntroDue())nextUp=dcIntro}else if(dcIntroDue())dcIntro();else notifyPrompt();break;
   case'notifon':enablePush();break;
@@ -2144,8 +2154,9 @@ async function signOut(){try{await cloudPush();await disablePush();await supa.au
 /* ================= shady deals ================= */
 // A contact texts an offer every 1-2 hours (not overnight). It expires after 20 minutes.
 // Pay now, get paid in 3-5 minutes. Every deal adds threat while it runs and can get you busted;
+// the bust risk comes from your threat with the deal's heat added, times the contact's danger (good causes give cover: at 0% or below, no risk);
 // a bust gives a sentence twice the time the deal has left. Still in jail when it pays out = it's lost.
-const DEAL_T=[ // tier: chance, back, seconds, threat, bust chance over the whole deal
+const DEAL_T=[ // tier: chance, back, seconds, threat, max bust chance over the whole deal
  {k:'Low',w:40,x:1.4,sec:300,add:5,bust:.1},{k:'Medium',w:35,x:2,sec:240,add:12,bust:.25},{k:'High',w:25,x:3,sec:180,add:25,bust:.5}];
 const DEAL_WHO=[['Margot','Accountant','👩‍💼'],['Vinnie','Knows a guy','🧔'],['Big Tony','Local legend','🕶️']];
 const DEAL_TXT=[["Quick paperwork trick. Give me {c} and I'll have {p} back to you in {m} minutes. Nobody will look twice. Probably.", "Got a client who pays early. Lend me {c}, get {p} back in {m} minutes. Easy money.", "A tax refund came through early. Don't ask whose. {c} now, {p} back in {m} minutes.", "I found a loophole. A tiny one. {c} in, {p} out in {m} minutes, before anyone closes it.", "Invoices that pay themselves. Well, almost. Send {c}, I'll return {p} in {m} minutes.", "A charity gala needs a donation. {c} goes in, {p} comes out in {m} minutes. Wear something nice.", "Currency swap at a very friendly rate. {c} now, {p} back in {m} minutes. The paperwork's already done.", "Small creative accounting job. {c} up front, {p} back in {m} minutes. Keep the receipts. Actually, don't."], ["A truck of lemons fell off a lorry. {c} now and I'll double it in {m} minutes. Keep your head down.", "Front-row concert tickets, no questions asked. {c} in, {p} out in {m} minutes.", "Designer handbags. Very real. Mostly. {c} in, {p} out in {m} minutes.", "My cousin's got a van full of tellies. {c} now and I'll double it in {m} minutes.", "Horse in the 3:15 can't lose. I know the horse. {c} on it, {p} back in {m} minutes.", "Crate of vintage watches, very vintage. {c} gets you in, {p} back in {m} minutes.", "The parking meters downtown are out of order. Mine aren't. {c} in, double it in {m} minutes.", "Bloke's selling a boat, needs cash today. {c} now, {p} when I flip it in {m} minutes."], ["Card game in the back room. {c} buys you a seat, the house pays you {p} in {m} minutes. Cops are already sniffing around.", "Shipment at the docks. {c} gets you in, {p} comes back in {m} minutes. Don't tell anyone.", "The casino cameras go down for maintenance in a minute. {c} at the table, {p} out in {m} minutes.", "Art auction, one painting, no paperwork. {c} gets you a share, {p} back in {m} minutes. Very hot.", "Underground race tonight. My driver doesn't lose. {c} on him, {p} back in {m} minutes.", "The mayor owes me a favour. {c} makes it happen, {p} comes back in {m} minutes. Cops are watching him too.", "Gold bars, still warm. Don't ask. {c} now, {p} in {m} minutes.", "Diamond exchange, back door, one time only. {c} in, {p} out in {m} minutes. Move fast."]];
@@ -2162,10 +2173,16 @@ function dealTick(){if(!dealsOpen())return;const t=now();if(!s.deals)s.deals=[];
  let guard=0;while(!s.deal&&t>=s.dealNext&&guard++<50){const at=s.dealNext;if(t<at+DEAL_LIFE){s.deal=makeDeal(at,s.dealTier||0);vib([40,60,40]);save()}else dealSchedule(at+DEAL_LIFE)}}
 function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*DEAL_STAKE)),pay=Math.round(cost*T.x),tx=DEAL_TXT[tier][Math.floor(Math.random()*DEAL_TXT[tier].length)];
  return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,bust:T.bust,at,exp:at+DEAL_LIFE,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
-// chance of a bust at one 30-second check, so the whole deal has its tier's bust chance
-const dealP=d=>1-Math.pow(1-d.bust,30/d.sec);
-function dealBust(c){for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d))return d}return null}
-function dealArrest(at,d){if(cardDodge(at))return;const th=threatAt(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at)));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th)};s.arrests++;ev('bust',{sev:'deal',loss:0,threat:Math.round(th),mgr:mgrOn()?1:0});
+// risk over the whole deal: threat (with the deal's heat included) x the contact's danger, capped per tier
+const DEAL_DNG=[.2,.4,.7];
+const dealRisk=(tier,th)=>Math.min(DEAL_T[tier].bust,Math.max(0,th)*DEAL_DNG[tier]/100);
+const riskTxt=r=>r<=0?'0%':r<.01?'under 1%':Math.round(r*100)+'%';
+// chance of a bust at one 30-second check, so the whole deal has that risk
+const heatAt=c=>(s.deals||[]).reduce((a,d)=>a+(c>=d.start&&c<d.end?d.add:0),0);
+const dealTh=c=>Math.max(0,threatRaw()-dealHeat()+heatAt(c)-(c<(s.cleanUntil||0)?20:0));
+const dealP=(d,th)=>1-Math.pow(1-dealRisk(d.tier,th),30/d.sec);
+function dealBust(c){const th=dealTh(c);if(th<=0)return null;for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,th))return d}return null}
+function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at)));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;ev('bust',{sev:'deal',who:d.who,loss:0,threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
@@ -2175,18 +2192,19 @@ function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
  const paid=(s.dealPaid||[]).length;b.hidden=!(off||run.length||paid);if(b.hidden)return;const dd=$('dealDot');dd.hidden=!(off||paid);dd.textContent=paid?'$':'1';dd.classList.toggle('cash',!!paid);b.classList.toggle('buzz',off||!!paid);
  const tg=$('dealTag');tg.hidden=!run.length;if(run.length)tg.textContent=dur((run[0].end-t)/1000);
- b.style.top=((document.querySelector('#stage .vtog')?20:0)+(boostOn()?80:46))+'px';if(ovKind==='deals'){const r=$('dealRun');if(r)r.innerHTML=dealRunHTML(dealSkip());const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
+ b.style.top=((document.querySelector('#stage .vtog')?20:0)+(boostOn()?80:46))+'px';if(ovKind==='deals'){const r=$('dealRun');if(r)r.innerHTML=dealRunHTML(dealSkip());const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const rk=$('dealRk');if(rk&&k)rk.textContent=riskTxt(dealRisk(k.tier,threatAt(t)));const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
 const dealSkip=()=>dealChat&&dealChat.reply==='in'?(s.deals||[]).find(x=>x.at===dealChat.offer.at):null;
 const bandCol=t=>t<10?'#7FD0F2':t<30?'#F5A63A':t<50?'#FF6B5A':'#FF4D3D';
-function dealRunHTML(skip){const t=now();return(s.deals||[]).filter(d=>d.end>t&&d!==skip).map(d=>`<div class="dsys">⏱ ${esc(d.who)}'s deal: ${$m(d.pay)} in <b class="num">${dur((d.end-t)/1000)}</b></div>`).join('')}
+function dealRunHTML(skip){const t=now();return(s.deals||[]).filter(d=>d.end>t&&d!==skip).map(d=>`<div class="dsys">⏱ ${esc(d.who)}'s deal: ${$m(d.pay)} in <b class="num">${dur((d.end-t)/1000)}</b> · ${riskTxt(dealRisk(d.tier,threatAt(t)))} risk</div>`).join('')}
 function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now();
  if(!d){const log=(s.dealLog||[]).slice(0,3);return`<div class="dthread"><div id="dealRun">${dealRunHTML()}</div><div class="dsys dempty">No deals right now.<br>Your contacts usually text every hour or two.</div>${log.map(l=>`<div class="dsys${l.bad?' bad':''}">${esc(l.txt)}</div>`).join('')}</div>`}
  const after=Math.round(threatRaw()-(cleanOn()?20:0)+(c&&c.reply==='in'?0:d.add)),col=bandCol(after),run=c&&c.reply==='in'?(s.deals||[]).find(x=>x.at===d.at):null;
  const inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
  let h=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(d.text))+
   inc(`You put in <b>${$m(d.cost)}</b>, you get <b class="g">${$m(d.pay)}</b> back in <b>${d.sec/60} min</b>. That's <b class="g">+${$m(d.pay-d.cost)}</b>.`)+
-  inc(`Heat on this one: <b style="color:${col}">+${d.add}% threat</b> while it runs ${d.tier===2?'🚨':d.tier===1?'👀':'🤫'}<br><small>You'd be on <b style="color:${col}">${after}%</b></small>`);
- if(c&&c.reply==='in')h+=out(`I'm in. Sending ${$m(d.cost)} 💸`)+inc(`Pleasure doing business, boss. ${$m(d.pay)} coming your way.`)+(run?`<div class="dsys">⏱ Pays out in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b></div>`:`<div class="dsys">✓ Paid out</div>`);
+  inc(`Heat on this one: <b style="color:${col}">+${d.add}% threat</b> while it runs ${d.tier===2?'🚨':d.tier===1?'👀':'🤫'}<br><small>You'd be on <b style="color:${col}">${Math.max(0,after)}%</b></small>`)+
+  inc(dealRisk(d.tier,after)<=0?`Risk of getting caught: <b style="color:var(--green)">0%</b> 😇<br><small>Your good causes cover the heat.</small>`:`Risk of getting caught: <b style="color:${col}">${riskTxt(dealRisk(d.tier,after))}</b><br><small>Lower your threat and the risk drops.</small>`);
+ if(c&&c.reply==='in')h+=out(`I'm in. Sending ${$m(d.cost)} 💸`)+inc(`Pleasure doing business, boss. ${$m(d.pay)} coming your way.`)+(run?`<div class="dsys">⏱ Pays out in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b> · <span id="dealRk">${riskTxt(dealRisk(run.tier,threatAt(t)))}</span> risk</div>`:`<div class="dsys">✓ Paid out</div>`);
  else if(c&&c.reply==='pass')h+=out('Not this time.')+inc("Your loss. I'll find someone else 🤷");
  else h+=`<div class="dsys">Offer expires in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
  const busy=(s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX,poor=s.cash<d.cost;
