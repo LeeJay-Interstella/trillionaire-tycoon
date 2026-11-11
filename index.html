@@ -945,7 +945,7 @@ let VB=setTop(-118);
 // Painted building art: businesses listed here show an image (1024x1024, transparent, island base ~90% down) instead of the drawn building.
 // Painted building art: one 1024x1024 transparent WebP per business, in img/<code>.webp, used on the city and in every picture of it.
 // The numbers are the box the building actually fills inside the image (left, top, right, bottom), so each one is sized and placed the same way.
-const BIMG={abd:[111,118,913,915],lem:[238,201,787,815]};
+const BIMG={abd:[111,118,913,915],lem:[238,201,787,815],clf:[111,79,911,919]};
 const bimgUrl=c=>`img/${c}.webp`;
 const BIMG_W=258; // the widest a painted building shows, in stage units (the drawn buildings are about 214 wide)
 const BIMG_H=BIMG_W*797/802; // and the tallest (so tall, narrow buildings aren't blown up past the others)
@@ -1014,7 +1014,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111062,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111063,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
