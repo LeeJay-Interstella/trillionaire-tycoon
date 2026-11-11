@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111059,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111060,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1757,11 +1757,10 @@ function welcome(r,arr){dialog('Welcome back, boss',`<p>You were away for <span 
 let swipeX=null,swipeY=0,swiped=false,dragDX=0,dragging=false,sliding=false;
 const slideEls=()=>[artEl,colEl];
 const canStep=()=>{const o=cur();return!!o&&grp(isGood(o)).length>1};
-function slideStep(d){if(sliding)return;if(!canStep())return step(d);sliding=true;const W=stage.clientWidth||400;
- slideEls().forEach(e=>{e.style.transition='transform .2s cubic-bezier(.5,0,.9,.6),opacity .2s';e.style.transform=`translateX(${-d*W*.75}px)`;e.style.opacity=0});
- setTimeout(()=>{step(d);slideEls().forEach(e=>{e.style.transition='none';e.style.transform=`translateX(${d*W*.75}px)`;e.style.opacity=0;e.getBoundingClientRect();
-  e.style.transition='transform .38s cubic-bezier(.2,1.25,.4,1),opacity .22s';e.style.transform='';e.style.opacity=1});setTimeout(()=>{sliding=false},380)},200)}
-function dragReset(){slideEls().forEach(e=>{e.style.transition='transform .3s cubic-bezier(.2,1.4,.4,1),opacity .2s';e.style.transform='';e.style.opacity=1})}
+function slideStep(d){if(!canStep())return step(d);step(d);const W=stage.clientWidth||400; // switch straight away, then slide the new one in (no waiting, rapid taps just keep going)
+ slideEls().forEach(e=>{try{e.getAnimations().forEach(a=>a.cancel())}catch(_){}e.style.transition='none';e.style.transform='';e.style.opacity=1;
+  try{e.animate([{transform:`translateX(${d*W*.4}px)`,opacity:.25},{transform:'translateX(0)',opacity:1}],{duration:200,easing:'cubic-bezier(.2,.9,.3,1)'})}catch(_){}})}
+function dragReset(){slideEls().forEach(e=>{e.style.transition='transform .22s cubic-bezier(.2,1.4,.4,1),opacity .15s';e.style.transform='';e.style.opacity=1})}
 stage.addEventListener('pointerdown',e=>{if(sliding)return;swipeX=e.clientX;swipeY=e.clientY;swiped=false;dragDX=0;dragging=false});
 stage.addEventListener('pointermove',e=>{if(swipeX==null||sliding)return;const dx=e.clientX-swipeX,dy=e.clientY-swipeY;
  if(!dragging&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy))dragging=true;if(!dragging)return;
