@@ -943,11 +943,20 @@ const VW=600,VH=500;let VY=-300,VWc=VW,VHc=VH;const WIDEQ=matchMedia('(hover:hov
 function setTop(top,bot=69){const wide=WIDEQ.matches,Z=wide?1.25:1;VWc=VW*Z;VHc=VH*Z;let cy=(top+bot)/2;if(wide){const st=document.getElementById('stage'),w=st?st.clientWidth:0,h=st?st.clientHeight:0;if(w&&h)cy+=.15*h/Math.max(w/VWc,h/VHc)}VY=Math.round(cy-VHc/2);const v=`${-VWc/2} ${VY} ${VWc} ${VHc}`;const c=document.querySelector('#city svg');if(c)c.setAttribute('viewBox',v);return v}
 let VB=setTop(-118);
 // Painted building art: businesses listed here show an image (1024x1024, transparent, island base ~90% down) instead of the drawn building.
-const BIMG={abd:'img/abd.webp'};
-const BIMG_W=258; // how wide the painted art's content shows, in stage units (the drawn buildings are about 214 wide)
+// Painted building art: one 1024x1024 transparent WebP per business, in img/<code>.webp, used on the city and in every picture of it.
+// The numbers are the box the building actually fills inside the image (left, top, right, bottom), so each one is sized and placed the same way.
+const BIMG={abd:[111,118,913,915],lem:[238,201,787,815]};
+const bimgUrl=c=>`img/${c}.webp`;
+const BIMG_W=258; // the widest a painted building shows, in stage units (the drawn buildings are about 214 wide)
+const BIMG_H=BIMG_W*797/802; // and the tallest (so tall, narrow buildings aren't blown up past the others)
 const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher number here moves the building up (desktop sits it lower)
-function bizArt(b){const u=BIMG[b.code];if(!u)return art(b);const k=BIMG_W/804,S=1024*k;
- return `<svg viewBox="0 0 1 1"><image href="${u}" x="${(-512*k).toFixed(1)}" y="${(69-916*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
+function bizArt(b){const m=BIMG[b.code];if(!m)return art(b);const[x0,y0,x1,y1]=m,k=Math.min(BIMG_W/(x1-x0),BIMG_H/(y1-y0)),S=1024*k;
+ return `<svg viewBox="0 0 1 1"><image href="${bimgUrl(b.code)}" data-bb="${m.join(',')}" x="${(-(x0+x1)/2*k).toFixed(1)}" y="${(69-(y1+1)*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
+// Small pictures (shop cards and popups): the same image file, cropped to the building.
+function picArt(b){const m=BIMG[b.code];if(!m)return art(b);const[x0,y0,x1,y1]=m,p=24;
+ return `<svg viewBox="${x0-p} ${y0-p} ${x1-x0+2*p} ${y1-y0+2*p}" preserveAspectRatio="xMidYMax meet"><image href="${bimgUrl(b.code)}" width="1024" height="1024" loading="lazy" decoding="async"/></svg>`}
+// Where the building sits on screen, from the painted image's box.
+function bimgRect(img){const r=img.getBoundingClientRect(),[x0,y0,x1,y1]=(img.dataset.bb||'0,0,1024,1024').split(',').map(Number),f=r.width/1024;return{left:r.left+x0*f,top:r.top+y0*f,width:(x1-x0)*f,height:(y1-y0)*f}}
 function onStage(svg,top,k=1){VB=setTop(top*k,69*k);layout();return svg.replace(/^<svg[^>]*>/,`<svg viewBox="${VB}" preserveAspectRatio="xMidYMid slice"><g class="hit" transform="scale(${k})"><rect x="-118" y="-290" width="236" height="370" fill="none" pointer-events="all"/>`).replace(/<\/svg>$/,'</g></svg>')}
 const CONE=`<svg viewBox="0 0 46 46"><polygon points="23,3 33,36 13,36" fill="#F5B946"/><polygon points="17,22 29,22 31,28 15,28" fill="#fff"/><rect x="5" y="36" width="36" height="6" fill="#E89A2B"/></svg>`;
 
@@ -1005,7 +1014,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111061,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111062,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1266,9 +1275,9 @@ function tfxDrop(el,an,ms){if(an)an.onfinish=()=>el.remove();else setTimeout(()=
 function tapFX(px,py,txt){
  if(!tfxB){artEl.insertAdjacentHTML('beforebegin','<div id="tfxB" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden"></div>');artEl.insertAdjacentHTML('afterend','<div id="tfxF" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:4;overflow:visible"></div>');tfxB=$('tfxB');tfxF=$('tfxF')}
  const S=TFX,sr=stage.getBoundingClientRect(),img=artEl.querySelector('image'),hg=artEl.querySelector('.hit');if(!hg&&!img)return;
- let r;if(img)r=img.getBoundingClientRect();else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
- const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),by=r.top-sr.top+r.height*(img?.895:.9);
- const k=Math.max(.45,Math.min(1.8,(img?r.width*804/1024:r.width)/266)); // scale effects to the building's size on screen
+ let r;if(img)r=bimgRect(img);else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
+ const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),by=r.top-sr.top+r.height*(img?.96:.9);
+ const k=Math.max(.45,Math.min(1.8,r.width/266)); // scale effects to the building's size on screen
  const now=performance.now();tfxHeat=Math.min(1,Math.max(0,tfxHeat-(now-tfxLast)/900)+.25);tfxLast=now;const boost=1+S.stack*tfxHeat;
  const calm=tfxReduce.matches;
  // flash + squash the building itself
@@ -1289,7 +1298,7 @@ function tapFX(px,py,txt){
   sp.style.cssText=`position:absolute;left:${cx}px;top:${cy-18*k}px;width:${z}px;height:${z}px;margin:${-z/2}px 0 0 ${-z/2}px`;sp.innerHTML=`<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0L12.4 7.6 20 10 12.4 12.4 10 20 7.6 12.4 0 10 7.6 7.6z" fill="${S.spkCol}"/></svg>`;tfxF.appendChild(sp);
   const ms=S.spkMs*(.8+Math.random()*.4);tfxDrop(sp,tfxAnim(sp,[{transform:'translate(0,0) scale(.2) rotate(0deg)',opacity:1},{transform:`translate(${Math.cos(a)*d*.7}px,${Math.sin(a)*d*.7-20}px) scale(1) rotate(90deg)`,opacity:1,offset:.5},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+10}px) scale(.3) rotate(180deg)`,opacity:0}],ms,'cubic-bezier(.2,.8,.4,1)'),ms)}
  // cash pop where you tapped
- if(S.popOn&&txt){const p=document.createElement('div');p.className='num tfxpop';p.textContent=txt;const o=Math.max(2,Math.round(S.popSize/12));const top=r.top-sr.top+r.height*(img?.11:.02),rise=Math.max(S.popRise,cy-top+S.popSize*1.6);p.style.cssText=`position:absolute;left:${cx+(Math.random()*30-15)*k}px;top:${cy}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;letter-spacing:-.5px;white-space:nowrap;transform:translate(-50%,-50%);z-index:6;--o:${o}px`;tfxB.appendChild(p);
+ if(S.popOn&&txt){const p=document.createElement('div');p.className='num tfxpop';p.textContent=txt;const o=Math.max(2,Math.round(S.popSize/12));const top=r.top-sr.top+r.height*.02,rise=Math.max(S.popRise,cy-top+S.popSize*1.6);p.style.cssText=`position:absolute;left:${cx+(Math.random()*30-15)*k}px;top:${cy}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;letter-spacing:-.5px;white-space:nowrap;transform:translate(-50%,-50%);z-index:6;--o:${o}px`;tfxB.appendChild(p);
   tfxDrop(p,tfxAnim(p,[{transform:'translate(-50%,-50%) scale(.9)',opacity:1},{transform:`translate(-50%,calc(-50% - ${rise*.8}px)) scale(1.05)`,opacity:1,offset:.75},{transform:`translate(-50%,calc(-50% - ${rise}px)) scale(1)`,opacity:0}],1300,'cubic-bezier(.2,.7,.3,1)'),1300)}
 }
 
@@ -1297,8 +1306,8 @@ function tapFX(px,py,txt){
 const TFX_FULL={glowCol:'#FF5A4A',haloCol:'#FF2A1A',glowSize:330,glowStr:.85,glowMs:500,flash:.35,halo:16,flashMs:320,shake:9,shakeMs:420};
 function tapFullFX(){const S=TFX_FULL,sr=stage.getBoundingClientRect(),img=artEl.querySelector('image'),hg=artEl.querySelector('.hit');if(!hg&&!img)return;
  if(!tfxB){artEl.insertAdjacentHTML('beforebegin','<div id="tfxB" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden"></div>');artEl.insertAdjacentHTML('afterend','<div id="tfxF" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:4;overflow:visible"></div>');tfxB=$('tfxB');tfxF=$('tfxF')}
- let r;if(img)r=img.getBoundingClientRect();else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
- const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),k=Math.max(.45,Math.min(1.8,(img?r.width*804/1024:r.width)/266));
+ let r;if(img)r=bimgRect(img);else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
+ const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),k=Math.max(.45,Math.min(1.8,r.width/266));
  const g=document.createElement('div'),sz=S.glowSize*k;g.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;margin:${-sz/2}px 0 0 ${-sz/2}px;border-radius:50%;background:radial-gradient(circle,${S.glowCol} 0%,${S.glowCol}00 68%)`;tfxB.appendChild(g);
  tfxDrop(g,tfxAnim(g,[{opacity:0,transform:'scale(.05)'},{opacity:S.glowStr,transform:'scale(.85)',offset:.25},{opacity:0,transform:'scale(1)'}],S.glowMs),S.glowMs);
  tfxAnim(artEl,[{filter:`sepia(1) saturate(6) hue-rotate(-58deg) brightness(${1+S.flash*.4}) drop-shadow(0 0 ${S.halo*k}px ${S.haloCol})`,offset:0},{filter:`sepia(.6) saturate(3.5) hue-rotate(-58deg) brightness(1.05) drop-shadow(0 0 ${S.halo*k*.6}px ${S.haloCol})`,offset:.4},{filter:'sepia(0) saturate(1) hue-rotate(0deg) brightness(1) drop-shadow(0 0 0 transparent)'}],S.flashMs+120,'ease-out');
@@ -1333,7 +1342,7 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const btn=o?`<button class="price own" data-act="goto" data-bid="${b.id}">OWNED · LV ${o.level}</button>`:!open?`<div class="price off num" style="white-space:nowrap"><svg viewBox="0 0 16 18" style="width:14px;height:16px;flex:none" aria-label="Locked" role="img"><rect x="2" y="8" width="12" height="9" rx="2" fill="currentColor"/><path d="M5 8V5.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2"/></svg>${b.secret?'FREE':priceHTML(b,b.price)}</div>`:!ok?`<div class="price off" style="font-size:11px;padding:8px">${esc(reqText(b))}</div>`:!land?`<div class="price off" style="font-size:11px;padding:8px">Buy a plot of land first</div>`:
   `<button class="price num ${canPay(b,buyPrice(b))?'':'off'}" data-act="ask" data-bid="${b.id}">${b.secret?'FREE':priceHTML(b,b.price)}</button>`;
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
- return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${art(b)}</div><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>
+ return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${b.threat}%</span></div>${btn}</div>`}
 function landBar(w){const n=plotsIn(w),have=landIn(w),free=have-usedIn(w),p=plotPrice(w,have);
  return`<div class="landbar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l9-5 9 5-9 4zM12 15V4M12 4l6 3-6 3"/></svg><div><b>Land · ${have}/${n} plots</b><span>${free} free to build on${have<n?' · next plot':''}</span></div>${have<n?`<button class="price num ${s.cash>=p?'':'off'}" data-act="land">${COIN} ${money(p)}</button>`:'<span class="all">All plots owned</span>'}</div>`}
@@ -1349,17 +1358,17 @@ function shopBody(){let h='',lockedShown=0;const w=s.world|0;
 const shopBalHTML=()=>`<div class="sbal"><small>AVAILABLE CASH</small><b class="num">${COIN} <span id="sbCash">${money(s.cash)}</span></b></div><div class="sbal gem"><small>CRYSTALS</small><b class="num">${GEM} <span id="sbGem">${Math.floor(s.gems).toLocaleString('en-US')}</span></b></div>`;
 function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');const h=document.querySelector('.sheet-h');if(h){const d=document.createElement('div');d.className='shopbal';d.innerHTML=shopBalHTML();h.after(d)}}
 function askBuy(bid){const b=B[bid];if(s.jail)return jailNag();if(!available(b))return;const p=buyPrice(b);
- dialog(`Build ${esc(b.name)}`,`<div class="pic">${art(b)}</div><p>${p?`Spend <span class="hlg num">${priceHTML(b,p)}</span> to buy`:'Claim'}<br><span class="hl">${esc(b.name.toUpperCase())}</span>?</p>${b.threat<0?'<p class="s">Lowers your threat. Threat reducers can never be sold.</p>':b.threat>5?`<p class="s">Careful: adds ${b.threat}% threat.</p>`:''}${gemPay(b)?'<p class="s">Crystal businesses can never be sold.</p>':''}`,
+ dialog(`Build ${esc(b.name)}`,`<div class="pic">${picArt(b)}</div><p>${p?`Spend <span class="hlg num">${priceHTML(b,p)}</span> to buy`:'Claim'}<br><span class="hl">${esc(b.name.toUpperCase())}</span>?</p>${b.threat<0?'<p class="s">Lowers your threat. Threat reducers can never be sold.</p>':b.threat>5?`<p class="s">Careful: adds ${b.threat}% threat.</p>`:''}${gemPay(b)?'<p class="s">Crystal businesses can never be sold.</p>':''}`,
   `<button class="no" data-act="close">No</button><button class="yes" data-act="buy" data-bid="${bid}" ${canPay(b,p)?'':'disabled'}>Yes</button>`)}
 function askUpgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);
- if(x.maxed)return dialog('Max level',`<div class="pic">${art(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> is already at its highest level.</p>`,`<button class="ok" data-act="close">OK</button>`);
+ if(x.maxed)return dialog('Max level',`<div class="pic">${picArt(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> is already at its highest level.</p>`,`<button class="ok" data-act="close">OK</button>`);
  dialog(`Upgrade ${esc(b.name)}`,`<p>Spend <span class="hlg num">${priceHTML(b,x.up)}</span> to reach <span class="hl">Level ${o.level+1}</span>?</p>
  <div class="cmp num">${b.rate?`<span>Earning rate</span><span>${$m(x.rate)}</span><span>→ ${$m(x.nRate)}</span><span>Max capacity</span><span>${$m(x.hold)}</span><span>→ ${$m(x.nHold)}</span>`:''}<span>Threat</span><span>${pct(x.threat)}</span><span style="color:${x.nThreat>x.threat?'var(--red)':'var(--green)'}">→ ${pct(x.nThreat)}</span><span>Upgrade time</span><span></span><span style="color:var(--ink)">${dur(x.upTime)}</span></div>
  <p class="s">Your stored cash is collected first. The business stops earning while the work happens.</p>`,
  `<button class="no" data-act="close">No</button><button class="yes" data-act="doupgrade" ${canPay(b,x.up)?'':'disabled'}>Yes</button>`)}
 function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
- if(!sellable(o))return dialog("Can't sell",`<div class="pic">${art(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> can never be sold.</p><p class="s">${b.threat<0?'Threat reducers stay with you for good.':'Businesses bought with crystals stay with you for good.'}</p>`,`<button class="ok" data-act="close">OK</button>`);
- dialog(`Sell ${esc(b.name)}`,`<div class="pic">${art(b)}</div><p>Sell <span class="hl">${esc(b.name.toUpperCase())}</span> for <span class="hlg num">${COIN} ${money(sellValue(o))}</span>?</p><p class="s">You get back ${b.sellT===3?'5% of its value':b.sellP+'% of what you invested'}, plus anything stored.</p>`,
+ if(!sellable(o))return dialog("Can't sell",`<div class="pic">${picArt(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> can never be sold.</p><p class="s">${b.threat<0?'Threat reducers stay with you for good.':'Businesses bought with crystals stay with you for good.'}</p>`,`<button class="ok" data-act="close">OK</button>`);
+ dialog(`Sell ${esc(b.name)}`,`<div class="pic">${picArt(b)}</div><p>Sell <span class="hl">${esc(b.name.toUpperCase())}</span> for <span class="hlg num">${COIN} ${money(sellValue(o))}</span>?</p><p class="s">You get back ${b.sellT===3?'5% of its value':b.sellP+'% of what you invested'}, plus anything stored.</p>`,
  `<button class="no" data-act="close">No</button><button class="yes" data-act="dosell">Yes</button>`)}
 // threat colour bands: 1 very low (blue), 2 low (orange), 3 medium (red), 4 high and very high (dark red)
 const thrLevel=th=>th<=0?0:th<10?1:th<30?2:th<50?3:4;
@@ -1863,7 +1872,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'notiflater':try{localStorage.setItem(NASK,String(now()))}catch(e){}closeOv();break;
   case'notifoff':disablePush().then(()=>toast('Notifications off'));break;
   case'named':{const v=($('on').value||'').trim()||'Boss';s.name=v;save();closeOv();
-   dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${art(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
+   dialog(`Welcome, ${esc(v)}!`,`<div class="pic">${picArt(B[0])}</div><p>Here's <span class="hlg num">${COIN} 1,000</span> to start your empire.</p><p class="s">Tap the shop button on the right to buy your first business.</p>`,`<button class="yes" data-act="shop">Let's go</button>`);upd();break}
   case'jnotex':{jailNote=null;const n=$('jnote');if(n){n.classList.add('out');setTimeout(()=>n.remove(),250)}break}
   case'jailhide':jailHid=true;closeOv();updPill();break;
   case'openjail':if(s.jail){jailHid=false;if(ovKind)closeOv();openJail();updPill()}break;
