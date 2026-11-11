@@ -57,6 +57,8 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 #stage{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:pan-y}
 #city{position:absolute;inset:0}
 #city svg{width:100%;height:100%;display:block}
+#city.photo{background:#8EC9F0 url(img/bg-day.webp) no-repeat;background-size:var(--bgw,cover) var(--bgh,auto);background-position:var(--bgx,50%) var(--bgy,60%)}
+.dark #city.photo{background-color:#1D2050;background-image:url(img/bg-night.webp)}
 #art{position:absolute;inset:0;pointer-events:none;z-index:2}
 #art svg{width:100%;height:100%;display:block}
 #art .hit{cursor:pointer}
@@ -1014,7 +1016,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111065,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111066,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1173,12 +1175,20 @@ function advance(t,quiet){let dt=t-s.last;if(dt<0)dt=0;const from=s.last;s.last=
 
 /* ================= stage rendering ================= */
 const stage=$('stage'),artEl=$('art'),colEl=$('column'),layer=$('layer'),panel=$('panel');
-$('city').innerHTML=citySVG(s.world|0);
+// Painted city backgrounds (day and night): one wide image per world, sized to cover the view with the central plaza under the building.
+const BGP={0:{w:2048,h:1150,px:.5,py:.635}}; // px/py: where the plaza's centre is in the image
+const BG_ANCHOR=34; // the spot on the ground (in stage units) that sits on the plaza centre
+function paintCity(w){const c=$('city');if(BGP[w]){c.classList.add('photo');c.dataset.w=w;c.innerHTML=''}else{c.classList.remove('photo');c.innerHTML=citySVG(w)}}
+function placeBG(w,hh){const c=$('city'),b=BGP[c.dataset.w];if(!b||!c.classList.contains('photo')||!VIEW)return;
+ const k=Math.max(w/b.w,hh/b.h)*1.18,W=b.w*k,H=b.h*k,ax=VIEW.ox,ay=VIEW.oy+BG_ANCHOR*VIEW.sc;
+ const x=Math.min(0,Math.max(w-W,ax-b.px*W)),y=Math.min(0,Math.max(hh-H,ay-b.py*H));
+ c.style.setProperty('--bgw',W.toFixed(0)+'px');c.style.setProperty('--bgh',H.toFixed(0)+'px');c.style.setProperty('--bgx',x.toFixed(0)+'px');c.style.setProperty('--bgy',y.toFixed(0)+'px')}
+paintCity(s.world|0);
 function layout(){const w=stage.clientWidth,hh=stage.clientHeight;if(!w||!hh)return;
  {const n=document.querySelectorAll('.tools .tool').length||7,sz=Math.max(30,Math.min(44,Math.floor((hh-24-(n-1)*6)/n)-3));stage.style.setProperty('--tsz',sz+'px')}const sc=Math.max(w/VWc,hh/VHc),ox=w/2,oy=(hh-VHc*sc)/2-VY*sc;
  BW=Math.round(Math.min(84,Math.max(54,w*.17)));BH=Math.round(BW*37/64);
  document.documentElement.style.setProperty('--bw',BW+'px');document.documentElement.style.setProperty('--bh',BH+'px');
- VIEW={sc,ox,oy};const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
+ VIEW={sc,ox,oy};placeBG(w,hh);const px=w-BW-60;stage.style.setProperty('--ox',ox+'px');stage.style.setProperty('--pilex',px+'px');stage.style.setProperty('--pileb',Math.round(hh*.04)+'px');
  SP=Math.max(3.5,BH*.13);PILE=Math.max(12,Math.min(40,Math.floor((hh*.8-BH)/SP)+1));try{stackN=-1}catch(e){}}
 let stageSig='',stackN=-1,VIEW={sc:1,ox:0,oy:0};
 function sigNow(){const o=cur();return(s.world|0)+'|'+freePlots(s.world|0)+'|'+(o?`${o.bid}|${o.busy||''}|${o.level}|${s.owned.length}|${s.cur}`:'none|'+s.owned.length)}
@@ -2394,7 +2404,7 @@ const LOCKSVG='<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10
 let mapIdx=0;
 function travel(w){if(!worldOpen(w))return;const o=cur();s.wlast=s.wlast||{};if(o)s.wlast[s.world|0]=o.bid;s.world=w;s.wseen=Math.max(s.wseen|0,w);
  const want=s.wlast[w];let i=s.owned.findIndex(x=>x.bid===want);if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w&&!isGood(x));if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w);if(i>=0)s.cur=i;
- $('city').innerHTML=citySVG(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
+ paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
 function mapBtnUpd(){const b=document.querySelector('.mapbtn');if(!b)return;b.setAttribute('aria-label','World map: '+WN[s.world|0]);let d=b.querySelector('.wdot');const nu=(s.wopen|0)>(s.wseen|0);if(nu&&!d){d=document.createElement('i');d.className='wdot';b.appendChild(d)}else if(!nu&&d)d.remove()}
 function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'<div class="dio">'+worldLand(WORLDS[w],false)+'</div>'}</div><p>You've reached ${$m(WU[w])}. Buy land in ${WN[w]} and build ${plotsIn(w)} new businesses. Everything you own keeps earning while you're there.</p>`,`<button class="no" data-act="close">Later</button><button class="ok" data-act="travelto" data-w="${w}">Travel there</button>`,'wodlg');const d=document.querySelector('.dlg');if(d)d.classList.add('wodlg')}
 function buyLand(){const w=s.world|0;if(!w)return;if(s.jail)return jailNag();const have=landIn(w);if(have>=plotsIn(w))return;const p=plotPrice(w,have);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
