@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111060,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111061,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2305,7 +2305,8 @@ function perkValue(k){const base=stInc(),xs=s.owned.filter(o=>!o.busy).map(o=>st
  if(k==='clean')return jail*.6; // priced the same whatever your threat is now (you can save it for later): a bit less than a jail-free card
  return 0}
 const stCount=v=>{const b=s.stBuys;return b&&b.day===dayKey(now())?(b.n[v]|0):0};
-const stPrice=(v,min)=>{if(stGem(v))return ST_GEM[v];const isPack=v[0]==='g'&&v.length===2,b=isPack?stCost(min):Math.max(10000,(ST_EDGE[v]||.85)*perkValue(v));return Math.round(b*(ST_FREE[v]?1:Math.pow(ST_UP,stCount(v))))};
+const ST_GEM_UP={mgr8:1}; // these crystal items also cost 25% more for each one bought that day (no daily cap)
+const stPrice=(v,min)=>{if(stGem(v))return ST_GEM_UP[v]?Math.ceil(ST_GEM[v]*Math.pow(ST_UP,stCount(v))):ST_GEM[v];const isPack=v[0]==='g'&&v.length===2,b=isPack?stCost(min):Math.max(10000,(ST_EDGE[v]||.85)*perkValue(v));return Math.round(b*(ST_FREE[v]?1:Math.pow(ST_UP,stCount(v))))};
 // The 8-hour manager costs crystals, not cash: flat price, no daily cap, no rise, but you can only hold ST_HOLD at once.
 const ST_GEM={mgr8:100,boost:45}; // boost: a bit cheaper than ten 3-minute main-screen boosts (10 x 5 = 50 crystals)
 const stGem=v=>ST_GEM[v]!=null,stCan=(v,c)=>stGem(v)?s.gems>=c:s.cash>=c,stTag$=(v,c)=>stGem(v)?`${GEM} ${c.toLocaleString('en-US')}`:`${COIN} ${money(c)}`;
@@ -2313,7 +2314,7 @@ const ST_HOLD={mgr8:3}; // you can hold at most this many (3 managers = 24 hours
 const stHeld=v=>v==='mgr8'?s.perks.mgr.length:(s.perks[v]||0),stFull=v=>ST_HOLD[v]!=null&&stHeld(v)>=ST_HOLD[v];
 const ST_FREE={tap2:1}; // buy as many as you like: no daily cap and no price rise (it keeps people playing)
 const stOut=v=>stFull(v)||(!stGem(v)&&!ST_FREE[v]&&stCount(v)>=ST_CAP);
-const stLine=(v,min)=>stFull(v)?'Wallet full':stGem(v)||ST_FREE[v]?'':stOut(v)?'Sold out today':stCount(v)?`${stCount(v)} of ${ST_CAP} today`:'';
+const stLine=(v,min)=>stFull(v)?'Wallet full':ST_GEM_UP[v]&&stCount(v)?`${stCount(v)} bought today`:stGem(v)||ST_FREE[v]?'':stOut(v)?'Sold out today':stCount(v)?`${stCount(v)} of ${ST_CAP} today`:'';
 const stMins=min=>{min=Math.round(min);return min>=60?(min%60?`${Math.floor(min/60)}h ${min%60}m`:`${min/60}h`):min+'m'};
 const gemStack=n=>(n>=250?PICON.gems:'')+PICON.gems+(n>=80?PICON.gems:'');
 function storeBody(){
@@ -2325,13 +2326,13 @@ function storeBody(){
   <p class="st-note">Each pack costs a bit more every time you buy it in a day, up to 3 a day, and prices reset at midnight. You also earn about 60–100 crystals a day for free from the treasure chest, free gifts, daily chance and missions.</p>`;
  if(storeTab==='perks')return tabs+ST_PERKS.map(([k,min,n,d])=>{const c=stPrice(k,pMin(k,min)),have=k==='mgr8'?s.perks.mgr.filter(h=>h===8).length:(s.perks[k]||0);
   return`<div class="st-perk">${k==='mgr8'?ST_MGR:PICON[k==='boost4'?'boost':k]}<div><b>${n}</b><small>${d}</small>${have?`<i>You have ${have}</i>`:''}</div><button class="st-buy num${stGem(k)?' gem':''} ${stCan(k,c)&&!stOut(k)?'':'off'}" data-act="stask" data-v="${k}"><span>${stTag$(k,c)}</span>${stLine(k,min)?`<small>${stLine(k,min)}</small>`:''}</button></div>`}).join('')+
-  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. 2× boosts and managers cost crystals (hold up to 3 managers at a time). Double taps: buy as many as you like. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
+  `<p class="st-note">Perks go to your perk wallet, ready to use whenever you like. 2× boosts and managers cost crystals. Each extra manager costs a bit more that day, and you can hold up to 3. Double taps: buy as many as you like. Other perks cost a bit more every time you buy one in a day, up to 3 a day, and prices reset at midnight.</p>`;
  return tabs+`<div class="st-soon">Coming with the app: crystal packs for real money. These prices are a preview and can't be bought yet.</div><div class="st-grid st-real">${ST_REAL.map(([n,p],i)=>`<div class="st-pack">${i===3?'<span class="rib best">BEST VALUE</span>':''}<div class="gm">${gemStack(n>=1200?1000:n>=550?250:25)}</div><h4 class="num">${n.toLocaleString('en-US')}<small>crystals</small></h4><button class="st-buy off">${p}<small>In the app</small></button></div>`).join('')}</div>`}
 function openStore(){if(!storeOpen())return sheet('Store',storeLocked(),'store');s.storeSeen=true;stTag();sheet('Store',storeBody(),'store')}
 function stItem(v){if(v[0]==='g'&&v.length===2){const[n,bon]=ST_PACKS[+v[1]];return{n:`${n+Math.round(n*bon/100)} crystals`,min:n*ST_RATE,give:()=>{s.gems+=n+Math.round(n*bon/100);gemLog(n+Math.round(n*bon/100),'Bought with cash')}}}
  const p=ST_PERKS.find(x=>x[0]===v);if(!p)return null;return{n:p[2],min:pMin(v,p[1]),give:()=>{if(v==='mgr8')s.perks.mgr.push(8);else s.perks[v]=(s.perks[v]||0)+1}}}
 function stAsk(v){if(!storeOpen())return openStore();const it=stItem(v);if(!it)return;const c=stPrice(v,it.min);if(s.jail)return jailNag();if(stFull(v))return toast(`You can hold ${ST_HOLD[v]} managers at a time. Use one to buy another`,'bad');if(stOut(v))return toast(`Sold out today. Back at midnight`,'bad');
- dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:ST_FREE[v]?`Buy as many as you like.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
+ dialog('Buy '+esc(it.n)+'?',`<p>Spend <span class="hlg num">${stTag$(v,c)}</span><br>on <span class="hl">${esc(it.n.toUpperCase())}</span>?</p><p class="s">${stGem(v)?`${ST_GEM_UP[v]?(stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:'')+'The next one today will cost a bit more. ':''}You have ${s.gems.toLocaleString('en-US')} crystals.${s.gems<c?` You need ${c-s.gems} more.`:''}`:ST_FREE[v]?`Buy as many as you like.${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`:`${stCount(v)?`You've bought ${stCount(v)} today, so it costs a bit more. `:''}${stCount(v)+1<ST_CAP?'The next one today will cost a bit more.':'This is your last one today.'}${s.cash<c?` You need ${$m(c-s.cash)} more.`:''}`}</p>`,
   `<button class="no" data-act="openstore">No</button><button class="yes" data-act="stbuy" data-v="${v}" data-c="${c}" ${stCan(v,c)?'':'disabled'}>Buy</button>`)}
 window.__stRefresh=()=>{stTag();if(ovKind==='store')openStore()};
 function stBuy(v,c){if(!storeOpen()||stOut(v))return;const it=stItem(v);if(!it||!(c>0)||!stCan(v,c))return toast(stGem(v)?'Not enough crystals':'Not enough cash','bad');if(stGem(v)){s.gems-=c;gemLog(-c,v==='mgr8'?'8-hour managers':v==='boost'?'2× boosts (Store)':'Store')}else{s.cash-=c;s.storeSpent=(s.storeSpent||0)+c}ev('buy',{item:it.n,cur:stGem(v)?'gems':'cash',price:Math.round(c)});{const k=dayKey(now());if(!s.stBuys||s.stBuys.day!==k)s.stBuys={day:k,n:{}};s.stBuys.n[v]=(s.stBuys.n[v]|0)+1}it.give();vib([20,30,20]);toast(`${it.n} added`,'good');save();upd();openStore()}
