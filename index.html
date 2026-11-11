@@ -1005,7 +1005,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111058,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111059,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1292,10 +1292,21 @@ function tapFX(px,py,txt){
  if(S.popOn&&txt){const p=document.createElement('div');p.className='num tfxpop';p.textContent=txt;const o=Math.max(2,Math.round(S.popSize/12));const top=r.top-sr.top+r.height*(img?.11:.02),rise=Math.max(S.popRise,cy-top+S.popSize*1.6);p.style.cssText=`position:absolute;left:${cx+(Math.random()*30-15)*k}px;top:${cy}px;font-family:var(--font);font-weight:900;font-size:${S.popSize}px;letter-spacing:-.5px;white-space:nowrap;transform:translate(-50%,-50%);z-index:6;--o:${o}px`;tfxB.appendChild(p);
   tfxDrop(p,tfxAnim(p,[{transform:'translate(-50%,-50%) scale(.9)',opacity:1},{transform:`translate(-50%,calc(-50% - ${rise*.8}px)) scale(1.05)`,opacity:1,offset:.75},{transform:`translate(-50%,calc(-50% - ${rise}px)) scale(1)`,opacity:0}],1300,'cubic-bezier(.2,.7,.3,1)'),1300)}
 }
+
+// Tapping a full business: the same glow and flash in red, plus a sideways shake instead of a bounce.
+const TFX_FULL={glowCol:'#FF5A4A',haloCol:'#FF2A1A',glowSize:330,glowStr:.85,glowMs:500,flash:.35,halo:16,flashMs:320,shake:9,shakeMs:420};
+function tapFullFX(){const S=TFX_FULL,sr=stage.getBoundingClientRect(),img=artEl.querySelector('image'),hg=artEl.querySelector('.hit');if(!hg&&!img)return;
+ if(!tfxB){artEl.insertAdjacentHTML('beforebegin','<div id="tfxB" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden"></div>');artEl.insertAdjacentHTML('afterend','<div id="tfxF" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;z-index:4;overflow:visible"></div>');tfxB=$('tfxB');tfxF=$('tfxF')}
+ let r;if(img)r=img.getBoundingClientRect();else{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;[...hg.children].forEach((c,i)=>{if(i===0&&c.tagName==='rect')return;const q=c.getBoundingClientRect();if(!q.width)return;x0=Math.min(x0,q.left);y0=Math.min(y0,q.top);x1=Math.max(x1,q.right);y1=Math.max(y1,q.bottom)});r=x1>x0?{left:x0,top:y0,width:x1-x0,height:y1-y0}:hg.getBoundingClientRect()}
+ const cx=r.left-sr.left+r.width/2,cy=r.top-sr.top+r.height*(img?.5:.55),k=Math.max(.45,Math.min(1.8,(img?r.width*804/1024:r.width)/266));
+ const g=document.createElement('div'),sz=S.glowSize*k;g.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;margin:${-sz/2}px 0 0 ${-sz/2}px;border-radius:50%;background:radial-gradient(circle,${S.glowCol} 0%,${S.glowCol}00 68%)`;tfxB.appendChild(g);
+ tfxDrop(g,tfxAnim(g,[{opacity:0,transform:'scale(.05)'},{opacity:S.glowStr,transform:'scale(.85)',offset:.25},{opacity:0,transform:'scale(1)'}],S.glowMs),S.glowMs);
+ tfxAnim(artEl,[{filter:`sepia(1) saturate(6) hue-rotate(-58deg) brightness(${1+S.flash*.4}) drop-shadow(0 0 ${S.halo*k}px ${S.haloCol})`,offset:0},{filter:`sepia(.6) saturate(3.5) hue-rotate(-58deg) brightness(1.05) drop-shadow(0 0 ${S.halo*k*.6}px ${S.haloCol})`,offset:.4},{filter:'sepia(0) saturate(1) hue-rotate(0deg) brightness(1) drop-shadow(0 0 0 transparent)'}],S.flashMs+120,'ease-out');
+ if(!tfxReduce.matches){const a=S.shake*k;artEl.style.transformOrigin='50% 90%';tfxAnim(artEl,[{transform:'translateX(0)'},{transform:`translateX(${-a}px) rotate(-1deg)`,offset:.12},{transform:`translateX(${a}px) rotate(1deg)`,offset:.3},{transform:`translateX(${-a*.7}px) rotate(-.6deg)`,offset:.48},{transform:`translateX(${a*.45}px) rotate(.4deg)`,offset:.66},{transform:`translateX(${-a*.2}px)`,offset:.84},{transform:'translateX(0)'}],S.shakeMs,'linear')}}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
- const room=x.hold-o.stored;if(room<0.005){tapFloat(px,py,'FULL','#E04B3A');vib(3);return}
+ const room=x.hold-o.stored;if(room<0.005){try{tapFullFX()}catch(e){}tapFloat(px,py,'FULL','#E04B3A');vib([8,40,8]);return}
  const v=Math.min(room,x.rate/60*TAP_SEC*bMul()*tapMul());o.stored+=v;s.taps++;s.tapEarned=(s.tapEarned||0)+v;vib(4);try{tapFX(px,py,'+'+tapFmt(v))}catch(e){tapFloat(px,py,'+'+tapFmt(v))}upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
