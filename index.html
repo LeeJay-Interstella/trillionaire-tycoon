@@ -264,6 +264,10 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .toast{background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:10px 14px;box-shadow:0 6px 0 #0003;animation:in .2s;max-width:100%;text-align:center}
 .toast.good{background:var(--green)} .toast.bad{background:var(--red)}
 .dark{--cream:#141A1B;--paper:#0B0F10;--ink:#ECEFE9;color-scheme:dark}
+/* night UI: the same colours about a third darker, so the game isn't glaring at night. The COLLECT money bar keeps its day colours. */
+.dark{--green:#2E7A29;--green-d:#1F5A1B;--lime:#8EA82E;--lime-d:#6E8420;--sky:#3289B8;--sky-d:#246A90;--red:#B23A2D;--orange:#C9583D;--orange-d:#9C3F27;--price:#A7B12F;--teal:#26838B}
+.dark :is(.statgrid b,.lb .v,.card .st .g,#jail .row small,.hlg){color:#7FD17A}.dark .arrow,.dark .pager{border-color:#4E7A55;color:#9BD58F}
+.dark .collect{box-shadow:0 5px 0 #2C7526}.dark .collect:active{box-shadow:0 1px 0 #2C7526}.dark .collect .amt{background:#3E9B37}.dark .collect button{background:#B5D43B;color:#2C7526}
 .dark body{background:#141A1B}
 .dark #app{background:#141A1B}
 .dark #city svg>rect:last-child{fill:#0B0F10;opacity:.66}
@@ -1021,7 +1025,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111073,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111074,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
