@@ -1029,7 +1029,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111084,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111086,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1111,7 +1111,9 @@ const own=bid=>s.owned.find(o=>o.bid===bid);
 const boostOn=()=>now()<s.boostUntil,bMul=()=>boostOn()?(s.boostX||2):1;
 const mgrOn=()=>now()<(s.mgrUntil||0);const cleanOn=()=>now()<(s.cleanUntil||0);
 const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*bMul();
-const threatRaw=()=>s.owned.reduce((a,o)=>a+st(o).threat,0)+dealHeat();
+// a business only affects threat once it's open: good causes and risky businesses alike count once built
+const gcBuilding=o=>o.busy==='build';
+const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
 const nw=()=>s.cash+(s.landVal||0)+(s.dealPaid||[]).reduce((a,d)=>a+d.pay,0)+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
 let friends=[],friendsLoaded=false;
@@ -1147,9 +1149,9 @@ const caught=(th,c)=>th>0&&chance(c)<Math.pow(Math.min(th,100)/100,2)*RAID; // c
 const threatAt=c=>Math.max(0,threatRaw()-(c<(s.cleanUntil||0)?20:0));
 function sentence(th,n){let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;const sev=th<20?'low':th<50?'mid':'high';return{sev,sec:sev==='low'?row[1]:sev==='mid'?row[2]:row[3],row}}
 function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0;let quiet=s.jail?s.jail.until+COOL:(s.coolUntil||0),cards=s.perks.jail||0;
- const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0}));
+ const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0,bld:gcBuilding(o)?o.end:0}));
  for(let c=s.nextCheck;c<t+horizon;c+=30000){if(c<jailEnd||c<quiet)continue;
-  const th=Math.max(0,sim.reduce((a,o)=>a+thrAt(o.b,o.level+(o.up&&c>=o.up?1:0)),0)-(c<(s.cleanUntil||0)?20:0));
+  const th=Math.max(0,sim.reduce((a,o)=>a+(o.bld&&c<o.bld?0:thrAt(o.b,o.level+(o.up&&c>=o.up?1:0))),0)-(c<(s.cleanUntil||0)?20:0));
   if(!caught(th,c))continue;
   if(cards>0&&c<(s.mgrUntil||0)){cards--;quiet=c+COOL;continue}
   const x=sentence(th,n);return{at:c,until:c+x.sec*1000,sec:x.sec,loss:x.sev==='high'}}
@@ -1229,7 +1231,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   `<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`}
  }else if(o.busy){const b=B[o.bid];artEl.innerHTML=onStage(siteArt(0),-110,1.35);artEl.dataset.act='site';
   L+=`<div class="callout"><div class="timer num" id="ctimer"></div><div class="lbl">TAP TO SPEED UP</div></div>`;
-  panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p></div></div>
+  panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p>${(()=>{const x=st(o),d=o.busy==='up'?x.nThreat-x.threat:x.threat;if(Math.abs(d)<.005)return'';const v=Math.round(d*10)/10;return`<p class="ucthr" style="color:${d<0?'var(--green)':'var(--red)'};font-weight:800;font-size:14px;letter-spacing:.3px;margin-top:3px">${d<0?'−'+(-v):'+'+v}% threat when ${o.busy==='up'?'done':d<0?'built':'it opens'}</p>`})()}</div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
  }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTop():TOPS[b.vis]);artEl.dataset.act=x.rate>0?'tapearn':'collect';
   L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
