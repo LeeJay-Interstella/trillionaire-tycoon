@@ -1029,7 +1029,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111086,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111087,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1399,9 +1399,13 @@ const shopBalHTML=()=>`<div class="sbal"><small>AVAILABLE CASH</small><b class="
 const thrShown=()=>Math.round(threatRaw()-(cleanOn()?20:0));
 function sbThr(){const t=$('sbThrT'),b=$('sbThr');if(!t||!b)return;const v=thrShown(),lv=thrLevel(Math.max(0,v));b.textContent=(v<0?'−'+(-v):v)+'%';t.classList.toggle('cov',v<0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
 function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');const h=document.querySelector('.sheet-h');if(h){const d=document.createElement('div');d.className='shopbal';d.innerHTML=shopBalHTML();h.after(d);sbThr()}}
+// saying No to a purchase made from Select business goes back to the shop, where you were
+let shopBack=null;
+function backToShop(){const y=shopBack;shopBack=null;openShop();const sb=$('sb');if(sb&&y!=null)sb.scrollTop=y}
 function askBuy(bid){const b=B[bid];if(s.jail)return jailNag();if(!available(b))return;const p=buyPrice(b);
+ shopBack=ovKind==='shop'?(($('sb')||{}).scrollTop||0):null;
  dialog(`Build ${esc(b.name)}`,`<div class="pic">${picArt(b)}</div><p>${p?`Spend <span class="hlg num">${priceHTML(b,p)}</span> to buy`:'Claim'}<br><span class="hl">${esc(b.name.toUpperCase())}</span>?</p>${b.threat<0?'<p class="s">Lowers your threat. Threat reducers can never be sold.</p>':b.threat>5?`<p class="s">Careful: adds ${b.threat}% threat.</p>`:''}${gemPay(b)?'<p class="s">Crystal businesses can never be sold.</p>':''}`,
-  `<button class="no" data-act="close">No</button><button class="yes" data-act="buy" data-bid="${bid}" ${canPay(b,p)?'':'disabled'}>Yes</button>`)}
+  `<button class="no" data-act="${shopBack!=null?'shopback':'close'}">No</button><button class="yes" data-act="buy" data-bid="${bid}" ${canPay(b,p)?'':'disabled'}>Yes</button>`,shopBack!=null?'askbuy':undefined)}
 function askUpgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);
  if(x.maxed)return dialog('Max level',`<div class="pic">${picArt(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> is already at its highest level.</p>`,`<button class="ok" data-act="close">OK</button>`);
  dialog(`Upgrade ${esc(b.name)}`,`<p>Spend <span class="hlg num">${priceHTML(b,x.up)}</span> to reach <span class="hl">Level ${o.level+1}</span>?</p>
@@ -1835,7 +1839,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
  const a=el.dataset.act,bid=el.dataset.bid!=null?+el.dataset.bid:null;
  if(!NOCHG.has(a))markChg();
  switch(a){
-  case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
+  case'dimclose':if(e.target!==el||ovKind==='name'||ovKind==='choose')break;if(ovKind==='askbuy'){backToShop();break}if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'close':if(['invite','addfriend','unfriend'].includes(ovKind)){lbF='friends';sheet('Rich list',ranksBody(lbF),'ranks')}else closeOv();break;
   case'site':tapSite(e);break;
   case'tapearn':tapEarn(e);break;
@@ -1859,6 +1863,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'finishok':{const o=cur();closeOv();if(!o||!o.busy||o.bid!==+el.dataset.bid)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;gemLog(-c,'Finish upgrades early');s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
   case'shop':if(!s.seenShop){s.seenShop=true;$('getmore')?.remove();save()}openShop();break;
   case'ask':askBuy(bid);break;
+  case'shopback':backToShop();break;
   case'buy':buy(bid);break;
   case'goto':s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();upd();break;
   case'upgrade':askUpgrade();break;case'doupgrade':upgrade();break;
