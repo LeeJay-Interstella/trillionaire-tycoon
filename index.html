@@ -71,7 +71,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 #art.pop{animation:pop .12s}
 @keyframes pop{50%{filter:brightness(1.12)}}
 
-.callout{position:absolute;left:50%;transform:translateX(-50%);top:4%;display:flex;flex-direction:column;align-items:stretch;pointer-events:none;z-index:4;filter:drop-shadow(0 4px 0 #0002)}
+.callout{position:absolute;left:50%;transform:translateX(-50%);top:max(4%,calc(var(--tsz,44px) + 30px));display:flex;flex-direction:column;align-items:stretch;pointer-events:none;z-index:4;filter:drop-shadow(0 4px 0 #0002)}
 .callout .timer{background:var(--green);color:#fff;font-weight:800;font-size:15px;text-align:center;padding:5px 10px}
 .callout .lbl{background:var(--orange);color:#fff;font-weight:900;font-size:clamp(16px,5vw,22px);padding:10px 16px;text-align:center;white-space:nowrap;position:relative}
 .callout .lbl::after{content:"";position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);border:12px solid transparent;border-bottom:0;border-top-color:var(--orange)}
@@ -1029,7 +1029,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111088,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111090,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1363,7 +1363,9 @@ function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return
  pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));{const L=grp(false).concat(grp(true));if(L.length&&!cur())s.cur=L[0]}toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
 const isGood=o=>!!o&&!(B[o.bid].rate>0); // good causes earn nothing and lower threat
-const grp=g=>s.owned.map((o,i)=>i).filter(i=>B[s.owned[i].bid].w===(s.world|0)&&isGood(s.owned[i])===g);
+// businesses step in tier order (cheapest first within a tier), not the order they were bought
+const grpKey=i=>{const b=B[s.owned[i].bid];return b.tier*1e6+b.id};
+const grp=g=>s.owned.map((o,i)=>i).filter(i=>B[s.owned[i].bid].w===(s.world|0)&&isGood(s.owned[i])===g).sort((x,y)=>grpKey(x)-grpKey(y));
 function step(d){const o=cur();if(!o)return;const L=grp(isGood(o));if(L.length<2)return;const p=Math.max(0,L.indexOf(s.cur));s.cur=L[(p+d+L.length)%L.length];upd()}
 function showGroup(g){const o=cur();if(o&&isGood(o)===g)return;if(o){s.vLast=s.vLast||{};s.vLast[isGood(o)?'g':'b']=o.bid}const L=grp(g);if(!L.length)return;const w=(s.vLast||{})[g?'g':'b'];const i=s.owned.findIndex(x=>x.bid===w);s.cur=L.includes(i)?i:L[0];vib(8);upd()}
 
