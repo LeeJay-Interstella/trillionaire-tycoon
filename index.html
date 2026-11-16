@@ -35,6 +35,7 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .rate{display:inline-flex;align-items:center;gap:4px;background:#ffffff26;color:#fff;font-weight:900;font-size:12px;letter-spacing:.2px;text-transform:none;padding:3px 8px;border-radius:999px;white-space:nowrap}
 .rate:empty{display:none}
 .rate.rboost{background:var(--lime);color:var(--green-d);animation:ratepulse 1.2s ease-in-out infinite}
+.rate.rtap{background:#ffffffe6;color:var(--green-d);transition:background .3s}
 .rate.rfrozen{background:#00000026;color:#ffffffb3}
 @keyframes ratepulse{50%{opacity:.72}}
 .t-nw b{font-size:clamp(30px,10vw,42px)}
@@ -1029,7 +1030,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111093,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111098,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1272,11 +1273,23 @@ function rain(){const o=cur();if(!o||o.busy||document.hidden)return;const x=st(o
 
 /* ================= HUD ================= */
 let shownCash=null,cashTween=0;
+// taps count towards the /min badge: what you earned tapping over the last 2s, back to normal as soon as you pause (0.7s)
+const TAP_WIN=2000,TAP_IDLE=330;let tapLog=[];
+// a pause is 1.5x your recent gap between taps (150-250ms), so it reacts as soon as you stop
+function tapIdle(){const n=tapLog.length;if(n<2)return 250;const k=Math.min(4,n-1),g=(tapLog[n-1][0]-tapLog[n-1-k][0])/k;return Math.max(150,Math.min(250,g*1.5))}
+function tapRate(){const t=performance.now();if(!tapLog.length||t-tapLog[tapLog.length-1][0]>tapIdle()){tapLog=[];return 0}tapLog=tapLog.filter(([at])=>t-at<TAP_WIN);return tapLog.reduce((a,[at,v])=>a+v*(1-(t-at)/TAP_WIN),0)/(TAP_WIN/2)*60000}
+// the badge number rolls towards its target like a ticker: up while you tap, quickly back down when you stop
+let rateV=null,rateT={v:0,base:0,on:false,sfx:''};
+(function rateLoop(){requestAnimationFrame(rateLoop);const r=$('nwrate');if(!r||!rateT.on||rateV===null)return;const tg=rateT.base+tapRate(),d=tg-rateV;rateT.v=tg;if(Math.abs(d)<Math.max(1,rateT.v*1e-4)){if(rateV!==rateT.v){rateV=rateT.v;r.textContent=`▲ ${$m(rateV)}/min${rateT.sfx}`}return}
+ rateV+=d*(d<0?.6:.35);r.textContent=`▲ ${$m(rateV)}/min${rateT.sfx}`})();
+function ratePulse(){const r=$('nwrate');if(!r||!r.textContent)return;try{r.animate([{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'},{transform:'scale(1.16)',boxShadow:'0 0 14px 4px rgba(215,245,66,.85)',offset:.35},{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'}],{duration:320,easing:'cubic-bezier(.2,.9,.3,1)'})}catch(e){}}
 function hud(){pmUI();dealUI();$('nw').textContent=money(nw());
  {const r=$('nwrate'),inc=income(),jailed=!!(s.jail&&s.jail.until>now());
-  r.textContent=jailed?`▲ ${$m(inc*JAIL_RATE)}/min · convicted`:inc>0?`▲ ${$m(inc)}/min${boostOn()?` · ${s.boostX||2}×`:''}`:'';
-  r.className='rate num'+(jailed?' rfrozen':boostOn()&&inc>0?' rboost':'');
-  r.setAttribute('aria-label',jailed?'Earning at half speed while convicted':`Earning ${$m(inc)} per minute`)}if(shownCash===null||s.cash<shownCash||performance.now()-cashTween>1500)shownCash=s.cash;else shownCash+=(s.cash-shownCash)*.3;$('cash').textContent=money(shownCash);$('gm').textContent=s.gems;
+  const tr=jailed?0:tapRate(),tot=inc+tr,tapping=tr>inc*.002;
+  rateT={v:tot,base:inc,on:!jailed&&tot>0,sfx:boostOn()?` · ${s.boostX||2}×`:''};if(rateV===null||jailed)rateV=tot;
+  r.textContent=jailed?`▲ ${$m(inc*JAIL_RATE)}/min · convicted`:tot>0?`▲ ${$m(rateV)}/min${rateT.sfx}`:'';
+  r.className='rate num'+(jailed?' rfrozen':boostOn()&&inc>0?' rboost':tapping?' rtap':'');
+  r.setAttribute('aria-label',jailed?'Earning at half speed while convicted':`Earning ${$m(tot)} per minute${tapping?', including your taps':''}`)}if(shownCash===null||s.cash<shownCash||performance.now()-cashTween>1500)shownCash=s.cash;else shownCash+=(s.cash-shownCash)*.3;$('cash').textContent=money(shownCash);$('gm').textContent=s.gems;
  const fit=(id,t)=>{const e=$(id).parentElement,n=t.length;e.style.fontSize=n>6?'15px':n>4?'18px':''};fit('gm',String(s.gems));fit('cash',money(s.cash));
  const th=threat(),thv=Math.round(threatRaw()-(cleanOn()?20:0));$('thr').textContent=(thv<0?'−'+(-thv):thv)+'%';{const t=$('thrT'),lv=thrLevel(th);t.classList.toggle('hot',th>0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
  const fr=s.freeAt<=now();$('freeTag').textContent=fr?'FREE':dur((s.freeAt-now())/1000);$('freeTag').className=fr?'tag':'tag sm';
@@ -1357,7 +1370,7 @@ function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rat
  if(room<0.005&&!mg){try{tapFullFX()}catch(e){}tapFloat(px,py,'FULL','#E04B3A');vib([8,40,8]);return}
  const v=Math.min(Math.max(0,room),full),ex=mg?full-v:0;o.stored+=v;
  if(ex>0){bank(ex,1);s.earned+=ex}
- const got=v+ex;s.taps++;s.tapEarned=(s.tapEarned||0)+got;vib(4);try{tapFX(px,py,'+'+tapFmt(got))}catch(e){tapFloat(px,py,'+'+tapFmt(got))}upd()}
+ const got=v+ex;tapLog.push([performance.now(),got]);ratePulse();s.taps++;s.tapEarned=(s.tapEarned||0)+got;vib(4);try{tapFX(px,py,'+'+tapFmt(got))}catch(e){tapFloat(px,py,'+'+tapFmt(got))}upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
