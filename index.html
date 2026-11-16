@@ -35,6 +35,8 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .rate{display:inline-flex;align-items:center;gap:4px;background:#ffffff26;color:#fff;font-weight:900;font-size:12px;letter-spacing:.2px;text-transform:none;padding:3px 8px;border-radius:999px;white-space:nowrap}
 .rate:empty{display:none}
 .rate.rboost{background:var(--lime);color:var(--green-d);animation:ratepulse 1.2s ease-in-out infinite}
+.t-nw{position:relative;z-index:3}.t-nw small.nwrow{overflow:visible}.rate{position:relative;z-index:4;transform-origin:50% 50%}
+#rateFx{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:400}
 .rate.rtap{background:#ffffffe6;color:var(--green-d);transition:background .3s}
 .rate.rfrozen{background:#00000026;color:#ffffffb3}
 @keyframes ratepulse{50%{opacity:.72}}
@@ -1030,7 +1032,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111098,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111099,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1282,7 +1284,17 @@ function tapRate(){const t=performance.now();if(!tapLog.length||t-tapLog[tapLog.
 let rateV=null,rateT={v:0,base:0,on:false,sfx:''};
 (function rateLoop(){requestAnimationFrame(rateLoop);const r=$('nwrate');if(!r||!rateT.on||rateV===null)return;const tg=rateT.base+tapRate(),d=tg-rateV;rateT.v=tg;if(Math.abs(d)<Math.max(1,rateT.v*1e-4)){if(rateV!==rateT.v){rateV=rateT.v;r.textContent=`▲ ${$m(rateV)}/min${rateT.sfx}`}return}
  rateV+=d*(d<0?.6:.35);r.textContent=`▲ ${$m(rateV)}/min${rateT.sfx}`})();
-function ratePulse(){const r=$('nwrate');if(!r||!r.textContent)return;try{r.animate([{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'},{transform:'scale(1.16)',boxShadow:'0 0 14px 4px rgba(215,245,66,.85)',offset:.35},{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'}],{duration:320,easing:'cubic-bezier(.2,.9,.3,1)'})}catch(e){}}
+// each tap: the badge pops with a lime glow and throws a few stars, like the business tap. Drawn in a fixed layer so nothing clips it
+function ratePulse(){const r=$('nwrate');if(!r||!r.textContent)return;
+ try{r.animate([{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'},{transform:'scale(1.1)',boxShadow:'0 0 16px 5px rgba(215,245,66,.9)',offset:.35},{transform:'scale(1)',boxShadow:'0 0 0 0 rgba(215,245,66,0)'}],{duration:340,easing:'cubic-bezier(.2,.9,.3,1)'})}catch(e){}
+ try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;let L=$('rateFx');if(!L){L=document.createElement('div');L.id='rateFx';document.body.appendChild(L)}
+  const b=r.getBoundingClientRect(),cx=b.left+b.width/2,cy=b.top+b.height/2;
+  const g=document.createElement('div');g.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:${b.width*1.6}px;height:${b.height*3.2}px;margin:${-b.height*1.6}px 0 0 ${-b.width*.8}px;border-radius:50%;background:radial-gradient(closest-side,rgba(215,245,66,.55),rgba(215,245,66,0));mix-blend-mode:screen`;L.appendChild(g);
+  g.animate([{opacity:1,transform:'scale(.6)'},{opacity:0,transform:'scale(1.2)'}],{duration:420,easing:'ease-out'}).onfinish=()=>g.remove();
+  for(let i=0;i<4;i++){const a=-Math.PI*(.1+Math.random()*.8)+(Math.random()<.35?Math.PI:0),d=26+Math.random()*30,z=10+Math.random()*7,sp=document.createElement('div');
+   sp.style.cssText=`position:absolute;left:${cx+(Math.random()-.5)*b.width*.7}px;top:${cy}px;width:${z}px;height:${z}px;margin:${-z/2}px 0 0 ${-z/2}px`;
+   sp.innerHTML=`<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0L12.4 7.6 20 10 12.4 12.4 10 20 7.6 12.4 0 10 7.6 7.6z" fill="${i%2?'#FFFFFF':'#D7F542'}"/></svg>`;L.appendChild(sp);
+   sp.animate([{transform:'translate(0,0) scale(.3) rotate(0deg)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(1) rotate(120deg)`,opacity:1,offset:.55},{transform:`translate(${Math.cos(a)*d*1.3}px,${Math.sin(a)*d*1.3+8}px) scale(.2) rotate(200deg)`,opacity:0}],{duration:520+Math.random()*180,easing:'cubic-bezier(.2,.8,.4,1)'}).onfinish=()=>sp.remove()}}catch(e){}}
 function hud(){pmUI();dealUI();$('nw').textContent=money(nw());
  {const r=$('nwrate'),inc=income(),jailed=!!(s.jail&&s.jail.until>now());
   const tr=jailed?0:tapRate(),tot=inc+tr,tapping=tr>inc*.002;
