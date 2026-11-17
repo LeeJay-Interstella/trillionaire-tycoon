@@ -699,6 +699,12 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dm.in{align-self:flex-start;background:#2C3537;color:#EEF1EE;border-bottom-left-radius:5px}
 .dm.out{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:5px}
 .dm .g{color:#7EDB6F}.dm small{font-size:12px;color:#9AA39D}
+.dm.dcard{padding:10px 14px 12px;min-width:62%}
+.dcard .dbig{font-family:var(--num,inherit);font-size:30px;font-weight:900;color:#7EDB6F;line-height:1.05;letter-spacing:-.5px}
+.dcard .dflow{font-size:13px;color:#C9D0CB;margin-top:2px}.dcard .dflow b{color:#fff}
+.dsys .g{color:#7EDB6F}
+.dcard .dchips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.dcard .dchip{font-size:12px;font-weight:900;padding:4px 9px;border-radius:99px;background:#1C2425;display:inline-flex;gap:5px;align-items:center}
 .dsys{align-self:center;font-size:11px;font-weight:800;color:#9AA39D;padding:4px 0;text-align:center}
 .dsys b{color:#F5B946}.dsys.bad{color:#FF8A73}
 .dempty{margin:auto 0;font-size:13px;line-height:1.5}
@@ -1086,7 +1092,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111712,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111713,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2399,10 +2405,8 @@ function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now();
  const after=Math.round(threatRaw()-(cleanOn()?20:0)+(c&&c.reply==='in'?0:d.add)),col=bandCol(after),run=c&&c.reply==='in'?(s.deals||[]).find(x=>x.at===d.at):null;
  const inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
  let h=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(d.text))+
-  inc(`You put in <b>${$m(d.cost)}</b>, you get <b class="g">${$m(d.pay)}</b> back in <b>${d.sec/60} min</b>. That's <b class="g">+${$m(d.pay-d.cost)}</b>.`)+
-  inc(`Heat: <b style="color:${col}">+${d.add}%</b> ${d.tier===2?'🚨':d.tier===1?'👀':'🤫'}<br><small>You'd be on <b style="color:${col}">${Math.max(0,after)}%</b></small>`)+
-  inc(dealRisk(d.tier,after)<=0?`Risk of getting caught: <b style="color:var(--green)">0%</b> 😇<br><small>Your good causes cover the heat.</small>`:`Risk of getting caught: <b style="color:${col}">${riskTxt(dealRisk(d.tier,after))}</b><br><small>Lower your threat and the risk drops.</small>`);
- if(c&&c.reply==='in')h+=out(`I'm in. Sending ${$m(d.cost)} 💸`)+inc(`Pleasure doing business, boss. ${$m(d.pay)} coming your way.`)+(run?`<div class="dsys">⏱ Pays out in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b> · <span id="dealRk">${riskTxt(dealRisk(run.tier,threatAt(t)))}</span> risk</div>`:`<div class="dsys">✓ Paid out</div>`);
+  `<div class="dm in dcard"><div class="dbig num">+${$m(d.pay-d.cost)}</div><div class="dflow num"><b>${$m(d.cost)}</b> → <b>${$m(d.pay)}</b> · ${d.sec/60} min</div><div class="dchips"><span class="dchip" style="color:${col}">${d.tier===2?'🚨':d.tier===1?'👀':'🤫'} Heat +${d.add}%</span>${dealRisk(d.tier,after)<=0?`<span class="dchip" style="color:#7EDB6F">😇 0% risk</span>`:`<span class="dchip" style="color:${col}">🚔 ${riskTxt(dealRisk(d.tier,after))} risk</span>`}</div></div>`;
+ if(c&&c.reply==='in')h+=out(`I'm in 💸`)+inc(`Pleasure, boss. 🤝`)+(run?`<div class="dsys">⏱ <b class="g num">${$m(d.pay)}</b> in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b> · <span id="dealRk">${riskTxt(dealRisk(run.tier,threatAt(t)))}</span> risk</div>`:`<div class="dsys">✓ Paid out</div>`);
  else if(c&&c.reply==='pass')h+=out('Not this time.')+inc("Your loss. I'll find someone else 🤷");
  else h+=`<div class="dsys">Offer expires in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
  const busy=(s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX,poor=s.cash<d.cost;
