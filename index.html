@@ -1015,11 +1015,12 @@ const bimgUrl=c=>`img/${c}${BIMG_N[c]&&document.documentElement.classList.contai
 const BIMG_W=258; // the widest a painted building shows, in stage units (the drawn buildings are about 214 wide)
 const BIMG_H=BIMG_W*797/802; // and the tallest (so tall, narrow buildings aren't blown up past the others)
 const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher number here moves the building up (desktop sits it lower)
-// every painted image is drawn at the same scale (they share a 1024 canvas), so a small stand stays small and a tier-8
-// giant stays big; the bounding box only positions it (centred, sitting on the ground line)
-const BIMG_K=.28;
-function bizArt(b){const m=BIMG[b.code];if(!m)return art(b);const[x0,y0,x1,y1]=m,k=Math.min(BIMG_K,BIMG_W/(x1-x0),BIMG_H*1.08/(y1-y0)),S=1024*k;
- return `<svg viewBox="0 0 1 1"><image href="${bimgUrl(b.code)}" data-bb="${m.join(',')}" x="${(-(x0+x1)/2*k).toFixed(1)}" y="${(69-(y1+1)*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
+// painted art is sized by tier: a tier-1 stand shows about 230 stage units wide, a tier-8 giant about 300 (the visible stage is
+// ~440 wide on a phone, with the side buttons on the right), never taller than 320. Each one is centred in the open sky between
+// the top bar and the bottom buttons, so small buildings don't sit low on the ground line.
+const BIMG_T1=230,BIMG_T8=300,BIMG_HMAX=320,BIMG_CY=-112;
+function bizArt(b){const m=BIMG[b.code];if(!m)return art(b);const[x0,y0,x1,y1]=m,t=Math.max(1,Math.min(8,b.tier||1)),W=BIMG_T1+(t-1)*(BIMG_T8-BIMG_T1)/7,k=Math.min(W/(x1-x0),BIMG_HMAX/(y1-y0)),S=1024*k;
+ return `<svg viewBox="0 0 1 1"><image href="${bimgUrl(b.code)}" data-bb="${m.join(',')}" x="${(-(x0+x1)/2*k).toFixed(1)}" y="${(BIMG_CY-(y0+y1)/2*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`}
 // Small pictures (shop cards and popups): the same image file, cropped to the building.
 function picArt(b){const m=BIMG[b.code];if(!m)return art(b);const[x0,y0,x1,y1]=m,p=24;
  return `<svg viewBox="${x0-p} ${y0-p} ${x1-x0+2*p} ${y1-y0+2*p}" preserveAspectRatio="xMidYMax meet"><image href="${bimgUrl(b.code)}" width="1024" height="1024" loading="lazy" decoding="async"/></svg>`}
@@ -1082,7 +1083,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111709,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111710,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
