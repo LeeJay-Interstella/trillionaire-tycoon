@@ -1079,7 +1079,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111704,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111705,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1165,15 +1165,18 @@ const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*bMul();
 const gcBuilding=o=>o.busy==='build';
 // goodwill: tapping a good cause permanently chips a little more off threat, weighted by the cause (like income per business).
 // each tap adds 0.01% of what the cause removes; every cause holds up to 50 taps and earns one back every ~5 min (full in 4h);
-// a cause's goodwill tops out at half its own reduction
+// a cause's goodwill tops out at half of one upgrade
 const GW_TAP=.0001,GW_DAY=50,GW_HRS=4,GW_LIFE=.5,GW_REGEN=GW_HRS*36e5/GW_DAY;
 const gwEn=o=>{const e=o.gwe;if(!e)return GW_DAY;return Math.min(GW_DAY,e.n+Math.max(0,now()-e.t)/GW_REGEN)};
 const gwNext=o=>{const e=gwEn(o);return e>=GW_DAY?0:(1-(e%1))*GW_REGEN};
 const gwBase=o=>Math.abs(Math.min(0,st(o).threat));
-const gwMax=o=>gwBase(o)*GW_LIFE;
+// cap: goodwill on a cause is worth at most half of one upgrade (the next level's gain, or the last one at max level),
+// so tapping can never beat paying for upgrades
+const gwStep=o=>{const b=B[o.bid],L=o.level,mx=Math.min(MAXL,b.maxL||MAXL);const d=L<mx?thrAt(b,L+1)-thrAt(b,L):thrAt(b,L)-thrAt(b,Math.max(1,L-1));return Math.abs(d)};
+const gwMax=o=>gwStep(o)*GW_LIFE;
 const gwAtO=o=>Math.min(+o.gw||0,gwMax(o));
 const gwAt=()=>s.owned.reduce((a,o)=>a+(o.gw&&isGood(o)&&!gcBuilding(o)?gwAtO(o):0),0);
-const gwLeft=o=>{if(gwAtO(o)>=gwMax(o)-1e-9)return'maxed';const e=Math.floor(gwEn(o));return e>=GW_DAY?`${GW_DAY}/${GW_DAY} ready`:`${e}/${GW_DAY} · +1 in ${dur(Math.ceil(gwNext(o)/1e3))}`};
+const gwLeft=o=>{if(gwAtO(o)>=gwMax(o)-1e-9)return'Maxed · upgrade for more';const e=Math.floor(gwEn(o));return e>=GW_DAY?`${GW_DAY}/${GW_DAY} ready`:`${e}/${GW_DAY} · +1 in ${dur(Math.ceil(gwNext(o)/1e3))}`};
 const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v>=.01?v.toFixed(3):v.toFixed(4);
 const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat()-gwAt();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
@@ -1441,7 +1444,7 @@ function gemTapRoll(px,py){if(gemTapToday()>=GEM_TAP_DAY||Math.random()>=GEM_TAP
   if(s.tapGem.n>=GEM_TAP_DAY)toast(`That's today's ${GEM_TAP_DAY} lucky crystals. More tomorrow!`);save()},120)}
 function gwUi(){const l=$('lgw'),n=$('lgwn'),o=cur();if(l&&o){const v=gwAtO(o);l.textContent=v>0?'−'+gwPct(v)+'%':'0%'}if(n&&o)n.textContent=gwLeft(o);const f=$('lgwf');if(f&&o)f.style.width=(gwEn(o)/GW_DAY*100)+'%'}
 function gwTap(ev){const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2,o=cur(),m=gwMax(o),v=gwAtO(o),add=gwBase(o)*GW_TAP,n=gwEn(o);
- if(!(m>0))return;if(v>=m-1e-9){tapFloat(px,py,'Goodwill maxed','#2F8DC0');vib(6);return}
+ if(!(m>0))return;if(v>=m-1e-9){tapFloat(px,py,'Maxed · upgrade for more','#2F8DC0');vib(6);return}
  if(n<1){tapFloat(px,py,'Next tap in '+dur(Math.ceil(gwNext(o)/1e3)),'#2F8DC0');vib(6);return}
  o.gw=Math.min(m,v+add);o.gwe={n:n-1,t:now()};if(n-1<1)toast(`${esc(B[o.bid].name)} is out of goodwill taps. They recharge one every ${Math.round(GW_REGEN/6e4)} minutes, and your other good causes still have some.`,'good');save();tapFloat(px,py,'−'+gwPct(add)+'%','#3E9B37');vib(6);gwUi();hud();if(ovKind==='shop'||ovKind==='store')sbThr();s.taps=(s.taps||0)+1}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return gwTap(ev);
