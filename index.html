@@ -187,6 +187,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .card h4{margin:0;color:var(--teal);font-weight:900;font-size:14px;text-align:center;text-transform:uppercase;line-height:1.1;min-height:2.2em;display:flex;align-items:center;justify-content:center}
 .card .pic{height:92px;margin:4px 0}
 .card .pic svg{width:100%;height:100%}
+.card .gemtap{align-self:flex-start;display:inline-flex;align-items:center;gap:4px;background:var(--sky);color:#fff;font-size:10px;font-weight:900;padding:2px 6px;margin:-2px 0 4px}.card .gemtap .gemi{width:9px;height:9px}
 .card .tier{align-self:flex-start;background:var(--green-d);color:#fff;font-size:10px;font-weight:900;padding:2px 6px;margin-bottom:4px}
 .card .st{display:grid;grid-template-columns:auto auto 1fr;column-gap:4px;font-size:11.5px;font-weight:700;line-height:1.45}
 .card .st .g{color:var(--green)} .card .st .r{color:var(--red)}
@@ -212,6 +213,12 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .code{background:#22301F}
 .tabs2{display:flex;gap:4px;padding:6px}
 .shoptabs{position:sticky;top:0;z-index:3;background:#E7E7E2}.dark .shoptabs{background:#0F1415}
+.tierjump{display:flex;gap:4px;padding:0 6px 6px;overflow-x:auto;scrollbar-width:none}.tierjump::-webkit-scrollbar{display:none}
+.tierjump button{flex:1 0 auto;min-width:38px;padding:6px 6px;border-radius:99px;background:#fff;color:var(--green-d);font-weight:900;font-size:12px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:2px;transition:background .15s,border-color .15s}
+.tierjump button i{font-style:normal;font-size:9px;opacity:.7}
+.tierjump button.lk{color:#999}
+.tierjump button.on{background:var(--green-d);color:var(--lime);border-color:var(--green-d)}
+.dark .tierjump button{background:#1C2425;color:#ECEFE9}.dark .tierjump button.lk{color:#6b7476}.dark .tierjump button.on{background:var(--lime);color:var(--green-d);border-color:var(--lime)}
 .tabs2 button{flex:1;padding:9px 4px;background:#fff;font-weight:800;font-size:12px;color:#777;text-transform:uppercase}
 .tabs2 button.on{background:var(--lime);color:var(--green-d)}
 .mail{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:#fff;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));border-bottom:2px solid #E7E7E2}
@@ -1032,7 +1039,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111099,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111701,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1241,7 +1248,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
-   ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span></div>`:
+   ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span>${gemTapBiz(b)?`<span style="color:var(--sky)">Lucky taps</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)">${GEM} <span id="lgem">${gemTapToday()}</span>/${GEM_TAP_DAY} today</span>`:''}</div>`:
     `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span></div>`}</div></div>
    ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
@@ -1373,6 +1380,13 @@ function tapFullFX(){const S=TFX_FULL,sr=stage.getBoundingClientRect(),img=artEl
  tfxDrop(g,tfxAnim(g,[{opacity:0,transform:'scale(.05)'},{opacity:S.glowStr,transform:'scale(.85)',offset:.25},{opacity:0,transform:'scale(1)'}],S.glowMs),S.glowMs);
  tfxAnim(artEl,[{filter:`sepia(1) saturate(6) hue-rotate(-58deg) brightness(${1+S.flash*.4}) drop-shadow(0 0 ${S.halo*k}px ${S.haloCol})`,offset:0},{filter:`sepia(.6) saturate(3.5) hue-rotate(-58deg) brightness(1.05) drop-shadow(0 0 ${S.halo*k*.6}px ${S.haloCol})`,offset:.4},{filter:'sepia(0) saturate(1) hue-rotate(0deg) brightness(1) drop-shadow(0 0 0 transparent)'}],S.flashMs+120,'ease-out');
  if(!tfxReduce.matches){const a=S.shake*k;artEl.style.transformOrigin='50% 90%';tfxAnim(artEl,[{transform:'translateX(0)'},{transform:`translateX(${-a}px) rotate(-1deg)`,offset:.12},{transform:`translateX(${a}px) rotate(1deg)`,offset:.3},{transform:`translateX(${-a*.7}px) rotate(-.6deg)`,offset:.48},{transform:`translateX(${a*.45}px) rotate(.4deg)`,offset:.66},{transform:`translateX(${-a*.2}px)`,offset:.84},{transform:'translateX(0)'}],S.shakeMs,'linear')}}
+// Lucky taps: tapping these gem/treasure businesses can turn up a crystal. ~1 in 150 taps, at most 5 a day in total
+const GEM_TAP={ltm:1,cms:1,jws:1,awd:1,clm:1,mnm:1,skm:1,bb10:1,dc04:1,dc12:1,dc20:1,gc08:1},GEM_TAP_P=1/150,GEM_TAP_DAY=5;
+const gemTapBiz=b=>!!GEM_TAP[b.code];
+const gemTapToday=()=>{const d=new Date().toDateString();if(!s.tapGem||s.tapGem.d!==d)s.tapGem={d,n:0};return s.tapGem.n};
+function gemTapRoll(px,py){if(gemTapToday()>=GEM_TAP_DAY||Math.random()>=GEM_TAP_P)return;s.gems+=1;s.tapGem.n++;gemLog(1,'taps');{const l=$('lgem');if(l)l.textContent=s.tapGem.n}
+ setTimeout(()=>{tapFloat(px,py-56,'+1 crystal','#5BC7F5');vib([10,30,10]);try{const t=document.querySelector('.t-cry');t&&t.animate([{transform:'scale(1)',filter:'brightness(1)'},{transform:'scale(1.12)',filter:'brightness(1.4)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:450})}catch(e){}
+  if(s.tapGem.n>=GEM_TAP_DAY)toast(`That's today's ${GEM_TAP_DAY} lucky crystals. More tomorrow!`);save()},120)}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
@@ -1382,7 +1396,7 @@ function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rat
  if(room<0.005&&!mg){try{tapFullFX()}catch(e){}tapFloat(px,py,'FULL','#E04B3A');vib([8,40,8]);return}
  const v=Math.min(Math.max(0,room),full),ex=mg?full-v:0;o.stored+=v;
  if(ex>0){bank(ex,1);s.earned+=ex}
- const got=v+ex;tapLog.push([performance.now(),got]);ratePulse();s.taps++;s.tapEarned=(s.tapEarned||0)+got;vib(4);try{tapFX(px,py,'+'+tapFmt(got))}catch(e){tapFloat(px,py,'+'+tapFmt(got))}upd()}
+ const got=v+ex;if(got>0&&gemTapBiz(B[o.bid]))gemTapRoll(px,py);tapLog.push([performance.now(),got]);ratePulse();s.taps++;s.tapEarned=(s.tapEarned||0)+got;vib(4);try{tapFX(px,py,'+'+tapFmt(got))}catch(e){tapFloat(px,py,'+'+tapFmt(got))}upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
@@ -1410,20 +1424,24 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const btn=o?`<button class="price own" data-act="goto" data-bid="${b.id}">OWNED · LV ${o.level}</button>`:!open?`<div class="price off num" style="white-space:nowrap"><svg viewBox="0 0 16 18" style="width:14px;height:16px;flex:none" aria-label="Locked" role="img"><rect x="2" y="8" width="12" height="9" rx="2" fill="currentColor"/><path d="M5 8V5.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2"/></svg>${b.secret?'FREE':priceHTML(b,b.price)}</div>`:!ok?`<div class="price off" style="font-size:11px;padding:8px">${esc(reqText(b))}</div>`:!land?`<div class="price off" style="font-size:11px;padding:8px">Buy a plot of land first</div>`:
   `<button class="price num ${canPay(b,buyPrice(b))?'':'off'}" data-act="ask" data-bid="${b.id}">${b.secret?'FREE':priceHTML(b,b.price)}</button>`;
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
- return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>
+ return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
 function landBar(w){const n=plotsIn(w),have=landIn(w),free=have-usedIn(w),p=plotPrice(w,have);
  return`<div class="landbar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l9-5 9 5-9 4zM12 15V4M12 4l6 3-6 3"/></svg><div><b>Land · ${have}/${n} plots</b><span>${free} free to build on${have<n?' · next plot':''}</span></div>${have<n?`<button class="price num ${s.cash>=p?'':'off'}" data-act="land">${COIN} ${money(p)}</button>`:'<span class="all">All plots owned</span>'}</div>`}
 // Select business filter: everything, money makers only, or good causes only
 let shopF='all';const shopOK=b=>shopF==='all'||(shopF==='good')===!(b.rate>0);
-const shopTabs=()=>`<div class="tabs2 shoptabs">${[['all','All'],['biz','Businesses'],['good','Good causes']].map(([k,l])=>`<button type="button" data-act="shopf" data-v="${k}" class="${shopF===k?'on':''}" aria-pressed="${shopF===k}">${l}</button>`).join('')}</div>`;
+// tier jump bar: one chip per tier, tap to go straight to it (main world only)
+const tierJump=()=>{if(s.world|0)return'';let h='';for(let t=1;t<TIERS.length;t++){if(!B.some(b=>b.tier===t&&b.w===0&&shopOK(b)))continue;h+=`<button type="button" data-act="tierjump" data-t="${t}" class="${t>s.tier?'lk':''}" aria-label="Tier ${t} ${TIERS[t]}">${t>s.tier?'<i>🔒</i>':''}T${t}</button>`}return`<div class="tierjump">${h}</div>`};
+const shopTabs=()=>`<div class="shoptabs"><div class="tabs2">${[['all','All'],['biz','Businesses'],['good','Good causes']].map(([k,l])=>`<button type="button" data-act="shopf" data-v="${k}" class="${shopF===k?'on':''}" aria-pressed="${shopF===k}">${l}</button>`).join('')}</div>${tierJump()}</div>`;
+function tierSpy(){const sb=$('sb');if(!sb)return;const st=sb.querySelector('.shoptabs'),top=sb.getBoundingClientRect().top+(st?st.offsetHeight:0)+6;let cur=0;sb.querySelectorAll('.tierh[data-t]').forEach(h=>{if(h.getBoundingClientRect().top<=top)cur=+h.dataset.t});if(!cur){const f=sb.querySelector('.tierh[data-t]');cur=f?+f.dataset.t:0}sb.querySelectorAll('.tierjump button').forEach(b=>b.classList.toggle('on',+b.dataset.t===cur))}
+function tierGo(t){const sb=$('sb'),h=sb&&sb.querySelector(`.tierh[data-t="${t}"]`);if(!h)return;const st=sb.querySelector('.shoptabs');sb.scrollTo({top:sb.scrollTop+h.getBoundingClientRect().top-sb.getBoundingClientRect().top-(st?st.offsetHeight:0),behavior:'smooth'})}
 function shopBody(){let h=shopTabs(),lockedShown=0;const w=s.world|0;
  if(w){h+=landBar(w);const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
   if(w===4){for(const t of[9,10,11]){const g=bs.filter(b=>b.tier===t);if(!g.length)continue;h+=`<div class="tierh"><b>${SDG[t]}</b><span>${g.filter(b=>own(b.id)).length}/${g.length}</span></div><div class="grid">${g.map(card).join('')}</div>`}}
   else if(bs.length)h+=`<div class="tierh"><b>${WN[w]}</b><span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span></div><div class="grid">${bs.map(card).join('')}</div>`;
   return h}
  for(let t=1;t<TIERS.length;t++){const open=t<=s.tier,bs=B.filter(b=>b.tier===t&&shopOK(b));if(!bs.length)continue;
-  h+=`<div class="tierh"><b>Tier ${t} · ${TIERS[t]}</b>${open?`<span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span>`:`<span class="num">${esc(tierHint(t))}</span>`}</div>`;
+  h+=`<div class="tierh" data-t="${t}"><b>Tier ${t} · ${TIERS[t]}</b>${open?`<span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span>`:`<span class="num">${esc(tierHint(t))}</span>`}</div>`;
   h+=`<div class="grid">${bs.map(card).join('')}</div>`}
  return h}
 const shopBalHTML=()=>`<div class="sbal"><small>AVAILABLE CASH</small><b class="num">${COIN} <span id="sbCash">${money(s.cash)}</span></b></div><div class="sbal gem"><small>CRYSTALS</small><b class="num">${GEM} <span id="sbGem">${Math.floor(s.gems).toLocaleString('en-US')}</span></b></div><div class="sbal thr" id="sbThrT"><small>THREAT</small><b class="num" id="sbThr"></b></div>`;
@@ -1432,7 +1450,7 @@ const thrShown=()=>Math.round(threatRaw()-(cleanOn()?20:0));
 function sbThr(){const t=$('sbThrT'),b=$('sbThr');if(!t||!b)return;const v=thrShown(),lv=thrLevel(Math.max(0,v));b.textContent=(v<0?'−'+(-v):v)+'%';t.classList.toggle('cov',v<0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
 // cash, crystals and threat bar under the sheet header (Select business and the Store)
 function addBal(){const h=document.querySelector('.sheet-h');if(h){const d=document.createElement('div');d.className='shopbal';d.innerHTML=shopBalHTML();h.after(d);sbThr()}}
-function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');addBal()}
+function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');addBal();const sb=$('sb');if(sb){sb.addEventListener('scroll',tierSpy,{passive:true});tierSpy()}}
 // saying No to a purchase made from Select business goes back to the shop, where you were
 let shopBack=null;
 // the buy confirmation sits on top of the shop, so No just lifts it off and the shop is still there underneath
@@ -1907,7 +1925,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'prev':slideStep(-1);break;case'next':slideStep(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
   case'threat':threatDlg();break;
   case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');loadFriends();break;
-  case'shopf':{shopF=el.dataset.v;const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=shopF==='all'?y:0}break}
+  case'shopf':{shopF=el.dataset.v;const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=shopF==='all'?y:0;tierSpy()}break}
+  case'tierjump':tierGo(+el.dataset.t);break;
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
   case'invite':inviteDlg(false);break;
   case'newcode':inviteDlg(true);break;
@@ -2227,7 +2246,7 @@ async function signOut(){try{await cloudPush();await disablePush();await supa.au
 const DEAL_T=[ // tier: chance, back, seconds, threat, max bust chance over the whole deal
  {k:'Low',w:40,x:1.4,sec:300,add:5,bust:.1},{k:'Medium',w:35,x:2,sec:240,add:12,bust:.25},{k:'High',w:25,x:3,sec:180,add:25,bust:.5}];
 const DEAL_WHO=[['Margot','Accountant','👩‍💼'],['Vinnie','Knows a guy','🧔'],['Big Tony','Local legend','🕶️']];
-const DEAL_TXT=[["Quick paperwork trick. Give me {c} and I'll have {p} back to you in {m} minutes. Nobody will look twice. Probably.", "Got a client who pays early. Lend me {c}, get {p} back in {m} minutes. Easy money.", "A tax refund came through early. Don't ask whose. {c} now, {p} back in {m} minutes.", "I found a loophole. A tiny one. {c} in, {p} out in {m} minutes, before anyone closes it.", "Invoices that pay themselves. Well, almost. Send {c}, I'll return {p} in {m} minutes.", "A charity gala needs a donation. {c} goes in, {p} comes out in {m} minutes. Wear something nice.", "Currency swap at a very friendly rate. {c} now, {p} back in {m} minutes. The paperwork's already done.", "Small creative accounting job. {c} up front, {p} back in {m} minutes. Keep the receipts. Actually, don't."], ["A truck of lemons fell off a lorry. {c} now and I'll double it in {m} minutes. Keep your head down.", "Front-row concert tickets, no questions asked. {c} in, {p} out in {m} minutes.", "Designer handbags. Very real. Mostly. {c} in, {p} out in {m} minutes.", "My cousin's got a van full of tellies. {c} now and I'll double it in {m} minutes.", "Horse in the 3:15 can't lose. I know the horse. {c} on it, {p} back in {m} minutes.", "Crate of vintage watches, very vintage. {c} gets you in, {p} back in {m} minutes.", "The parking meters downtown are out of order. Mine aren't. {c} in, double it in {m} minutes.", "Bloke's selling a boat, needs cash today. {c} now, {p} when I flip it in {m} minutes."], ["Card game in the back room. {c} buys you a seat, the house pays you {p} in {m} minutes. Cops are already sniffing around.", "Shipment at the docks. {c} gets you in, {p} comes back in {m} minutes. Don't tell anyone.", "The casino cameras go down for maintenance in a minute. {c} at the table, {p} out in {m} minutes.", "Art auction, one painting, no paperwork. {c} gets you a share, {p} back in {m} minutes. Very hot.", "Underground race tonight. My driver doesn't lose. {c} on him, {p} back in {m} minutes.", "The mayor owes me a favour. {c} makes it happen, {p} comes back in {m} minutes. Cops are watching him too.", "Gold bars, still warm. Don't ask. {c} now, {p} in {m} minutes.", "Diamond exchange, back door, one time only. {c} in, {p} out in {m} minutes. Move fast."]];
+const DEAL_TXT=[["Quick paperwork trick. Nobody will look twice. Probably.", "Got a client who pays early. Easy money.", "A tax refund came through early. Don't ask whose.", "I found a loophole. A tiny one, before anyone closes it.", "Invoices that pay themselves. Well, almost.", "A charity gala needs a donation. Wear something nice.", "Currency swap at a very friendly rate. Paperwork's done.", "Small creative accounting job. Keep the receipts. Actually, don't."], ["A truck of lemons fell off a lorry. Keep your head down.", "Front-row concert tickets, no questions asked.", "Designer handbags. Very real. Mostly.", "My cousin's got a van full of tellies.", "Horse in the 3:15 can't lose. I know the horse.", "Crate of vintage watches. Very vintage.", "The parking meters downtown are broken. Mine aren't.", "Bloke's selling a boat, needs cash today."], ["Card game in the back room. Cops are already sniffing around.", "Shipment at the docks. Don't tell anyone.", "The casino cameras go down for maintenance in a minute.", "One painting, no paperwork. Very hot.", "Underground race tonight. My driver doesn't lose.", "The mayor owes me a favour. Cops are watching him too.", "Gold bars, still warm. Don't ask.", "Diamond exchange, back door, one time only. Move fast."]];
 const DEAL_STAKE=15,DEAL_LIFE=20*6e4,DEAL_MAX=3;
 let dealChat=null;
 const dealsOpen=()=>s.owned.length>=3&&income()>0;
@@ -2270,7 +2289,7 @@ function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now();
  const inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
  let h=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(d.text))+
   inc(`You put in <b>${$m(d.cost)}</b>, you get <b class="g">${$m(d.pay)}</b> back in <b>${d.sec/60} min</b>. That's <b class="g">+${$m(d.pay-d.cost)}</b>.`)+
-  inc(`Heat on this one: <b style="color:${col}">+${d.add}% threat</b> while it runs ${d.tier===2?'🚨':d.tier===1?'👀':'🤫'}<br><small>You'd be on <b style="color:${col}">${Math.max(0,after)}%</b></small>`)+
+  inc(`Heat: <b style="color:${col}">+${d.add}%</b> ${d.tier===2?'🚨':d.tier===1?'👀':'🤫'}<br><small>You'd be on <b style="color:${col}">${Math.max(0,after)}%</b></small>`)+
   inc(dealRisk(d.tier,after)<=0?`Risk of getting caught: <b style="color:var(--green)">0%</b> 😇<br><small>Your good causes cover the heat.</small>`:`Risk of getting caught: <b style="color:${col}">${riskTxt(dealRisk(d.tier,after))}</b><br><small>Lower your threat and the risk drops.</small>`);
  if(c&&c.reply==='in')h+=out(`I'm in. Sending ${$m(d.cost)} 💸`)+inc(`Pleasure doing business, boss. ${$m(d.pay)} coming your way.`)+(run?`<div class="dsys">⏱ Pays out in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b> · <span id="dealRk">${riskTxt(dealRisk(run.tier,threatAt(t)))}</span> risk</div>`:`<div class="dsys">✓ Paid out</div>`);
  else if(c&&c.reply==='pass')h+=out('Not this time.')+inc("Your loss. I'll find someone else 🤷");
