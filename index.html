@@ -251,6 +251,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .wtoast small{display:block;color:var(--lime);font-size:11px;letter-spacing:.4px;text-transform:uppercase}
 .wtoast button{margin-left:auto;background:var(--lime);color:var(--green-d);padding:8px 12px;font-size:12px;font-weight:900;flex:none}
 .tool .dot.wish{background:#FF5A7A}.tool .dot.wish svg{width:11px;height:11px;fill:#fff;stroke:none}
+.gwrow{grid-column:1/-1;display:flex;align-items:center;gap:8px;color:var(--sky);font-size:12px;font-weight:800;margin-top:2px}
+.gwbar{display:inline-block;flex:0 0 110px;width:110px;height:8px;border-radius:4px;background:#D6E9F5;overflow:hidden;vertical-align:middle}.gwbar i{display:block;height:100%;background:var(--sky);border-radius:4px;transition:width .2s}.dark .gwbar{background:#26343a}
 .tierjump{display:flex;gap:4px;padding:0 6px 6px;overflow-x:auto;scrollbar-width:none}.tierjump::-webkit-scrollbar{display:none}
 .tierjump button{flex:1 0 auto;min-width:38px;padding:6px 6px;border-radius:99px;background:#fff;color:var(--green-d);font-weight:900;font-size:12px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:2px;transition:background .15s,border-color .15s}
 .tierjump button i{font-style:normal;font-size:9px;opacity:.7}
@@ -1162,14 +1164,16 @@ const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*bMul();
 // a business only affects threat once it's open: good causes and risky businesses alike count once built
 const gcBuilding=o=>o.busy==='build';
 // goodwill: tapping a good cause permanently chips a little more off threat, weighted by the cause (like income per business).
-// each tap adds 0.01% of what the cause removes; 500 goodwill taps a day shared across all causes (you pick where they go);
+// each tap adds 0.01% of what the cause removes; every cause holds up to 50 taps and earns one back every ~5 min (full in 4h);
 // a cause's goodwill tops out at half its own reduction
-const GW_TAP=.0001,GW_DAY=500,GW_LIFE=.5;
+const GW_TAP=.0001,GW_DAY=50,GW_HRS=4,GW_LIFE=.5,GW_REGEN=GW_HRS*36e5/GW_DAY;
+const gwEn=o=>{const e=o.gwe;if(!e)return GW_DAY;return Math.min(GW_DAY,e.n+Math.max(0,now()-e.t)/GW_REGEN)};
+const gwNext=o=>{const e=gwEn(o);return e>=GW_DAY?0:(1-(e%1))*GW_REGEN};
 const gwBase=o=>Math.abs(Math.min(0,st(o).threat));
 const gwMax=o=>gwBase(o)*GW_LIFE;
 const gwAtO=o=>Math.min(+o.gw||0,gwMax(o));
 const gwAt=()=>s.owned.reduce((a,o)=>a+(o.gw&&isGood(o)&&!gcBuilding(o)?gwAtO(o):0),0);
-const gwToday=()=>s.gwd&&s.gwd.d===new Date().toDateString()?s.gwd.n:0;
+const gwLeft=o=>{if(gwAtO(o)>=gwMax(o)-1e-9)return'maxed';const e=Math.floor(gwEn(o));return e>=GW_DAY?`${GW_DAY}/${GW_DAY} ready`:`${e}/${GW_DAY} · +1 in ${dur(Math.ceil(gwNext(o)/1e3))}`};
 const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v>=.01?v.toFixed(3):v.toFixed(4);
 const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat()-gwAt();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
@@ -1297,9 +1301,9 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
    ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span>${gemTapBiz(b)?`<span style="color:var(--sky)">Lucky taps</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)">${GEM} <span id="lgem">${gemTapToday()}</span>/${GEM_TAP_DAY} today</span>`:''}</div>`:
-    `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span><span style="color:var(--sky)">Tap goodwill</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)"><span id="lgw">0%</span> <small style="opacity:.75;white-space:nowrap">· <span id="lgwn">${gwToday()}</span>/${GW_DAY} today</small></span></div>`}</div></div>
+    `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span><span style="color:var(--sky)">Tap goodwill</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)"><span id="lgw">0%</span> </span><span class="gwrow"><i class="gwbar"><i id="lgwf" style="width:${gwEn(o)/GW_DAY*100}%"></i></i><span id="lgwn">${gwLeft(o)}</span></span></div>`}</div></div>
    ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
-    `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash. Tap it to lower threat a little more each day.</span></div>`}`}
+    `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash, but taps add goodwill.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){const bo=boostOn(),tp=tapMul()>1;bc.hidden=!bo&&!tp;bc.textContent=[bo?(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000):'',tp?'2X TAPS · '+dur((s.tapUntil-now())/1000):''].filter(Boolean).join('  ·  ')}
  {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){if(d.hidden===on)requestAnimationFrame(()=>{layout();stackN=-1;updStage()});d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=dur((s.mgrUntil-now())/1000)+' left'}}}
@@ -1435,11 +1439,11 @@ const gemTapToday=()=>{const d=new Date().toDateString();if(!s.tapGem||s.tapGem.
 function gemTapRoll(px,py){if(gemTapToday()>=GEM_TAP_DAY||Math.random()>=GEM_TAP_P)return;s.gems+=1;s.tapGem.n++;gemLog(1,'taps');{const l=$('lgem');if(l)l.textContent=s.tapGem.n}
  setTimeout(()=>{tapFloat(px,py-56,'+1 crystal','#5BC7F5');vib([10,30,10]);try{const t=document.querySelector('.t-cry');t&&t.animate([{transform:'scale(1)',filter:'brightness(1)'},{transform:'scale(1.12)',filter:'brightness(1.4)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:450})}catch(e){}
   if(s.tapGem.n>=GEM_TAP_DAY)toast(`That's today's ${GEM_TAP_DAY} lucky crystals. More tomorrow!`);save()},120)}
-function gwUi(){const l=$('lgw'),n=$('lgwn'),o=cur();if(l&&o){const v=gwAtO(o);l.textContent=v>0?'−'+gwPct(v)+'%':'0%'}if(n)n.textContent=gwToday()}
-function gwTap(ev){const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2,o=cur(),m=gwMax(o),v=gwAtO(o),add=gwBase(o)*GW_TAP,n=gwToday();
+function gwUi(){const l=$('lgw'),n=$('lgwn'),o=cur();if(l&&o){const v=gwAtO(o);l.textContent=v>0?'−'+gwPct(v)+'%':'0%'}if(n&&o)n.textContent=gwLeft(o);const f=$('lgwf');if(f&&o)f.style.width=(gwEn(o)/GW_DAY*100)+'%'}
+function gwTap(ev){const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2,o=cur(),m=gwMax(o),v=gwAtO(o),add=gwBase(o)*GW_TAP,n=gwEn(o);
  if(!(m>0))return;if(v>=m-1e-9){tapFloat(px,py,'Goodwill maxed','#2F8DC0');vib(6);return}
- if(n>=GW_DAY){tapFloat(px,py,'Done for today','#2F8DC0');vib(6);return}
- o.gw=Math.min(m,v+add);s.gwd={d:new Date().toDateString(),n:n+1};if(n+1===GW_DAY)toast(`That's all ${GW_DAY} goodwill taps for today. Come back tomorrow for more.`,'good');save();tapFloat(px,py,'−'+gwPct(add)+'%','#3E9B37');vib(6);gwUi();hud();if(ovKind==='shop'||ovKind==='store')sbThr();s.taps=(s.taps||0)+1}
+ if(n<1){tapFloat(px,py,'Next tap in '+dur(Math.ceil(gwNext(o)/1e3)),'#2F8DC0');vib(6);return}
+ o.gw=Math.min(m,v+add);o.gwe={n:n-1,t:now()};if(n-1<1)toast(`${esc(B[o.bid].name)} is out of goodwill taps. They recharge one every ${Math.round(GW_REGEN/6e4)} minutes, and your other good causes still have some.`,'good');save();tapFloat(px,py,'−'+gwPct(add)+'%','#3E9B37');vib(6);gwUi();hud();if(ovKind==='shop'||ovKind==='store')sbThr();s.taps=(s.taps||0)+1}
 function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return gwTap(ev);
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
