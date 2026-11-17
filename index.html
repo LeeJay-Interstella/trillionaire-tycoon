@@ -235,7 +235,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .wrow h5{margin:0;color:var(--teal);font-weight:900;font-size:13.5px;text-transform:uppercase;line-height:1.1}
 .wrow .wsub{font-size:10.5px;font-weight:800;color:#888;margin:2px 0 6px;text-transform:uppercase;letter-spacing:.3px}
 .wbar{height:10px;background:#EEF2E4;border-radius:6px;overflow:hidden}.wbar i{display:block;height:100%;background:var(--green);border-radius:6px;transition:width .3s}
-.wrow .eta{font-size:11px;font-weight:800;margin-top:4px;color:var(--green-d);display:flex;justify-content:space-between;gap:6px}.wrow .eta span{color:#888}
+.wrow .eta{font-size:11px;font-weight:800;margin-top:4px;color:var(--green-d);display:flex;justify-content:space-between;gap:6px;white-space:nowrap;min-width:0}.wrow .eta span{color:#888;overflow:hidden;text-overflow:ellipsis;min-width:0}.wrow>div:nth-child(2){min-width:0}
 .wrow .act{display:flex;flex-direction:column;align-items:center}
 .wrow .wbuy{background:#ECECE8;color:#9a9a92;font-weight:900;font-size:13px;padding:8px 10px;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .wrow.ready{border-color:var(--lime);background:#FBFFF0}
@@ -1162,15 +1162,15 @@ const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*bMul();
 // a business only affects threat once it's open: good causes and risky businesses alike count once built
 const gcBuilding=o=>o.busy==='build';
 // goodwill: tapping a good cause permanently chips a little more off threat, weighted by the cause (like income per business).
-// each tap adds 0.05% of what the cause removes; 100 goodwill taps a day shared across all causes (you pick where they go);
+// each tap adds 0.01% of what the cause removes; 500 goodwill taps a day shared across all causes (you pick where they go);
 // a cause's goodwill tops out at half its own reduction
-const GW_TAP=.0005,GW_DAY=100,GW_LIFE=.5;
+const GW_TAP=.0001,GW_DAY=500,GW_LIFE=.5;
 const gwBase=o=>Math.abs(Math.min(0,st(o).threat));
 const gwMax=o=>gwBase(o)*GW_LIFE;
 const gwAtO=o=>Math.min(+o.gw||0,gwMax(o));
 const gwAt=()=>s.owned.reduce((a,o)=>a+(o.gw&&isGood(o)&&!gcBuilding(o)?gwAtO(o):0),0);
 const gwToday=()=>s.gwd&&s.gwd.d===new Date().toDateString()?s.gwd.n:0;
-const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v.toFixed(3);
+const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v>=.01?v.toFixed(3):v.toFixed(4);
 const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat()-gwAt();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
 const nw=()=>s.cash+(s.landVal||0)+(s.dealPaid||[]).reduce((a,d)=>a+d.pay,0)+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
