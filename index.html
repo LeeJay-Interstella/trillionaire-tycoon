@@ -213,6 +213,44 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dark .code{background:#22301F}
 .tabs2{display:flex;gap:4px;padding:6px}
 .shoptabs{position:sticky;top:0;z-index:3;background:#E7E7E2}.dark .shoptabs{background:#0F1415}
+.card .trow{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}.card .trow .tier{margin-bottom:0}
+.wbtn{width:26px;height:26px;flex:none;margin:-4px -2px -4px 0;border-radius:50%;background:#fff;border:2px solid #E1EBC9;display:flex;align-items:center;justify-content:center;padding:0}
+.wbtn svg{width:14px;height:14px;fill:none;stroke:#B9C2A6;stroke-width:2.4}
+.wbtn.on{background:#FF5A7A;border-color:#FF5A7A}.wbtn.on svg{fill:#fff;stroke:#fff}
+.wbtn.pop{animation:wpop .35s}@keyframes wpop{40%{transform:scale(1.3)}}
+.dark .wbtn{background:#1C2425;border-color:#2b3537}.dark .wbtn.on{background:#FF5A7A;border-color:#FF5A7A}
+.tabs2 button .wh{width:11px;height:11px;fill:currentColor;vertical-align:-1px;margin-right:3px}
+.tabs2 button .wn{display:inline-block;min-width:16px;padding:0 4px;margin-left:3px;border-radius:9px;background:#FF5A7A;color:#fff;font-size:10px;line-height:16px}
+.wl{padding:6px;display:flex;flex-direction:column;gap:6px}
+.wsw{position:relative;overflow:hidden;background:#E5484D}
+.wdel{position:absolute;top:0;left:0;bottom:0;width:88px;background:#E5484D;color:#fff;font-weight:900;font-size:12px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.wdel svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.4}
+.wrow{position:relative;touch-action:pan-y;transition:transform .22s ease-out;will-change:transform}
+.wrow.drag{transition:none}
+.wrow.tease{animation:wtease 1.6s ease-in-out .4s}
+@keyframes wtease{0%,100%{transform:none}30%,60%{transform:translateX(72px)}}
+.wtoast{touch-action:none;transition:transform .2s ease-out,opacity .2s}.wtoast.drag{transition:none}.wtoast.gone{transform:translateY(-140%)!important;opacity:0}
+.wrow{background:#fff;border:2px solid #E1EBC9;display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:8px 10px}
+.wrow .pic{width:64px;height:58px}.wrow .pic svg,.wrow .pic img{width:100%;height:100%;object-fit:contain}
+.wrow h5{margin:0;color:var(--teal);font-weight:900;font-size:13.5px;text-transform:uppercase;line-height:1.1}
+.wrow .wsub{font-size:10.5px;font-weight:800;color:#888;margin:2px 0 6px;text-transform:uppercase;letter-spacing:.3px}
+.wbar{height:10px;background:#EEF2E4;border-radius:6px;overflow:hidden}.wbar i{display:block;height:100%;background:var(--green);border-radius:6px;transition:width .3s}
+.wrow .eta{font-size:11px;font-weight:800;margin-top:4px;color:var(--green-d);display:flex;justify-content:space-between;gap:6px}.wrow .eta span{color:#888}
+.wrow .act{display:flex;flex-direction:column;align-items:center}
+.wrow .wbuy{background:#ECECE8;color:#9a9a92;font-weight:900;font-size:13px;padding:8px 10px;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.wrow.ready{border-color:var(--lime);background:#FBFFF0}
+.wrow.ready .wbuy{background:var(--lime);color:var(--green-d);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--lime);animation:wp 1.4s infinite}
+@keyframes wp{50%{transform:scale(1.05)}}
+.wrow .rm{font-size:10px;font-weight:900;color:#B9C2A6;text-transform:uppercase;background:none;padding:2px 4px}
+.whint{margin:4px 6px 6px;padding:10px 12px;background:#FFF0F3;color:#B23A55;font-size:12px;font-weight:800;line-height:1.35;display:flex;gap:8px;align-items:center}.whint svg{width:18px;height:18px;fill:#FF5A7A;flex:none}
+.wempty{padding:28px 20px 10px;text-align:center;color:#888;font-weight:800;font-size:13px}
+.dark .wrow{background:#1C2425;border-color:#2b3537}.dark .wrow.ready{background:#1f2a1c;border-color:var(--lime)}.dark .wbar{background:#2b3537}.dark .wrow .wbuy{background:#2b3537;color:#7d878a}.dark .wrow.ready .wbuy{background:var(--lime);color:var(--green-d);box-shadow:0 0 0 3px #1C2425,0 0 0 5px var(--lime)}.dark .whint{background:#2a1c21;color:#ff9db1}
+.wtoast{pointer-events:auto;width:100%;box-sizing:border-box;background:var(--green-d);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:12px;font-weight:900;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:wtin .35s ease-out;max-width:480px;margin:0 auto}
+@keyframes wtin{from{transform:translateY(-20px);opacity:0}}
+.wtoast .h{width:34px;height:34px;border-radius:50%;background:#FF5A7A;display:flex;align-items:center;justify-content:center;flex:none}.wtoast .h svg{width:18px;height:18px;fill:#fff}
+.wtoast small{display:block;color:var(--lime);font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+.wtoast button{margin-left:auto;background:var(--lime);color:var(--green-d);padding:8px 12px;font-size:12px;font-weight:900;flex:none}
+.tool .dot.wish{background:#FF5A7A}.tool .dot.wish svg{width:11px;height:11px;fill:#fff;stroke:none}
 .tierjump{display:flex;gap:4px;padding:0 6px 6px;overflow-x:auto;scrollbar-width:none}.tierjump::-webkit-scrollbar{display:none}
 .tierjump button{flex:1 0 auto;min-width:38px;padding:6px 6px;border-radius:99px;background:#fff;color:var(--green-d);font-weight:900;font-size:12px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:2px;transition:background .15s,border-color .15s}
 .tierjump button i{font-style:normal;font-size:9px;opacity:.7}
@@ -1039,12 +1077,12 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111701,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111704,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
  if(!(s.maxT>0)||d>s.maxT)s.maxT=d;else d=s.maxT}return d};
-const fresh=()=>({world:0,wopen:0,land:{},landVal:0,name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
+const fresh=()=>({wish:[],world:0,wopen:0,land:{},landVal:0,name:'',cash:1000,gems:20,owned:[],cur:0,tier:1,taps:0,collects:0,speedups:0,ach:{},arrests:0,last:now(),start:now(),jail:null,earned:0,
  nextCheck:now()+180000,boostUntil:0,boostReady:0,freeAt:now()+120000,chestAt:now(),
  dc:{last:'',streak:0,got:null},perks:{mgr:[],jail:0,boost:0,crew:0,clean:0,manual:0,tap2:0},mgr:{level:1,train:null},mgrUntil:0,mgrTotal:0,cleanUntil:0,crew:0,dcSeen:false,seed:(Math.random()*2147483647)|0});
 function pack(st){return JSON.stringify(Object.assign({},st,{ver:SAVE_VER,b:BUILD,owned:st.owned.map(o=>{const c=Object.assign({},o,{code:B[o.bid].code});delete c.bid;return c})}))}
@@ -1123,7 +1161,17 @@ const mgrOn=()=>now()<(s.mgrUntil||0);const cleanOn=()=>now()<(s.cleanUntil||0);
 const income=()=>s.owned.reduce((a,o)=>a+(o.busy?0:st(o).rate),0)*bMul();
 // a business only affects threat once it's open: good causes and risky businesses alike count once built
 const gcBuilding=o=>o.busy==='build';
-const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat();
+// goodwill: tapping a good cause permanently chips a little more off threat, weighted by the cause (like income per business).
+// each tap adds 0.05% of what the cause removes; 100 goodwill taps a day shared across all causes (you pick where they go);
+// a cause's goodwill tops out at half its own reduction
+const GW_TAP=.0005,GW_DAY=100,GW_LIFE=.5;
+const gwBase=o=>Math.abs(Math.min(0,st(o).threat));
+const gwMax=o=>gwBase(o)*GW_LIFE;
+const gwAtO=o=>Math.min(+o.gw||0,gwMax(o));
+const gwAt=()=>s.owned.reduce((a,o)=>a+(o.gw&&isGood(o)&&!gcBuilding(o)?gwAtO(o):0),0);
+const gwToday=()=>s.gwd&&s.gwd.d===new Date().toDateString()?s.gwd.n:0;
+const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v.toFixed(3);
+const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat()-gwAt();
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
 const nw=()=>s.cash+(s.landVal||0)+(s.dealPaid||[]).reduce((a,d)=>a+d.pay,0)+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
 let friends=[],friendsLoaded=false;
@@ -1146,7 +1194,7 @@ const skipCost=o=>Math.max(1,Math.round(Math.sqrt(Math.max(1,(o.end-now())/1000)
 const tapCut=o=>Math.max(1300,o.total*.005);
 const vib=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};
 const cur=()=>{const o=s.owned[s.cur];return o&&B[o.bid].w===(s.world|0)?o:null};
-function toast(m,c){const box=$('toasts');while(box.children.length>=3)box.firstChild.remove();const t=document.createElement('div');t.className='toast '+(c||'');t.textContent=m;$('toasts').appendChild(t);setTimeout(()=>t.remove(),2600)}
+function toast(m,c){const box=$('toasts');while(box.children.length>=3){const o=[...box.children].find(e=>!e.classList.contains('wtoast'));if(!o)break;o.remove()}const t=document.createElement('div');t.className='toast '+(c||'');t.textContent=m;$('toasts').appendChild(t);setTimeout(()=>t.remove(),2600)}
 function floaty(x,y,txt,col){const f=document.createElement('div');f.className='floaty';f.textContent=txt;if(col)f.style.color=col;f.style.left=(x-30)+'px';f.style.top=(y-20)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),900)}
 
 /* ================= simulation ================= */
@@ -1243,15 +1291,15 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   L+=`<div class="callout"><div class="timer num" id="ctimer"></div><div class="lbl">TAP TO SPEED UP</div></div>`;
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p>${(()=>{const x=st(o),d=o.busy==='up'?x.nThreat-x.threat:x.threat;if(Math.abs(d)<.005)return'';const v=Math.round(d*10)/10;return`<p class="ucthr" style="color:${d<0?'var(--green)':'var(--red)'};font-weight:800;font-size:14px;letter-spacing:.3px;margin-top:3px">${d<0?'−'+(-v):'+'+v}% threat when ${o.busy==='up'?'done':d<0?'built':'it opens'}</p>`})()}</div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
- }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTop():TOPS[b.vis]);artEl.dataset.act=x.rate>0?'tapearn':'collect';
+ }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTop():TOPS[b.vis]);artEl.dataset.act='tapearn';
   L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button><button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
    ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span>${gemTapBiz(b)?`<span style="color:var(--sky)">Lucky taps</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)">${GEM} <span id="lgem">${gemTapToday()}</span>/${GEM_TAP_DAY} today</span>`:''}</div>`:
-    `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span></div>`}</div></div>
+    `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span><span style="color:var(--sky)">Tap goodwill</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)"><span id="lgw">0%</span> <small style="opacity:.75;white-space:nowrap">· <span id="lgwn">${gwToday()}</span>/${GW_DAY} today</small></span></div>`}</div></div>
    ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
-    `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash.</span></div>`}`}
+    `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash. Tap it to lower threat a little more each day.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
 function updStage(){const o=cur();const bc=$('boostChip');if(bc){const bo=boostOn(),tp=tapMul()>1;bc.hidden=!bo&&!tp;bc.textContent=[bo?(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000):'',tp?'2X TAPS · '+dur((s.tapUntil-now())/1000):''].filter(Boolean).join('  ·  ')}
  {const on=mgrOn(),d=$('duty');stage.classList.toggle('onduty',on);if(d){if(d.hidden===on)requestAnimationFrame(()=>{layout();stackN=-1;updStage()});d.hidden=!on;if(on){$('dutyT').textContent=mgrName(s.mgrTotal/36e5)+' on duty · Lv '+s.mgr.level;$('dutyS').textContent=dur((s.mgrUntil-now())/1000)+' left'}}}
@@ -1387,7 +1435,12 @@ const gemTapToday=()=>{const d=new Date().toDateString();if(!s.tapGem||s.tapGem.
 function gemTapRoll(px,py){if(gemTapToday()>=GEM_TAP_DAY||Math.random()>=GEM_TAP_P)return;s.gems+=1;s.tapGem.n++;gemLog(1,'taps');{const l=$('lgem');if(l)l.textContent=s.tapGem.n}
  setTimeout(()=>{tapFloat(px,py-56,'+1 crystal','#5BC7F5');vib([10,30,10]);try{const t=document.querySelector('.t-cry');t&&t.animate([{transform:'scale(1)',filter:'brightness(1)'},{transform:'scale(1.12)',filter:'brightness(1.4)'},{transform:'scale(1)',filter:'brightness(1)'}],{duration:450})}catch(e){}
   if(s.tapGem.n>=GEM_TAP_DAY)toast(`That's today's ${GEM_TAP_DAY} lucky crystals. More tomorrow!`);save()},120)}
-function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return collect();
+function gwUi(){const l=$('lgw'),n=$('lgwn'),o=cur();if(l&&o){const v=gwAtO(o);l.textContent=v>0?'−'+gwPct(v)+'%':'0%'}if(n)n.textContent=gwToday()}
+function gwTap(ev){const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2,o=cur(),m=gwMax(o),v=gwAtO(o),add=gwBase(o)*GW_TAP,n=gwToday();
+ if(!(m>0))return;if(v>=m-1e-9){tapFloat(px,py,'Goodwill maxed','#2F8DC0');vib(6);return}
+ if(n>=GW_DAY){tapFloat(px,py,'Done for today','#2F8DC0');vib(6);return}
+ o.gw=Math.min(m,v+add);s.gwd={d:new Date().toDateString(),n:n+1};if(n+1===GW_DAY)toast(`That's all ${GW_DAY} goodwill taps for today. Come back tomorrow for more.`,'good');save();tapFloat(px,py,'−'+gwPct(add)+'%','#3E9B37');vib(6);gwUi();hud();if(ovKind==='shop'||ovKind==='store')sbThr();s.taps=(s.taps||0)+1}
+function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rate>0))return gwTap(ev);
  const t=performance.now();if(t-tapLast<TAP_GAP)return;tapLast=t;
  const px=ev&&ev.clientX||innerWidth/2,py=ev&&ev.clientY||innerHeight/2;
  const room=x.hold-o.stored,full=x.rate/60*TAP_SEC*bMul()*tapMul(),mg=mgrOn();
@@ -1401,7 +1454,7 @@ function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)ret
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(b.w&&freePlots(b.w)<1)return toast('Buy a plot of land first','bad');
  if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
- pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
+ if(Array.isArray(s.wish))s.wish=s.wish.filter(c=>c!==b.code);pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);s.owned.push({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+bt,total:bt});s.cur=s.owned.length-1;closeOv();vib(20);save();upd()}
 function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
  pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
@@ -1420,22 +1473,64 @@ function closeOv(){if(ovKind==='deals'){dealChat=null;if((s.dealPaid||[]).length
 function dialog(title,body,btns,kind){ovKind=kind||'dlg';ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dlg"><h3>${title}</h3><div class="body">${body}${btns?`<div class="btns">${btns}</div>`:''}</div></div></div>`}
 function sheet(title,body,kind){ovKind=kind;ovl.innerHTML=`<div class="sheet" data-act="dimclose"><div class="sheet-in"><div class="sheet-h"><svg viewBox="0 0 24 24" style="opacity:.0"><path d="M0 0"/></svg><h3>${title}</h3><button data-act="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div class="sheet-b" id="sb">${body}</div></div></div>`}
 
+// wishlist: up to 5 businesses you're saving for (stored by code)
+const WISH_MAX=5,HEART='<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.2 0 3.6 1.2 5.4 3.2C13.8 6.2 15.2 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg>';
+const wishList=()=>(Array.isArray(s.wish)?s.wish:[]).map(c=>BY[c]).filter(b=>b&&!own(b.id));
+const wished=b=>Array.isArray(s.wish)&&s.wish.includes(b.code);
+const wishOK=b=>!own(b.id)&&!b.secret;
+function wishToggle(bid,el){const b=B[bid];if(!b)return;if(!Array.isArray(s.wish))s.wish=[];s.wish=s.wish.filter(c=>BY[c]&&!own(BY[c].id));
+ if(wished(b)){s.wish=s.wish.filter(c=>c!==b.code)}else{if(s.wish.length>=WISH_MAX)return toast(`Your wishlist is full (${WISH_MAX}). Remove one first.`,'bad');s.wish.push(b.code);ev('wish',{biz:b.name})}
+ save();if(el&&el.classList.contains('wbtn')){el.classList.toggle('on',wished(b));el.setAttribute('aria-pressed',wished(b));el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+ const t=document.querySelector('#sb .tabs2');if(t)t.outerHTML=shopTabs2();if(shopF==='wish'){const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}}wishBadge()}
+const wishBtn=b=>wishOK(b)?`<button type="button" class="wbtn${wished(b)?' on':''}" data-act="wish" data-bid="${b.id}" aria-pressed="${wished(b)}" aria-label="Wishlist ${esc(b.name)}">${HEART}</button>`:'';
+function wishRow(b){const p=buyPrice(b),gp=gemPay(b),have=gp?s.gems:s.cash,f=Math.min(1,have/p),r=f>=1&&available(b),pm=gp?0:Math.max(0,rateT.base||0),left=Math.max(0,p-have);
+ const eta=r?'':!available(b)?(b.w?'World locked':`Unlocks: ${esc(tierHint(b.tier))}`):gp?`${money(left)} crystals to go`:pm>0?`~${dur(left/pm*60)} to go`:'';
+ return`<div class="wsw" data-wb="${b.id}"><button type="button" class="wdel" data-act="wish" data-bid="${b.id}" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button><div class="wrow${r?' ready':''}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${b.w?WN[b.w]:`Tier ${b.tier} · ${TIERS[b.tier]}`}${b.rate>0?'':' · Good cause'}</div><div class="wbar"><i style="width:${(f*100).toFixed(1)}%"></i></div><div class="eta">${r?'Ready to buy!':`${Math.floor(f*100)}% saved`}<span>${eta}</span></div></div><div class="act"><button type="button" class="wbuy num" data-act="ask" data-bid="${b.id}">${gp?GEM:COIN} ${money(p)}</button></div></div></div>`}
+function wishBody(){const L=wishList();let h=L.length?`<div class="wl">${L.map(wishRow).join('')}</div>`:`<div class="wempty">Nothing saved yet</div>`;
+ return h+`<div class="whint">${HEART}<span>Tap the heart on any business to save it here (up to ${WISH_MAX}). We'll tell you the moment you can afford it. Swipe right to remove.</span></div>`}
+// live: refresh bars, and flag/announce businesses that just became affordable
+let wishSeen=null;
+function wishTick(){const L=wishList(),ready=L.filter(b=>available(b)&&canPay(b,buyPrice(b)));const ids=ready.map(b=>b.id);
+ if(wishSeen===null)wishSeen=new Set(ids);else{const nw=ready.filter(b=>!wishSeen.has(b.id));wishSeen=new Set(ids);if(nw.length&&s.name&&!s.jail)wishPing(nw[0])}
+ wishBadge(ready.length);
+ if(ovKind==='shop'&&shopF==='wish'){const sb=$('sb');if(sb)L.forEach(b=>{const w=sb.querySelector(`.wsw[data-wb="${b.id}"]`),r=w&&w.querySelector('.wrow');if(!r)return;const nr=document.createElement('div');nr.innerHTML=wishRow(b);const n=nr.firstChild.querySelector('.wrow');r.classList.toggle('ready',n.classList.contains('ready'));r.querySelector('.wbar i').style.width=n.querySelector('.wbar i').style.width;r.querySelector('.eta').innerHTML=n.querySelector('.eta').innerHTML})}}
+function wishBadge(n){const t=document.querySelector('.tool[data-act="shop"]');if(!t)return;if(n==null)n=wishList().filter(b=>available(b)&&canPay(b,buyPrice(b))).length;let d=t.querySelector('.dot.wish');if(n>0){if(!d){d=document.createElement('span');d.className='dot wish';t.appendChild(d)}d.innerHTML=HEART}else if(d)d.remove()}
+function wishPing(b){document.querySelector('.wtoast')?.remove();const d=document.createElement('div');d.className='wtoast';d.innerHTML=`<div class="h">${HEART}</div><div><small>Wishlist</small>${esc(b.name)} is ready to buy</div><button type="button" data-act="wishbuy" data-bid="${b.id}">BUY</button>`;const tb=$('toasts');tb.prepend(d);vib(15);setTimeout(()=>d.remove(),6000)}
+// swipe: wishlist rows slide right to show Remove; the ready banner flicks up to dismiss
+let wsw=null,wNoClick=0;const WDEL=88;
+function wClose(ex){document.querySelectorAll('#sb .wrow.open').forEach(r=>{if(r!==ex){r.classList.remove('open');r.style.transform=''}})}
+document.addEventListener('pointerdown',e=>{const t=e.target.closest('.wtoast');const r=!t&&e.target.closest('#sb .wrow');if(!t&&!r){wClose();return}
+ wsw={el:t||r,kind:t?'t':'r',x:e.clientX,y:e.clientY,base:r&&r.classList.contains('open')?WDEL:0,on:false,d:0}},{passive:true});
+document.addEventListener('pointermove',e=>{if(!wsw)return;const dx=e.clientX-wsw.x,dy=e.clientY-wsw.y;
+ if(!wsw.on){if(wsw.kind==='r'&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){wsw.on=true;wClose(wsw.el)}else if(wsw.kind==='t'&&dy<-6){wsw.on=true}else if(Math.abs(dy)>10&&wsw.kind==='r'){wsw=null;return}else return;wsw.el.classList.add('drag')}
+ if(wsw.kind==='r'){const v=Math.min(WDEL+24,Math.max(0,wsw.base+dx));wsw.d=v;wsw.el.style.transform=`translateX(${v}px)`}
+ else{const v=Math.min(0,dy);wsw.d=v;wsw.el.style.transform=`translateY(${v}px)`;wsw.el.style.opacity=String(Math.max(.2,1+v/120))}},{passive:true});
+function wEnd(){if(!wsw)return;const g=wsw;wsw=null;g.el.classList.remove('drag');
+ if(!g.on){if(g.kind==='r'&&g.el.classList.contains('open')){g.el.classList.remove('open');g.el.style.transform='';wNoClick=Date.now()}return}
+ wNoClick=Date.now();
+ if(g.kind==='r'){const open=g.d>WDEL/2;g.el.classList.toggle('open',open);g.el.style.transform=open?`translateX(${WDEL}px)`:''}
+ else{if(g.d<-30){g.el.classList.add('gone');setTimeout(()=>g.el.remove(),220)}else{g.el.style.transform='';g.el.style.opacity=''}}}
+document.addEventListener('pointerup',wEnd);document.addEventListener('pointercancel',wEnd);
+document.addEventListener('click',e=>{if(Date.now()-wNoClick<350&&!e.target.closest('.wdel')){e.stopPropagation();e.preventDefault()}},true);
+// first time the list has something in it, the top row slides open a little to show Remove is there
+function wishTease(){if(s.wishTeased||shopF!=='wish')return;const r=document.querySelector('#sb .wrow');if(!r)return;s.wishTeased=1;save();r.classList.add('tease');r.addEventListener('animationend',()=>r.classList.remove('tease'),{once:true})}
 function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=reqOk(b),land=!b.w||freePlots(b.w)>0;
  const btn=o?`<button class="price own" data-act="goto" data-bid="${b.id}">OWNED · LV ${o.level}</button>`:!open?`<div class="price off num" style="white-space:nowrap"><svg viewBox="0 0 16 18" style="width:14px;height:16px;flex:none" aria-label="Locked" role="img"><rect x="2" y="8" width="12" height="9" rx="2" fill="currentColor"/><path d="M5 8V5.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2"/></svg>${b.secret?'FREE':priceHTML(b,b.price)}</div>`:!ok?`<div class="price off" style="font-size:11px;padding:8px">${esc(reqText(b))}</div>`:!land?`<div class="price off" style="font-size:11px;padding:8px">Buy a plot of land first</div>`:
   `<button class="price num ${canPay(b,buyPrice(b))?'':'off'}" data-act="ask" data-bid="${b.id}">${b.secret?'FREE':priceHTML(b,b.price)}</button>`;
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
- return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
+ return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><div class="trow"><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
 function landBar(w){const n=plotsIn(w),have=landIn(w),free=have-usedIn(w),p=plotPrice(w,have);
  return`<div class="landbar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l9-5 9 5-9 4zM12 15V4M12 4l6 3-6 3"/></svg><div><b>Land · ${have}/${n} plots</b><span>${free} free to build on${have<n?' · next plot':''}</span></div>${have<n?`<button class="price num ${s.cash>=p?'':'off'}" data-act="land">${COIN} ${money(p)}</button>`:'<span class="all">All plots owned</span>'}</div>`}
 // Select business filter: everything, money makers only, or good causes only
-let shopF='all';const shopOK=b=>shopF==='all'||(shopF==='good')===!(b.rate>0);
+let shopF='all';const shopOK=b=>shopF==='all'||shopF==='wish'||(shopF==='good')===!(b.rate>0);
 // tier jump bar: one chip per tier, tap to go straight to it (main world only)
 const tierJump=()=>{if(s.world|0)return'';let h='';for(let t=1;t<TIERS.length;t++){if(!B.some(b=>b.tier===t&&b.w===0&&shopOK(b)))continue;h+=`<button type="button" data-act="tierjump" data-t="${t}" class="${t>s.tier?'lk':''}" aria-label="Tier ${t} ${TIERS[t]}">${t>s.tier?'<i>🔒</i>':''}T${t}</button>`}return`<div class="tierjump">${h}</div>`};
-const shopTabs=()=>`<div class="shoptabs"><div class="tabs2">${[['all','All'],['biz','Businesses'],['good','Good causes']].map(([k,l])=>`<button type="button" data-act="shopf" data-v="${k}" class="${shopF===k?'on':''}" aria-pressed="${shopF===k}">${l}</button>`).join('')}</div>${tierJump()}</div>`;
+const shopTabs2=()=>{const n=wishList().length;return`<div class="tabs2">${[['all','All'],['biz','Business'],['good','Causes'],['wish',`<svg class="wh" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.2 0 3.6 1.2 5.4 3.2C13.8 6.2 15.2 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg>Wish${n?`<span class="wn">${n}</span>`:''}`]].map(([k,l])=>`<button type="button" data-act="shopf" data-v="${k}" class="${shopF===k?'on':''}" aria-pressed="${shopF===k}" ${k==='wish'?'aria-label="Wishlist"':''}>${l}</button>`).join('')}</div>`};
+const shopTabs=()=>`<div class="shoptabs">${shopTabs2()}${shopF==='wish'?'':tierJump()}</div>`;
 function tierSpy(){const sb=$('sb');if(!sb)return;const st=sb.querySelector('.shoptabs'),top=sb.getBoundingClientRect().top+(st?st.offsetHeight:0)+6;let cur=0;sb.querySelectorAll('.tierh[data-t]').forEach(h=>{if(h.getBoundingClientRect().top<=top)cur=+h.dataset.t});if(!cur){const f=sb.querySelector('.tierh[data-t]');cur=f?+f.dataset.t:0}sb.querySelectorAll('.tierjump button').forEach(b=>b.classList.toggle('on',+b.dataset.t===cur))}
 function tierGo(t){const sb=$('sb'),h=sb&&sb.querySelector(`.tierh[data-t="${t}"]`);if(!h)return;const st=sb.querySelector('.shoptabs');sb.scrollTo({top:sb.scrollTop+h.getBoundingClientRect().top-sb.getBoundingClientRect().top-(st?st.offsetHeight:0),behavior:'smooth'})}
-function shopBody(){let h=shopTabs(),lockedShown=0;const w=s.world|0;
+function shopBody(){let h=shopTabs(),lockedShown=0;const w=s.world|0;if(shopF==='wish')return h+wishBody();
  if(w){h+=landBar(w);const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
   if(w===4){for(const t of[9,10,11]){const g=bs.filter(b=>b.tier===t);if(!g.length)continue;h+=`<div class="tierh"><b>${SDG[t]}</b><span>${g.filter(b=>own(b.id)).length}/${g.length}</span></div><div class="grid">${g.map(card).join('')}</div>`}}
   else if(bs.length)h+=`<div class="tierh"><b>${WN[w]}</b><span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span></div><div class="grid">${bs.map(card).join('')}</div>`;
@@ -1450,7 +1545,7 @@ const thrShown=()=>Math.round(threatRaw()-(cleanOn()?20:0));
 function sbThr(){const t=$('sbThrT'),b=$('sbThr');if(!t||!b)return;const v=thrShown(),lv=thrLevel(Math.max(0,v));b.textContent=(v<0?'−'+(-v):v)+'%';t.classList.toggle('cov',v<0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
 // cash, crystals and threat bar under the sheet header (Select business and the Store)
 function addBal(){const h=document.querySelector('.sheet-h');if(h){const d=document.createElement('div');d.className='shopbal';d.innerHTML=shopBalHTML();h.after(d);sbThr()}}
-function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');addBal();const sb=$('sb');if(sb){sb.addEventListener('scroll',tierSpy,{passive:true});tierSpy()}}
+function openShop(){sheet(s.world?WN[s.world]:'Select business',shopBody(),'shop');addBal();const sb=$('sb');if(sb){sb.addEventListener('scroll',tierSpy,{passive:true});tierSpy();wishTease()}}
 // saying No to a purchase made from Select business goes back to the shop, where you were
 let shopBack=null;
 // the buy confirmation sits on top of the shop, so No just lifts it off and the shop is still there underneath
@@ -1925,8 +2020,10 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'prev':slideStep(-1);break;case'next':slideStep(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
   case'threat':threatDlg();break;
   case'ranks':sheet('Rich list',ranksBody(lbF),'ranks');loadFriends();break;
-  case'shopf':{shopF=el.dataset.v;const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=shopF==='all'?y:0;tierSpy()}break}
+  case'shopf':{shopF=el.dataset.v;const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=shopF==='all'?y:0;tierSpy();wishTease()}break}
   case'tierjump':tierGo(+el.dataset.t);break;
+  case'wish':wishToggle(bid,el);break;
+  case'wishbuy':{document.querySelector('.wtoast')?.remove();if(ovKind)closeOv();openShop();askBuy(bid);break}
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
   case'invite':inviteDlg(false);break;
   case'newcode':inviteDlg(true);break;
@@ -2370,7 +2467,7 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  if(got.length===1)toast(`${got[0]} complete! Claim your crystals in the mailbox.`,'good');else if(got.length>1)toast(`${got.length} goals complete! Claim your crystals in the mailbox.`,'good');
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();mapBtnUpd();try{stTag()}catch(e){}if(sigNow()!==stageSig)renderStage();else updStage();
- if(ovKind==='shop'||ovKind==='store'){sbThr();const c=$('sbCash'),g=$('sbGem');if(c)c.textContent=money(s.cash);if(g)g.textContent=Math.floor(s.gems).toLocaleString('en-US');const sb=$('sb');if(sb&&ovKind==='shop')sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
+ try{wishTick()}catch(e){}try{gwUi()}catch(e){}if(ovKind==='shop'||ovKind==='store'){sbThr();const c=$('sbCash'),g=$('sbGem');if(c)c.textContent=money(s.cash);if(g)g.textContent=Math.floor(s.gems).toLocaleString('en-US');const sb=$('sb');if(sb&&ovKind==='shop')sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
 function whatsNew(){if(s.seenBuild===BUILD)return false;const fresh=s.seenBuild==null&&!(s.earned>0)&&s.owned.length<2;s.seenBuild=BUILD;save();if(fresh||!NOTES.length)return false;dialog("What's new",`<p>Your game just updated.</p>${notesHTML(NOTES)}`,`<button class="yes" data-act="close">Nice</button>`);return true}
 function tick(){if(!clockReady){hud();return}dealTick();if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}if(s.gcRefund&&!ovKind&&s.name){const f=s.gcRefund;delete s.gcRefund;save();dialog('Good causes updated',f.map(([n,a,m,r])=>`<p><span class="hl">${esc(n.toUpperCase())}</span> now maxes out at level ${m}, so it's moved from level ${a} to ${m}. You've been refunded <span class="hl num">${$m(r)}</span> for the extra upgrades.</p>`).join('')+`<p class="s">Early good causes now give a bigger cut with each upgrade, up to level 10.</p>`,`<button class="ok" data-act="close">Got it</button>`)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your manager was on shift, so your get-out-of-jail-free card kept you out and the money kept coming!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){jailHid=false;if(ovKind&&ovKind!=='jail'&&ovKind!=='splash')closeOv();openJail();vib([60,40,60])}else if(s.jail&&!jailHid&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();updPill();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
