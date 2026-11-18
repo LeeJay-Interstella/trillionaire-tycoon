@@ -258,6 +258,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .tool .dot.wish{background:#FF5A7A}.tool .dot.wish svg{width:11px;height:11px;fill:#fff;stroke:none}
 .gwrow{grid-column:1/-1;display:flex;align-items:center;gap:8px;color:var(--sky);font-size:12px;font-weight:800;margin-top:2px}
 .gwbar{display:inline-block;flex:0 0 110px;width:110px;height:8px;border-radius:4px;background:#D6E9F5;overflow:hidden;vertical-align:middle}.gwbar i{display:block;height:100%;background:var(--sky);border-radius:4px;transition:width .2s}.dark .gwbar{background:#26343a}
+.sr-sal .tp{color:#3E9B37;font-weight:800}.sr-sal .tp small{display:block;font-size:11.5px;color:#8A9488;font-weight:700;margin-top:1px}.sr-sal .tp.tr{text-align:right}
 .sr-tap{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:0 4px 4px;padding:10px 16px;background:#FFF6DD;border:2px solid #F5B946;font-weight:800;font-size:14px}
 .sr-tap .k{color:#3E9B37;text-align:right}.sr-tap .m{font-size:11.5px;color:#8A7A4E;font-weight:700}.sr-tap .m:nth-of-type(4){text-align:right}
 .dark .sr-tap{background:#2A2615;border-color:#7A6326}.dark .sr-tap .m{color:#C9B57A}
@@ -1101,7 +1102,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111803,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111804,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1899,14 +1900,13 @@ function backCharge(){const sh=s.shift,c=commission();let total=0;
 const salRate=d=>d.live?Math.round(commission()*100):Math.max(20,41-(d.mlv||1));
 const salLate=d=>d.salFrom&&d.salFrom>d.start+6e4;
 const HOW={served:'served the sentence',lawyer:'lawyer got you out',bribe:'bribed out',card:'jail-free card'};
-function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">This shift has ended.</div>`;const t=now(),x=shiftStats(d),wh=x.worked/36e5;
+function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">This shift has ended.</div>`;const t=now(),x=shiftStats(d),wh=x.worked/36e5,tp=d.taps||0;
  const name=mgrName(d.hours)+' · '+d.hours+' hours';
  let h=`<div class="sr-top">${MGR}<div><small>${d.live?'Shift so far':i===0?'Shift report':dmy(d.start)+' · '+hm(d.start)+' – '+hm(d.end)}${d.mlv?' · Lv '+d.mlv:''}</small><b>${d.live?mgrName(d.hours)+' · '+hrs(d.end-t)+' left':name}</b></div></div>`;
  if(d.live){const safe=d.rows.reduce((a,r)=>a+r.safe,0),proj=x.keep+d.rows.reduce((a,r)=>a+r.rate*(1-commission())*Math.max(0,d.end-Math.max(t,r.fills))/36e5,0);
-  h+=`<div class="sr-hero"><small>You keep so far</small><b class="num">${$m(x.keep)}</b><span class="num">${$m(safe)} still in the safes${x.keep-safe>=1?` · ${$m(x.keep-safe)} already collected`:''}</span><span>${proj?`On track for about <em>${$m(proj)}</em> by ${hm(d.end)}`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
- else h+=`<div class="sr-hero"><small>You keep</small><b class="num">${$m(x.keep)}</b><span>${x.cut>=1?`After your manager's ${salRate(d)}% salary`:'Cash you would have lost without a manager'}</span></div>`;
- if(x.cut>=1)h+=`<div class="sr-sal num"><span>Manager earned past full</span><span>${$m(x.total)}</span><span class="m">Salary · ${salRate(d)}% commission${salLate(d)?' from '+hm(d.salFrom):''}</span><span class="m">−${$m(x.cut)}</span><hr><span>You keep</span><span class="k">${$m(x.keep)}</span>${salLate(d)?`<span class="note" style="grid-column:1/3;font-weight:600;font-size:11.5px;color:#888;line-height:1.35;margin-top:2px">Salary started at ${hm(d.salFrom)}, when this update arrived. Cash earned before then had no salary taken.</span>`:''}</div>`;
- if((d.taps||0)>=1)h+=`<div class="sr-tap num"><span>👆 Your taps past full</span><span class="k">+${$m(d.taps)}</span><span class="m">${(d.tapN||0).toLocaleString('en-GB')} taps · 0% commission · straight to your cash</span><span class="m">all yours</span><hr><span>Total for you this shift</span><span class="k">${$m(x.keep+d.taps)}</span></div>`;
+  h+=`<div class="sr-hero"><small>You keep so far</small><b class="num">${$m(x.keep+tp)}</b><span class="num">${$m(safe)} still in the safes${x.keep+tp-safe>=1?` · ${$m(x.keep+tp-safe)} already collected`:''}</span><span>${proj?`On track for about <em>${$m(proj+tp)}</em> by ${hm(d.end)}`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
+ else h+=`<div class="sr-hero"><small>You keep</small><b class="num">${$m(x.keep+tp)}</b><span>${x.cut>=1?`After your manager's ${salRate(d)}% salary${tp>=1?', plus your taps':''}`:tp>=1?'Manager earnings plus your taps':'Cash you would have lost without a manager'}</span></div>`;
+ if(x.cut>=1||tp>=1)h+=`<div class="sr-sal num"><span>Manager earned past full</span><span>${$m(x.total)}</span>${x.cut>=1?`<span class="m">Salary · ${salRate(d)}% commission${salLate(d)?' from '+hm(d.salFrom):''}</span><span class="m">−${$m(x.cut)}</span>`:''}${tp>=1?`<span class="tp">👆 Your taps past full<small>${(d.tapN||0).toLocaleString('en-GB')} taps · 0% commission · all yours</small></span><span class="tp tr">+${$m(tp)}</span>`:''}<hr><span>You keep</span><span class="k">${$m(x.keep+tp)}</span>${salLate(d)?`<span class="note" style="grid-column:1/3;font-weight:600;font-size:11.5px;color:#888;line-height:1.35;margin-top:2px">Salary started at ${hm(d.salFrom)}, when this update arrived. Cash earned before then had no salary taken.</span>`:''}</div>`;
  h+=`<div class="sr-stats four"><div><small>Worked</small><b>${hrs(x.worked)}</b></div><div><small>Busted</small><b class="${d.jails.length?'r':''}">${d.jails.length}×</b></div><div><small>In jail</small><b class="${x.lost?'r':''}">${hrs(x.lost)}</b></div><div><small>Trained</small><b class="${d.trained?'t':''}">${d.trained?'+'+d.trained+' lv':'—'}</b></div></div>`;
  h+=`<div class="sr-tl"><div class="lab"><span>${hm(d.start)}</span><span>${d.live?'Now '+hm(t):'Shift timeline'}</span><span>${hm(d.end)}</span></div><div class="sr-bar">${tlBar(d)}</div>
   <div class="sr-leg"><span><i style="background:#43B14F"></i>Working</span><span><i style="background:#E04B3A"></i>In jail</span>${d.live?'<span><i style="background:#BFE3B6"></i>Still to go</span>':''}</div>
