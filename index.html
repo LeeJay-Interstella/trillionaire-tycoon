@@ -222,6 +222,11 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .tabs2 button .wh{width:11px;height:11px;fill:currentColor;vertical-align:-1px;margin-right:3px}
 .tabs2 button .wn{display:inline-block;min-width:16px;padding:0 4px;margin-left:3px;border-radius:9px;background:#FF5A7A;color:#fff;font-size:10px;line-height:16px}
 .wl{padding:6px;display:flex;flex-direction:column;gap:6px}
+.wthr{font-size:10.5px;font-weight:900;margin-top:5px;white-space:nowrap}
+.wrow{cursor:pointer}
+.bitag{text-align:center;font-size:11px;font-weight:900;letter-spacing:.4px;text-transform:uppercase;color:#8A9488;margin:-4px 0 10px}
+.binfo{display:grid;grid-template-columns:1fr auto;gap:7px 14px;font-size:14px;font-weight:800;text-align:left;background:#F3F5EE;padding:12px 14px;margin:0 0 10px}
+.binfo b{text-align:right}.dark .binfo{background:#1C2425}
 .wsw{position:relative;overflow:hidden;background:#E5484D}
 .wdel{position:absolute;top:0;left:0;bottom:0;width:88px;background:#E5484D;color:#fff;font-weight:900;font-size:12px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
 .wdel svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.4}
@@ -1092,7 +1097,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111713,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111801,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1505,7 +1510,20 @@ function wishToggle(bid,el){const b=B[bid];if(!b)return;if(!Array.isArray(s.wish
 const wishBtn=b=>wishOK(b)?`<button type="button" class="wbtn${wished(b)?' on':''}" data-act="wish" data-bid="${b.id}" aria-pressed="${wished(b)}" aria-label="Wishlist ${esc(b.name)}">${HEART}</button>`:'';
 function wishRow(b){const p=buyPrice(b),gp=gemPay(b),have=gp?s.gems:s.cash,f=Math.min(1,have/p),r=f>=1&&available(b),pm=gp?0:Math.max(0,rateT.base||0),left=Math.max(0,p-have);
  const eta=r?'':!available(b)?(b.w?'World locked':`Unlocks: ${esc(tierHint(b.tier))}`):gp?`${money(left)} crystals to go`:pm>0?`~${dur(left/pm*60)} to go`:'';
- return`<div class="wsw" data-wb="${b.id}"><button type="button" class="wdel" data-act="wish" data-bid="${b.id}" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button><div class="wrow${r?' ready':''}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${b.w?WN[b.w]:`Tier ${b.tier} · ${TIERS[b.tier]}`}${b.rate>0?'':' · Good cause'}</div><div class="wbar"><i style="width:${have>0?Math.max(2,f*100).toFixed(1):0}%"></i></div><div class="eta">${r?'Ready to buy!':f<.01?`${gp?GEM+' '+money(have):$m(have)} saved`:`${Math.floor(f*100)}% saved`}<span>${eta}</span></div></div><div class="act"><button type="button" class="wbuy num" data-act="ask" data-bid="${b.id}">${gp?GEM:COIN} ${money(p)}</button></div></div></div>`}
+ return`<div class="wsw" data-wb="${b.id}"><button type="button" class="wdel" data-act="wish" data-bid="${b.id}" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button><div class="wrow${r?' ready':''}" data-act="bizinfo" data-bid="${b.id}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${b.w?WN[b.w]:`Tier ${b.tier} · ${TIERS[b.tier]}`}${b.rate>0?'':' · Good cause'}</div><div class="wbar"><i style="width:${have>0?Math.max(2,f*100).toFixed(1):0}%"></i></div><div class="eta">${r?'Ready to buy!':f<.01?`${gp?GEM+' '+money(have):$m(have)} saved`:`${Math.floor(f*100)}% saved`}<span>${eta}</span></div></div><div class="act"><button type="button" class="wbuy num" data-act="ask" data-bid="${b.id}">${gp?GEM:COIN} ${money(p)}</button>${thrTag(b)}</div></div></div>`}
+const thrCol=t=>t<0?'#3E9B37':t>=50?'#E5484D':t>=20?'#E8892B':'#8A9488';
+const thrTag=b=>`<div class="wthr" style="color:${thrCol(b.threat)}">${b.threat<0?'−'+Math.abs(b.threat):'+'+b.threat}% threat</div>`;
+// business info popup: everything the shop card says, bigger, plus payback, with Buy
+function bizInfo(bid){const b=B[bid];if(!b)return;const p=buyPrice(b),gp=gemPay(b),fill=b.rate>0&&b.hold?b.hold/b.rate:0,pay=!gp&&b.rate>0?p/b.rate:0;
+ const row=(k,v,c)=>`<span${c?` style="color:${c}"`:''}>${k}</span><b${c?` style="color:${c}"`:''}>${v}</b>`;
+ const body=`<div class="pic">${picArt(b)}</div><div class="bitag">${b.w?(b.w===4?SDG[b.tier]:WN[b.w]):'Tier '+b.tier+' · '+TIERS[b.tier]}${gemPay(b)?' · Crystal':''}</div>
+  <div class="binfo num">${b.rate>0?row('Earning',$m(b.rate)+'/min','#3E9B37')+row('Max hold',$m(b.hold),'#3E9B37')+row('Fills in',dur(fill*60)):row('Earning','None')}
+  ${row('Build time',dur(b.time))}${row('Threat',(b.threat<0?'−'+Math.abs(b.threat):'+'+b.threat)+'%',thrCol(b.threat))}${pay?row('Pays back in','~'+dur(pay*60)):''}
+  ${gemTapBiz(b)?row('Lucky taps',GEM+' crystals','#2F8DC0'):''}</div>
+  ${b.threat<0?'<p class="s">Lowers your threat for good, and taps add goodwill. Can never be sold.</p>':b.threat>=50?'<p class="s">High heat: watch your threat.</p>':''}`;
+ const own_=own(b.id),btn=own_?`<button class="ok" data-act="infoclose">Owned · Lv ${own_.level}</button>`:available(b)?`<button class="yes num" data-act="infobuy" data-bid="${bid}" ${canPay(b,p)?'':'disabled'}>${gp?GEM:COIN} ${money(p)}</button>`:`<button class="ok" disabled>${b.w?'World locked':'Locked'}</button>`;
+ const btns=`<button class="no" data-act="infoclose">Close</button>${btn}`;
+ if(ovKind==='shop'){shopBack=($('sb')||{}).scrollTop||0;stackDialog(esc(b.name),body,btns,'askbuy')}else dialog(esc(b.name),body,btns)}
 function wishBody(){const L=wishList();let h=L.length?`<div class="wl">${L.map(wishRow).join('')}</div>`:`<div class="wempty">Nothing saved yet</div>`;
  return h+`<div class="whint">${HEART}<span>Tap the heart on any business to save it here (up to ${WISH_MAX}). We'll tell you the moment you can afford it. Swipe right to remove.</span></div>`}
 // live: refresh bars, and flag/announce businesses that just became affordable
@@ -1538,7 +1556,7 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const btn=o?`<button class="price own" data-act="goto" data-bid="${b.id}">OWNED · LV ${o.level}</button>`:!open?`<div class="price off num" style="white-space:nowrap"><svg viewBox="0 0 16 18" style="width:14px;height:16px;flex:none" aria-label="Locked" role="img"><rect x="2" y="8" width="12" height="9" rx="2" fill="currentColor"/><path d="M5 8V5.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2"/></svg>${b.secret?'FREE':priceHTML(b,b.price)}</div>`:!ok?`<div class="price off" style="font-size:11px;padding:8px">${esc(reqText(b))}</div>`:!land?`<div class="price off" style="font-size:11px;padding:8px">Buy a plot of land first</div>`:
   `<button class="price num ${canPay(b,buyPrice(b))?'':'off'}" data-act="ask" data-bid="${b.id}">${b.secret?'FREE':priceHTML(b,b.price)}</button>`;
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
- return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic">${picArt(b)}</div><div class="trow"><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
+ return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic" data-act="bizinfo" data-bid="${b.id}" style="cursor:pointer">${picArt(b)}</div><div class="trow"><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
 function landBar(w){const n=plotsIn(w),have=landIn(w),free=have-usedIn(w),p=plotPrice(w,have);
  return`<div class="landbar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l9-5 9 5-9 4zM12 15V4M12 4l6 3-6 3"/></svg><div><b>Land · ${have}/${n} plots</b><span>${free} free to build on${have<n?' · next plot':''}</span></div>${have<n?`<button class="price num ${s.cash>=p?'':'off'}" data-act="land">${COIN} ${money(p)}</button>`:'<span class="all">All plots owned</span>'}</div>`}
@@ -2043,6 +2061,9 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'shopf':{shopF=el.dataset.v;const sb=$('sb');if(sb){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=shopF==='all'?y:0;tierSpy();wishTease()}break}
   case'tierjump':tierGo(+el.dataset.t);break;
   case'wish':wishToggle(bid,el);break;
+  case'bizinfo':bizInfo(bid);break;
+  case'infoclose':if(ovKind==='askbuy')backToShop();else closeOv();break;
+  case'infobuy':{const st=ovl.querySelector('.dim.stack');if(st&&$('sb')){st.remove();ovKind='shop'}askBuy(bid);break}
   case'wishbuy':{document.querySelector('.wtoast')?.remove();if(ovKind)closeOv();openShop();askBuy(bid);break}
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
   case'invite':inviteDlg(false);break;
