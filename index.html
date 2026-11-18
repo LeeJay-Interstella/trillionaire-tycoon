@@ -258,6 +258,10 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .tool .dot.wish{background:#FF5A7A}.tool .dot.wish svg{width:11px;height:11px;fill:#fff;stroke:none}
 .gwrow{grid-column:1/-1;display:flex;align-items:center;gap:8px;color:var(--sky);font-size:12px;font-weight:800;margin-top:2px}
 .gwbar{display:inline-block;flex:0 0 110px;width:110px;height:8px;border-radius:4px;background:#D6E9F5;overflow:hidden;vertical-align:middle}.gwbar i{display:block;height:100%;background:var(--sky);border-radius:4px;transition:width .2s}.dark .gwbar{background:#26343a}
+.sr-tap{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:0 4px 4px;padding:10px 16px;background:#FFF6DD;border:2px solid #F5B946;font-weight:800;font-size:14px}
+.sr-tap .k{color:#3E9B37;text-align:right}.sr-tap .m{font-size:11.5px;color:#8A7A4E;font-weight:700}.sr-tap .m:nth-of-type(4){text-align:right}
+.dark .sr-tap{background:#2A2615;border-color:#7A6326}.dark .sr-tap .m{color:#C9B57A}
+.sr-tap hr{grid-column:1/3;border:0;border-top:1px dashed #E5C77A;margin:4px 0}
 .tierjump{display:flex;gap:4px;padding:0 6px 6px;overflow-x:auto;scrollbar-width:none}.tierjump::-webkit-scrollbar{display:none}
 .tierjump button{flex:1 0 auto;min-width:38px;padding:6px 6px;border-radius:99px;background:#fff;color:var(--green-d);font-weight:900;font-size:12px;border:1.5px solid transparent;display:flex;align-items:center;justify-content:center;gap:2px;transition:background .15s,border-color .15s}
 .tierjump button i{font-style:normal;font-size:9px;opacity:.7}
@@ -1097,7 +1101,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111802,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111803,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1473,7 +1477,7 @@ function tapEarn(ev){const o=cur();if(!o||o.busy)return;const x=st(o);if(!(x.rat
  // commission: the money past full goes straight into your cash
  if(room<0.005&&!mg){try{tapFullFX()}catch(e){}tapFloat(px,py,'FULL','#E04B3A');vib([8,40,8]);return}
  const v=Math.min(Math.max(0,room),full),ex=mg?full-v:0;o.stored+=v;
- if(ex>0){bank(ex,1);s.earned+=ex}
+ if(ex>0){bank(ex,1);s.earned+=ex;if(s.shift){s.shift.taps=(s.shift.taps||0)+ex;s.shift.tapN=(s.shift.tapN||0)+1}}
  const got=v+ex;if(got>0&&gemTapBiz(B[o.bid]))gemTapRoll(px,py);tapLog.push([performance.now(),got]);ratePulse();s.taps++;s.tapEarned=(s.tapEarned||0)+got;vib(4);try{tapFX(px,py,'+'+tapFmt(got))}catch(e){tapFloat(px,py,'+'+tapFmt(got))}upd()}
 function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;const c=tapCut(o);o.end-=c;s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
@@ -1871,12 +1875,12 @@ function shiftCheck(t){if(!s.shift&&(s.mgrUntil||0)>t)s.shift={start:s.mgrUntil-
 function endShift(){const sh=s.shift;s.shift=null;if(!sh)return;const rows=[];let nEarn=0;
  for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0))continue;nEarn++;const r=sh.biz[b.code];if(r&&r.extra>=1)rows.push({name:b.name,lv:o.level,cap:st(o).hold,extra:r.extra,cut:r.cut||0,fillAt:r.fillAt})}
  rows.sort((a,b)=>b.extra-a.extra);
- s.shifts=[{start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level,salFrom:sh.salFrom||sh.start}].concat(s.shifts||[]).slice(0,30);s.shiftPending=1}
+ s.shifts=[{start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level,salFrom:sh.salFrom||sh.start,taps:sh.taps||0,tapN:sh.tapN||0}].concat(s.shifts||[]).slice(0,30);s.shiftPending=1}
 // one shape for the live shift and for past ones
 function shiftData(i){const t=now();
  if(i==='live'){const sh=s.shift;if(!sh)return null;const rows=[];let nEarn=0;
   for(const o of s.owned){const b=B[o.bid];if(!(b.rate>0)||o.busy)continue;nEarn++;const r=sh.biz[b.code]||{extra:0,fillAt:0};const x=st(o),full=o.stored>=x.hold-1e-9,ph=x.rate*60*bMul();rows.push({name:b.name,lv:o.level,cap:x.hold,extra:r.extra,cut:r.cut||0,fillAt:r.fillAt,safe:o.safe||0,ph:full?ph:0,rate:ph,fills:full?t:t+(x.hold-o.stored)/x.rate*6e4})}
-  rows.sort((a,b)=>b.extra-a.extra);return{live:true,start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level,salFrom:sh.salFrom||sh.start,upto:Math.min(t,sh.end)}}
+  rows.sort((a,b)=>b.extra-a.extra);return{live:true,start:sh.start,end:sh.end,hours:sh.hours,jails:sh.jails,rows,nEarn,partial:sh.partial||0,trained:sh.trained||0,mlv:s.mgr.level,salFrom:sh.salFrom||sh.start,taps:sh.taps||0,tapN:sh.tapN||0,upto:Math.min(t,sh.end)}}
  const r=(s.shifts||[])[i];return r?Object.assign({live:false,upto:r.end},r):null}
 function shiftStats(d){const t=now();let lost=0;
  for(const j of d.jails){const e=j.end!=null?j.end:(d.live&&s.jail?t:j.at+j.sec*1000);lost+=Math.max(0,Math.min(e,d.upto)-Math.max(j.at,d.start))}
@@ -1902,6 +1906,7 @@ function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">Thi
   h+=`<div class="sr-hero"><small>You keep so far</small><b class="num">${$m(x.keep)}</b><span class="num">${$m(safe)} still in the safes${x.keep-safe>=1?` · ${$m(x.keep-safe)} already collected`:''}</span><span>${proj?`On track for about <em>${$m(proj)}</em> by ${hm(d.end)}`:`The manager keeps earning until ${hm(d.end)}`}</span></div>`}
  else h+=`<div class="sr-hero"><small>You keep</small><b class="num">${$m(x.keep)}</b><span>${x.cut>=1?`After your manager's ${salRate(d)}% salary`:'Cash you would have lost without a manager'}</span></div>`;
  if(x.cut>=1)h+=`<div class="sr-sal num"><span>Manager earned past full</span><span>${$m(x.total)}</span><span class="m">Salary · ${salRate(d)}% commission${salLate(d)?' from '+hm(d.salFrom):''}</span><span class="m">−${$m(x.cut)}</span><hr><span>You keep</span><span class="k">${$m(x.keep)}</span>${salLate(d)?`<span class="note" style="grid-column:1/3;font-weight:600;font-size:11.5px;color:#888;line-height:1.35;margin-top:2px">Salary started at ${hm(d.salFrom)}, when this update arrived. Cash earned before then had no salary taken.</span>`:''}</div>`;
+ if((d.taps||0)>=1)h+=`<div class="sr-tap num"><span>👆 Your taps past full</span><span class="k">+${$m(d.taps)}</span><span class="m">${(d.tapN||0).toLocaleString('en-GB')} taps · 0% commission · straight to your cash</span><span class="m">all yours</span><hr><span>Total for you this shift</span><span class="k">${$m(x.keep+d.taps)}</span></div>`;
  h+=`<div class="sr-stats four"><div><small>Worked</small><b>${hrs(x.worked)}</b></div><div><small>Busted</small><b class="${d.jails.length?'r':''}">${d.jails.length}×</b></div><div><small>In jail</small><b class="${x.lost?'r':''}">${hrs(x.lost)}</b></div><div><small>Trained</small><b class="${d.trained?'t':''}">${d.trained?'+'+d.trained+' lv':'—'}</b></div></div>`;
  h+=`<div class="sr-tl"><div class="lab"><span>${hm(d.start)}</span><span>${d.live?'Now '+hm(t):'Shift timeline'}</span><span>${hm(d.end)}</span></div><div class="sr-bar">${tlBar(d)}</div>
   <div class="sr-leg"><span><i style="background:#43B14F"></i>Working</span><span><i style="background:#E04B3A"></i>In jail</span>${d.live?'<span><i style="background:#BFE3B6"></i>Still to go</span>':''}</div>
