@@ -1116,6 +1116,9 @@ function siteArt(p){let s=box(-56,-56,-7,112,112,7,'#BDBDBD')+box(-50,-50,0,100,
  const[cx,cy]=P(0,0,8);
  s+=`<circle cx="${cx}" cy="${cy-6}" r="26" fill="#8BC34A"/><g transform="translate(${cx-11} ${cy-24})" fill="#2C7526"><rect x="6" y="0" width="7" height="20" rx="3.5"/><rect x="2" y="13" width="20" height="16" rx="5"/><rect x="13" y="9" width="5" height="10" rx="2.5"/><rect x="17" y="11" width="5" height="9" rx="2.5"/></g>`;
  return`<svg viewBox="-118 -110 236 190" preserveAspectRatio="xMidYMax meet"><defs><pattern id="tp" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="12" height="12" fill="#F7D046"/><rect width="6" height="12" fill="#2A2A2A"/></pattern></defs>${s}</svg>`}
+// empty world on the main screen: the same fenced plot as the land cards, SOLD if you have a free plot, FOR SALE if not
+function stagePlot(w){const inner=plotArt(w,freePlots(w)>0?'sold':'sale').replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
+ return`<svg viewBox="-118 -110 236 190" preserveAspectRatio="xMidYMax meet"><svg x="-112" y="-62" width="224" height="157" viewBox="0 0 120 84" overflow="visible">${inner}</svg></svg>`}
 function lotArt(){let s=box(-60,-60,-7,120,120,7,'#C5DFA3')+box(-56,-56,0,112,112,2,'#D8EBC0');
  s+=box(-4,-4,2,4,4,60,'#8D6E63');const q=[[-30,0,40],[26,0,40],[26,0,62],[-30,0,62]];s+=`<polygon points="${pts(q)}" fill="#fff" stroke="#2C7526" stroke-width="3"/>`;
  const[cx,cy]=P(-2,0,51);s+=`<text x="${cx}" y="${cy+6}" text-anchor="middle" font-family="Montserrat,Arial" font-weight="900" font-size="16" fill="#2C7526">$</text>`;
@@ -1229,7 +1232,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111926,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111927,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1440,7 +1443,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
  if(G.length>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
  if(o&&!both&&G.length>1)L+=`<div class="pager num">${G.indexOf(s.cur)+1} / ${G.length}</div>`;}
  L+=`<div class="boost num" id="boostChip" hidden></div>`;
- if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
+ if(!o){artEl.innerHTML=onStage((s.world|0)?stagePlot(s.world|0):lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
   {const w=s.world|0,fp=freePlots(w);panel.innerHTML=w?`<div class="uc">${CONE}<div><h2>${fp>0?'Your land':'Land for sale'}</h2><p>${fp>0?`${fp} free plot${fp>1?'s':''}`:'Buy a plot to build'}</p></div></div><button class="bigbtn" data-act="shop">${fp>0?'Build a business':'Buy land'}</button>`:
   `<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`}
