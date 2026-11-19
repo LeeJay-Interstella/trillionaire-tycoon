@@ -1001,6 +1001,16 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .pcard.next{border-color:#F5B946;cursor:pointer;box-shadow:0 0 0 2px #F5B946 inset}
 .pcard .pbt.buy{background:var(--price);color:var(--green-d);font-size:13px}.pcard .pbt.buy.off{background:#E5E5E5;color:#9a9a9a}
 .lmore{display:block;width:calc(100% - 8px);margin:0 4px 6px;padding:10px;background:none;border:2px dashed #C9A27A;color:#8A5A2B;font:inherit;font-weight:900;font-size:13px;cursor:pointer}
+
+.pcard.own{cursor:pointer}.pcard.lock{cursor:pointer}
+.pcard .pp svg{max-width:92px;max-height:64px}.pcard .pp{height:64px}
+.plotbig{display:grid;place-items:center;margin:-6px 0 4px}.plotbig svg{width:190px;height:auto}
+.plist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;text-align:left;margin-top:8px}
+.prow{display:flex;align-items:center;gap:10px;background:#F3F5F0;padding:6px 8px}.dark .prow{background:#1C2425}
+.prow .pic{width:46px;height:40px;flex:none;display:grid;place-items:center}.prow .pic img,.prow .pic svg{max-width:46px;max-height:40px}
+.prow .pt{flex:1;min-width:0}.prow .pt b{display:block;font-size:13.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prow .pt small{font-size:11px;font-weight:700;color:#7A8691}
+.prow .pbuy{flex:none;border:0;background:var(--price);color:var(--green-d);font:inherit;font-weight:900;font-size:13px;padding:8px 10px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.prow .pbuy.off{background:#E5E5E5;color:#9a9a9a}
 </style>
 
 <div id="app">
@@ -1219,7 +1229,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111925,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111926,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1683,12 +1693,30 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
  return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic" data-act="bizinfo" data-bid="${b.id}" style="cursor:pointer">${picArt(b)}</div><div class="trow"><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
-const PLOT_SVG='<svg viewBox="0 0 64 44" aria-hidden="true"><path d="M32 6 60 20 32 34 4 20z" fill="#8BC34A" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M4 20v6l28 14 28-14v-6L32 34z" fill="#A0784A" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M32 6v28" stroke="#14191A" stroke-width="1" opacity=".25"/><path d="M38 9v-7l8 3-8 3" fill="#F5B946" stroke="#14191A" stroke-width="1.6" stroke-linejoin="round"/></svg>';
-// one card per plot: owned ones show what's on them, the next one is for sale, the rest wait their turn
+// a plot of land in each world's colours: fenced dirt with a sign that says FOR SALE, SOLD, or nothing yet
+const PLOT_LOOK={1:['#EED39A','#D9B474','#B38A4E','#8A6A3E'],2:['#E39A6A','#C97A4E','#A0583A','#7A3E28'],3:['#8C7A62','#76654F','#5A4A38','#3E3226'],4:['#9C8AD0','#7E6CB8','#5E4E96','#423472']};
+function plotArt(w,st,big){const L=PLOT_LOOK[w]||PLOT_LOOK[1],lock=st==='lock',top=lock?'#D7DAD3':L[0],dirt=lock?'#C4C8C0':L[1],side=lock?'#A9AEA6':L[2],dk=lock?'#8E938B':L[3],post=lock?'#A9AEA6':'#7A5230',rail=lock?'#BFC3BB':'#A8784A';
+ const sign=st==='sale'?['#E5484D','#fff','FOR SALE']:st==='sold'?['#3DA62F','#fff','SOLD']:null;
+ let fence='';const P=[[14,40],[24,35],[34,30],[44,25],[54,20],[60,17],[70,22],[80,27],[90,32],[100,37],[108,41]];
+ for(const[x,y]of P)fence+=`<rect x="${x-1.6}" y="${y-11}" width="3.2" height="12" rx="1" fill="${post}"/>`;
+ fence=`<path d="M14 33 60 10 108 34" fill="none" stroke="${rail}" stroke-width="2.4" stroke-linecap="round"/><path d="M14 37 60 14 108 38" fill="none" stroke="${rail}" stroke-width="2" stroke-linecap="round" opacity=".8"/>`+fence;
+ const tuft=(x,y)=>lock?'':`<path d="M${x} ${y}l-2-5M${x} ${y}l1-6M${x} ${y}l3-4" stroke="#5FA83A" stroke-width="1.8" stroke-linecap="round"/>`;
+ const furrows=lock?'':`<path d="M34 40 60 27M44 45 70 32M54 50 80 37M64 55 90 42" stroke="${dk}" stroke-width="1.4" opacity=".35" stroke-linecap="round"/>`;
+ const sg=sign?`<g><rect x="86" y="44" width="3" height="20" rx="1" fill="#6A4526"/><rect x="${70}" y="34" width="${sign[2].length>4?36:28}" height="14" rx="2" fill="${sign[0]}" stroke="#14191A" stroke-width="1.6" transform="rotate(-6 88 41)"/><text x="${70+(sign[2].length>4?18:14)}" y="44.2" text-anchor="middle" font-family="Montserrat,Arial Black,sans-serif" font-weight="900" font-size="${sign[2].length>4?6.6:7.2}" fill="${sign[1]}" transform="rotate(-6 88 41)">${sign[2]}</text></g>`:'';
+ return`<svg viewBox="0 0 120 84" ${big?'class="big"':''} aria-hidden="true"><path d="M8 40v9l52 26 52-26v-9L60 66z" fill="${side}" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M60 66v9" stroke="#14191A" stroke-width="1.2" opacity=".4"/><path d="M8 40 60 14 112 40 60 66z" fill="${top}" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M20 40 60 20 100 40 60 60z" fill="${dirt}"/>${furrows}${fence}${tuft(22,44)}${tuft(98,44)}${tuft(60,63)}${sg}</svg>`}
+const PLOT_SVG=plotArt(1,'sale');
+// one card per plot: owned ones show what's on them, the next one is for sale, the rest wait their turn; tap any of them
 function plotCard(w,i,have,built){const n=i+1,p=plotPrice(w,i);
- if(i<have){const b=built[i];return`<div class="pcard own"><div class="pp">${b?picArt(B[b.bid]):PLOT_SVG}</div><b>Plot ${n}</b><span class="st">${b?esc(B[b.bid].name):'Ready to build'}</span><span class="pbt ok">Owned</span></div>`}
- if(i===have)return`<div class="pcard next" data-act="landask" data-w="${w}"><div class="pp">${PLOT_SVG}</div><b>Plot ${n}</b><span class="st">For sale</span><span class="pbt buy num ${s.cash>=p?'':'off'}">${COIN} ${money(p)}</span></div>`;
- return`<div class="pcard lock"><div class="pp">${PLOT_SVG}</div><b>Plot ${n}</b><span class="st">After plot ${n-1}</span><span class="pbt num">${COIN} ${money(p)}</span></div>`}
+ if(i<have){const b=built[i];return`<div class="pcard own" data-act="plotview" data-w="${w}" data-i="${i}"><div class="pp">${b?picArt(B[b.bid]):plotArt(w,'sold')}</div><b>Plot ${n}</b><span class="st">${b?esc(B[b.bid].name):'Ready to build'}</span><span class="pbt ok">${b?'Built':'Owned'}</span></div>`}
+ if(i===have)return`<div class="pcard next" data-act="landask" data-w="${w}"><div class="pp">${plotArt(w,'sale')}</div><b>Plot ${n}</b><span class="st">For sale</span><span class="pbt buy num ${s.cash>=p?'':'off'}">${COIN} ${money(p)}</span></div>`;
+ return`<div class="pcard lock" data-act="plotview" data-w="${w}" data-i="${i}"><div class="pp">${plotArt(w,'lock')}</div><b>Plot ${n}</b><span class="st">After plot ${n-1}</span><span class="pbt num">${COIN} ${money(p)}</span></div>`}
+// tap a plot: empty ones show what you could build there, built ones take you to the business
+function plotView(w,i){const have=landIn(w),built=s.owned.filter(o=>B[o.bid].w===w),n=i+1;
+ if(i>=have){const p=plotPrice(w,i);return dialog(`Plot ${n} · ${WN[w]}`,`<div class="plotbig">${plotArt(w,'lock',1)}</div><p>This plot goes on sale after plot ${n-1}.</p><p class="s">It will cost <b class="num">${$m(p)}</b>.</p>`,`<button class="yes" data-act="landback">OK</button>`)}
+ const b=built[i];if(b){const bid=b.bid;if((w|0)!==(s.world|0)&&worldOpen(w)){s.wlast=s.wlast||{};s.wlast[w]=bid;travel(w)}s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();stageSig='';upd();return}
+ const opts=B.filter(x=>x.w===w&&!own(x.id)&&available(x)).sort((a,c)=>a.price-c.price);
+ const rows=opts.map(x=>{const pr=buyPrice(x),ok=canPay(x,pr);return`<div class="prow"><div class="pic">${picArt(x)}</div><div class="pt"><b>${esc(x.name)}</b><small>${x.rate>0?$m(x.rate)+'/min':'Good cause'} · ${dur(x.time)} build</small></div><button type="button" class="pbuy num ${ok?'':'off'}" data-act="${ok?'buy':'plotshort'}" data-bid="${x.id}">${priceHTML(x,pr)}</button></div>`}).join('');
+ dialog(`Plot ${n} · ${WN[w]}`,`<div class="plotbig">${plotArt(w,'sold',1)}</div><p><b>Ready to build.</b> Pick a ${WN[w]} business to put here.</p><div class="plist">${rows||'<p class="s">You own every business here.</p>'}</div>`,`<button class="no" data-act="landback">Back</button>`)}
 function landSec(w,brief){const n=plotsIn(w),have=landIn(w),built=s.owned.filter(o=>B[o.bid].w===w),free=have-built.length;
  let ids=[...Array(n).keys()];if(brief)ids=ids.filter(i=>i>=have-1&&i<=have+1).slice(0,3);
  return`<div class="tierh landh"><b>${WN[w]} · Land</b><span>${have}/${n} plots${free>0?` · ${free} free`:''}</span></div><div class="lgrid">${ids.map(i=>plotCard(w,i,have,built)).join('')}</div>${brief?`<button type="button" class="lmore" data-act="travelland" data-w="${w}">Go to ${WN[w]} to build</button>`:''}`}
@@ -2231,6 +2259,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
    {const sb=$('sb');shopY=sb?sb.scrollTop:0}
    dialog('Buy a plot of land?',`<p>You're about to buy <b>plot ${have+1} of ${n}</b> in <b>${WN[w]}</b> for <b class="num">${$m(p)}</b>.</p><p class="s">Each plot holds one ${WN[w]} business. You'll still pay for the business when you build it.</p>`,`<button class="no" data-act="landback">Not now</button><button class="yes" data-act="landbuy" data-w="${w}">Buy plot</button>`);break}
   case'landbuy':buyLand(+el.dataset.w);break;
+  case'plotview':{const sb=$('sb');if(sb&&ovKind==='shop')shopY=sb.scrollTop;plotView(+el.dataset.w,+el.dataset.i);break}
+  case'plotshort':{const x=B[bid];if(x)toast(`You need ${money(buyPrice(x)-(gemPay(x)?s.gems:s.cash))} more for ${x.name}`,'bad');break}
   case'landback':{const y=shopY;openShop();const sb=$('sb');if(sb)sb.scrollTop=y;break}
   case'travelland':{const w=+el.dataset.w;if(worldOpen(w)){closeOv();travel(w);setTimeout(openShop,350)}break}
   case'playhere':playHere();break;
