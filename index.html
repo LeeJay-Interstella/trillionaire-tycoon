@@ -985,6 +985,22 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .sfld label{display:block;font-weight:800;font-size:11px;color:#8A9488;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
 .sfld .val{font-size:15px;font-weight:800;word-break:break-all}
 .snote{font-size:11.5px;font-weight:700;color:#8A9488;padding:8px 14px 0;line-height:1.4}
+
+/* land plots as cards */
+.landh{background:#8A5A2B}
+.lgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px}
+@media(min-width:700px){.lgrid{grid-template-columns:repeat(6,1fr)}}
+.pcard{background:#fff;border:2px solid #E1EBC9;display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 6px 0;min-width:0;gap:2px}
+.dark .pcard{background:#1C2425;border-color:#2B3637}
+.pcard .pp{width:100%;height:56px;display:grid;place-items:center}.pcard .pp svg,.pcard .pp img{max-width:76px;max-height:56px}
+.pcard b{font-size:13px;font-weight:900}
+.pcard .st{font-size:10.5px;font-weight:800;color:#7A8691;line-height:1.2;min-height:26px;display:flex;align-items:center;overflow:hidden}
+.pcard .pbt{align-self:stretch;margin:4px -6px 0;padding:7px 4px;font-size:12px;font-weight:900;background:#ECEFE6;color:#9AA096;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap}
+.pcard .pbt.ok{background:var(--lime);color:var(--green-d)}
+.pcard.lock{opacity:.6}.pcard.lock .pp{filter:grayscale(1)}
+.pcard.next{border-color:#F5B946;cursor:pointer;box-shadow:0 0 0 2px #F5B946 inset}
+.pcard .pbt.buy{background:var(--price);color:var(--green-d);font-size:13px}.pcard .pbt.buy.off{background:#E5E5E5;color:#9a9a9a}
+.lmore{display:block;width:calc(100% - 8px);margin:0 4px 6px;padding:10px;background:none;border:2px dashed #C9A27A;color:#8A5A2B;font:inherit;font-weight:900;font-size:13px;cursor:pointer}
 </style>
 
 <div id="app">
@@ -1203,7 +1219,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111924,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111925,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1667,10 +1683,19 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
  return`<div class="card${open?'':' locked'}"><h4>${esc(b.name)}</h4><div class="pic" data-act="bizinfo" data-bid="${b.id}" style="cursor:pointer">${picArt(b)}</div><div class="trow"><span class="tier">${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w]):'TIER '+b.tier}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}
   <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span><span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
+const PLOT_SVG='<svg viewBox="0 0 64 44" aria-hidden="true"><path d="M32 6 60 20 32 34 4 20z" fill="#8BC34A" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M4 20v6l28 14 28-14v-6L32 34z" fill="#A0784A" stroke="#14191A" stroke-width="2" stroke-linejoin="round"/><path d="M32 6v28" stroke="#14191A" stroke-width="1" opacity=".25"/><path d="M38 9v-7l8 3-8 3" fill="#F5B946" stroke="#14191A" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+// one card per plot: owned ones show what's on them, the next one is for sale, the rest wait their turn
+function plotCard(w,i,have,built){const n=i+1,p=plotPrice(w,i);
+ if(i<have){const b=built[i];return`<div class="pcard own"><div class="pp">${b?picArt(B[b.bid]):PLOT_SVG}</div><b>Plot ${n}</b><span class="st">${b?esc(B[b.bid].name):'Ready to build'}</span><span class="pbt ok">Owned</span></div>`}
+ if(i===have)return`<div class="pcard next" data-act="landask" data-w="${w}"><div class="pp">${PLOT_SVG}</div><b>Plot ${n}</b><span class="st">For sale</span><span class="pbt buy num ${s.cash>=p?'':'off'}">${COIN} ${money(p)}</span></div>`;
+ return`<div class="pcard lock"><div class="pp">${PLOT_SVG}</div><b>Plot ${n}</b><span class="st">After plot ${n-1}</span><span class="pbt num">${COIN} ${money(p)}</span></div>`}
+function landSec(w,brief){const n=plotsIn(w),have=landIn(w),built=s.owned.filter(o=>B[o.bid].w===w),free=have-built.length;
+ let ids=[...Array(n).keys()];if(brief)ids=ids.filter(i=>i>=have-1&&i<=have+1).slice(0,3);
+ return`<div class="tierh landh"><b>${WN[w]} · Land</b><span>${have}/${n} plots${free>0?` · ${free} free`:''}</span></div><div class="lgrid">${ids.map(i=>plotCard(w,i,have,built)).join('')}</div>${brief?`<button type="button" class="lmore" data-act="travelland" data-w="${w}">Go to ${WN[w]} to build</button>`:''}`}
 function landBar(w){const n=plotsIn(w),have=landIn(w),free=have-usedIn(w),p=plotPrice(w,have);
  return`<div class="landbar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20l9-5 9 5-9 4zM12 15V4M12 4l6 3-6 3"/></svg><div><b>Land · ${have}/${n} plots</b><span>${free} free to build on${have<n?' · next plot':''}</span></div>${have<n?`<button class="price num ${s.cash>=p?'':'off'}" data-act="land">${COIN} ${money(p)}</button>`:'<span class="all">All plots owned</span>'}</div>`}
 // Select business filter: everything, money makers only, or good causes only
-let shopF='all';const shopOK=b=>shopF==='all'||shopF==='wish'||(shopF==='good')===!(b.rate>0);
+let shopF='all',shopY=0;const shopOK=b=>shopF==='all'||shopF==='wish'||(shopF==='good')===!(b.rate>0);
 // tier jump bar: one chip per tier, tap to go straight to it (main world only)
 const tierJump=()=>{if(s.world|0)return'';let h='';for(let t=1;t<TIERS.length;t++){if(!B.some(b=>b.tier===t&&b.w===0&&shopOK(b)))continue;h+=`<button type="button" data-act="tierjump" data-t="${t}" class="${t>s.tier?'lk':''}" aria-label="Tier ${t} ${TIERS[t]}">${t>s.tier?'<i>🔒</i>':''}T${t}</button>`}return`<div class="tierjump">${h}</div>`};
 const shopTabs2=()=>{const n=wishList().length;return`<div class="tabs2">${[['all','All'],['biz','Business'],['good','Causes'],['wish',`<svg class="wh" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.2 0 3.6 1.2 5.4 3.2C13.8 6.2 15.2 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></svg>Wish${n?`<span class="wn">${n}</span>`:''}`]].map(([k,l])=>`<button type="button" data-act="shopf" data-v="${k}" class="${shopF===k?'on':''}" aria-pressed="${shopF===k}" ${k==='wish'?'aria-label="Wishlist"':''}>${l}</button>`).join('')}</div>`};
@@ -1678,10 +1703,11 @@ const shopTabs=()=>`<div class="shoptabs">${shopTabs2()}${shopF==='wish'?'':tier
 function tierSpy(){const sb=$('sb');if(!sb)return;const st=sb.querySelector('.shoptabs'),top=sb.getBoundingClientRect().top+(st?st.offsetHeight:0)+6;let cur=0;sb.querySelectorAll('.tierh[data-t]').forEach(h=>{if(h.getBoundingClientRect().top<=top)cur=+h.dataset.t});if(!cur){const f=sb.querySelector('.tierh[data-t]');cur=f?+f.dataset.t:0}sb.querySelectorAll('.tierjump button').forEach(b=>b.classList.toggle('on',+b.dataset.t===cur))}
 function tierGo(t){const sb=$('sb'),h=sb&&sb.querySelector(`.tierh[data-t="${t}"]`);if(!h)return;const st=sb.querySelector('.shoptabs');sb.scrollTo({top:sb.scrollTop+h.getBoundingClientRect().top-sb.getBoundingClientRect().top-(st?st.offsetHeight:0),behavior:'smooth'})}
 function shopBody(){let h=shopTabs(),lockedShown=0;const w=s.world|0;if(shopF==='wish')return h+wishBody();
- if(w){h+=landBar(w);const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
+ if(w){h+=landSec(w);const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
   if(w===4){for(const t of[9,10,11]){const g=bs.filter(b=>b.tier===t);if(!g.length)continue;h+=`<div class="tierh"><b>${SDG[t]}</b><span>${g.filter(b=>own(b.id)).length}/${g.length}</span></div><div class="grid">${g.map(card).join('')}</div>`}}
   else if(bs.length)h+=`<div class="tierh"><b>${WN[w]}</b><span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span></div><div class="grid">${bs.map(card).join('')}</div>`;
   return h}
+ if(shopF==='all')for(let k=1;k<=4;k++)if(worldOpen(k)&&landIn(k)<plotsIn(k))h+=landSec(k,true);
  for(let t=1;t<TIERS.length;t++){const open=t<=s.tier,bs=B.filter(b=>b.tier===t&&shopOK(b));if(!bs.length)continue;
   h+=`<div class="tierh" data-t="${t}"><b>Tier ${t} · ${TIERS[t]}</b>${open?`<span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span>`:`<span class="num">${esc(tierHint(t))}</span>`}</div>`;
   h+=`<div class="grid">${bs.map(card).join('')}</div>`}
@@ -2200,7 +2226,13 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'mapnext':mapGoTo(mapIdx+1);break;
   case'mapgo':{const st=worldState(WORLDS[mapIdx],mapIdx);if(st.here)closeMap();else if(st.open)travel(mapIdx);else toast('Locked: '+(WU[mapIdx]===1e12?'become a Trillionaire':'reach $'+money(WU[mapIdx])+' net worth'),'bad');break}
   case'travelto':travel(+el.dataset.w);break;
-  case'land':buyLand();break;
+  case'land':case'landask':{const w=el.dataset.w!=null?+el.dataset.w:(s.world|0),have=landIn(w),n=plotsIn(w);if(!w||have>=n)break;const p=plotPrice(w,have);
+   if(s.cash<p){toast(`You need ${$m(p-s.cash)} more for plot ${have+1}`,'bad');break}
+   {const sb=$('sb');shopY=sb?sb.scrollTop:0}
+   dialog('Buy a plot of land?',`<p>You're about to buy <b>plot ${have+1} of ${n}</b> in <b>${WN[w]}</b> for <b class="num">${$m(p)}</b>.</p><p class="s">Each plot holds one ${WN[w]} business. You'll still pay for the business when you build it.</p>`,`<button class="no" data-act="landback">Not now</button><button class="yes" data-act="landbuy" data-w="${w}">Buy plot</button>`);break}
+  case'landbuy':buyLand(+el.dataset.w);break;
+  case'landback':{const y=shopY;openShop();const sb=$('sb');if(sb)sb.scrollTop=y;break}
+  case'travelland':{const w=+el.dataset.w;if(worldOpen(w)){closeOv();travel(w);setTimeout(openShop,350)}break}
   case'playhere':playHere();break;
   case'finish':{const o=cur();if(!o||!o.busy)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');
    // crystals are hard to earn, so finishing early always asks first
@@ -2861,8 +2893,8 @@ function travel(w){if(!worldOpen(w))return;const o=cur();s.wlast=s.wlast||{};if(
  paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
 function mapBtnUpd(){const b=document.querySelector('.mapbtn');if(!b)return;b.setAttribute('aria-label','World map: '+WN[s.world|0]);let d=b.querySelector('.wdot');const nu=(s.wopen|0)>(s.wseen|0);if(nu&&!d){d=document.createElement('i');d.className='wdot';b.appendChild(d)}else if(!nu&&d)d.remove()}
 function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'<div class="dio">'+worldLand(WORLDS[w],false)+'</div>'}</div><p>You've reached ${$m(WU[w])}. Buy land in ${WN[w]} and build ${plotsIn(w)} new businesses. Everything you own keeps earning while you're there.</p>`,`<button class="no" data-act="close">Later</button><button class="ok" data-act="travelto" data-w="${w}">Travel there</button>`,'wodlg');const d=document.querySelector('.dlg');if(d)d.classList.add('wodlg')}
-function buyLand(){const w=s.world|0;if(!w)return;if(s.jail)return jailNag();const have=landIn(w);if(have>=plotsIn(w))return;const p=plotPrice(w,have);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
- s.cash-=p;ev('land',{world:w,price:Math.round(p)});s.landVal=(s.landVal||0)+p;s.land[w]=have+1;vib(20);toast(`Plot ${have+1} of ${plotsIn(w)} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}upd()}
+function buyLand(wi){const w=wi==null?s.world|0:wi;if(!w||!worldOpen(w))return;if(s.jail)return jailNag();const have=landIn(w);if(have>=plotsIn(w))return;const p=plotPrice(w,have);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
+ s.cash-=p;ev('land',{world:w,price:Math.round(p)});s.landVal=(s.landVal||0)+p;s.land[w]=have+1;vib(20);toast(`Plot ${have+1} of ${plotsIn(w)} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}else{const y=shopY;openShop();const s2=$('sb');if(s2)s2.scrollTop=y}upd()}
 function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter(o=>B[o.bid].w===i).length;
  if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`+(i?` · ${landIn(i)}/${plotsIn(i)} plots`:''),pct:own/bs.length};
  return{locked:1,label:`$${money(n)} / $${money(w.need)}`,pct:Math.min(1,n/w.need)}}
