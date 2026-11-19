@@ -1201,7 +1201,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111917,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111918,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1789,7 +1789,7 @@ const sico=(k)=>`<span class="si"><svg viewBox="0 0 24 24">${SI[k]}</svg></span>
 let bossView='main';
 function bossBody(){return bossView==='acct'?acctView():bossView==='data'?dataView():bossMain()}
 function bossMain(){const pic=s.avatar?`<img src="${s.avatar}" alt="">`:BOSS_SVG,signed=cloudOn()&&cloudUser,nst=notifState(),ntx={unsupported:'Open from your Home Screen icon to use these',blocked:'Blocked in iPhone Settings',signin:'Sign in to turn these on',ask:'Off',on:'On'}[nst];
- return`<div class="bprof"><label class="bav" aria-label="Change profile picture">${pic}<input type="file" class="avf" accept="image/*"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><div class="who"><b>${esc(s.name||'Boss')}${s.tril?`<i class="tclub btag${s.tril.n===1?'':' g'}" data-act="plaque" role="button" aria-label="Your Trillionaire badge">${s.tril.n?'T#'+s.tril.n:'T'}</i>`:''}</b><small>Net worth ${$m(nw())}</small><span class="lk"><label class="avl">${s.avatar?'Change photo':'Add photo'}<input type="file" class="avf" accept="image/*"></label>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
+ return`<div class="bprof"><label class="bav" aria-label="Change profile picture">${pic}<input type="file" class="avf" accept="image/*" onchange="window.__avPick&&window.__avPick(this)"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><div class="who"><b>${esc(s.name||'Boss')}${s.tril?`<i class="tclub btag${s.tril.n===1?'':' g'}" data-act="plaque" role="button" aria-label="Your Trillionaire badge">${s.tril.n?'T#'+s.tril.n:'T'}</i>`:''}</b><small>Net worth ${$m(nw())}</small><span class="lk"><label class="avl">${s.avatar?'Change photo':'Add photo'}<input type="file" class="avf" accept="image/*" onchange="window.__avPick&&window.__avPick(this)"></label>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
  <div class="statgrid num"><div class="rl" data-act="ranks"><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
  <div class="bsec">My empire<span>${$m(income())}/min</span></div><div id="cAllW">${colAllBtn()}</div><div id="pfw">${pfBody()}</div>
  <div class="bsec">Account &amp; settings</div>
@@ -1815,7 +1815,7 @@ function dataView(){return BACK()+`<div class="shead">Save &amp; progress</div>
 // profile picture: pick a photo, crop it square and shrink it so it saves and syncs with the game
 function avatarFile(f){if(!f)return;if(f.type&&!/^image\//.test(f.type))return toast('Pick a photo','bad');const url=URL.createObjectURL(f);{const im=new Image();im.onload=()=>{URL.revokeObjectURL(url);const z=160,c=document.createElement('canvas');c.width=c.height=z;const g=c.getContext('2d'),m=Math.min(im.width,im.height);
   g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,z,z);s.avatar=c.toDataURL('image/jpeg',.82);markChg();save();hud();if(ovKind==='boss'){const el=$('sb');if(el){const y=el.scrollTop;el.innerHTML=bossBody();el.scrollTop=y}}toast('Profile picture updated','good');try{if(cloudUser){clearTimeout(pushTimer);cloudPush(true)}}catch(e){}};im.onerror=()=>{URL.revokeObjectURL(url);toast("Couldn't read that photo. Try a different one.",'bad')};im.src=url}}
-document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('avf')){const f=e.target.files&&e.target.files[0];avatarFile(f);try{e.target.value=''}catch(x){}}});
+window.__avPick=el=>{const f=el.files&&el.files[0];if(!f)return;avatarFile(f);setTimeout(()=>{try{el.value=''}catch(x){}},0)};
 function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
  dialog('Back up your save',`<p class="s">Copy this code and keep it somewhere safe. Paste it on another phone or browser to carry on where you left off.</p>
  <textarea id="bk" readonly style="width:100%;height:84px;font:600 11px/1.3 monospace;border:3px solid var(--lime);padding:8px;resize:none;word-break:break-all">${code}</textarea>
@@ -2257,7 +2257,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'paidboost':if(s.gems<5)return;s.gems-=5;gemLog(-5,'3-min boosts');ev('perk',{k:'boost3'});s.boostX=2;s.boostUntil=now()+18e4;closeOv();toast('2X income for 3 minutes!','good');upd();break;
   case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);bank(c,1);s.gems+=10;gemLog(10,'Treasure chest');s.chestAt=now()+4*36e5;
    dialog('Treasure chest',`<p>Inside you find<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">10 crystals</span></p><p class="s">A new chest arrives every 4 hours.</p>`,`<button class="yes" data-act="close">Awesome</button>`);upd();break}
-  case'boss':bossAll=false;bossView='main';sheet('Boss',bossBody(),'boss');break;
+  case'boss':bossAll=false;bossView='main';acctSig='';sheet('Boss',bossBody(),'boss');break;
   case'bossview':{if(ovKind!=='boss'){bossView=el.dataset.v||'main';sheet('Boss',bossBody(),'boss');break}bossView=el.dataset.v||'main';const sb=$('sb');if(sb){sb.innerHTML=bossBody();sb.scrollTop=bossView==='main'?sb.scrollHeight:0}break}
   case'signoutask':dialog('Sign out?',`<p>You're about to sign out of <b>${esc(cloudUser&&cloudUser.email||'your account')}</b>.</p><p class="s">Your progress is saved to your account first. This device stops syncing until you sign in again.</p>`,`<button class="no" data-act="bossview" data-v="main">Cancel</button><button class="yes" data-act="signoutgo">Sign out</button>`);break;
   case'signoutgo':closeOv();signOut();break;
@@ -2496,7 +2496,11 @@ function notifRow(){const st=notifState();if(st==='off')return'';
 function acctHTML(){if(!cloudOn())return'';
  if(!cloudUser)return`<div class="pad" style="padding-bottom:0"><div class="acct"><div><b>Save to the cloud</b><small>Sign in to keep your progress synced on every device. Signed-in players' gameplay stats (visits, taps, purchases) are recorded to help improve the game.</small></div><button class="bigbtn" data-act="auth" data-v="in" style="padding:12px 16px;font-size:15px;width:auto">Sign in</button></div></div>`;
  return`<div class="pad" style="padding-bottom:0"><div class="acct"><div style="min-width:0"><b>${esc(cloudUser.email||'Signed in')}</b><small id="syncst">${syncText()}</small><small style="opacity:.7">Gameplay stats are recorded to help improve the game.</small></div><div style="display:flex;gap:6px"><button class="bigbtn ghost" data-act="syncnow" style="padding:10px 12px;font-size:13px;width:auto">Sync now</button><button class="bigbtn ghost" data-act="signout" style="padding:10px 12px;font-size:13px;width:auto">Sign out</button></div></div></div>`}
-function refreshAcct(){if(ovKind==='boss'){const el=$('sb');if(el)el.innerHTML=bossBody()}}
+// while the Boss panel is open, only refresh the sync text; rebuilding the panel would throw away a photo picker that's open
+let acctSig='';
+function refreshAcct(){if(ovKind!=='boss')return;const sig=(cloudUser?cloudUser.email||'1':'')+'|'+notifState();const el=$('sb');if(!el)return;
+ if(sig!==acctSig&&acctSig!==''){acctSig=sig;const y=el.scrollTop;el.innerHTML=bossBody();el.scrollTop=y;return}acctSig=sig;
+ el.querySelectorAll('#syncst').forEach(n=>{const t=syncText();if(n.textContent!==t)n.textContent=t})}
 function authDlg(mode){const up=mode==='up';
  dialog(up?'Create account':'Sign in',`<p class="s">${up?'Make an account to save your progress online.':'Sign in to load your progress on this device.'}</p>
  <input class="nm" id="ae" type="email" aria-label="Email" placeholder="Email" autocomplete="email" autocapitalize="off" style="text-align:left;font-size:16px">
