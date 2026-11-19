@@ -954,6 +954,14 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .pfl .wbar i.full{background:var(--orange)}
 .pfl .pr{font-size:12px;font-weight:900;color:var(--green);margin-top:6px;white-space:nowrap}
 .pfl .pr.gc{color:var(--teal)}
+.call{display:flex;height:44px;margin:8px 6px 4px;box-shadow:0 4px 0 var(--green-d);cursor:pointer;transition:transform .06s;user-select:none;-webkit-user-select:none}
+.call:active{transform:translateY(3px);box-shadow:0 1px 0 var(--green-d)}
+.call .amt{flex:1;background:var(--green);color:#fff;display:flex;align-items:center;gap:8px;padding-left:12px;font-weight:900;font-size:20px;min-width:0;overflow:hidden;white-space:nowrap}
+.call .amt b{font-weight:900}
+.call .go{width:118px;background:var(--lime);color:var(--green-d);font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.call .coin{font-size:18px}
+.call.off{opacity:.55;cursor:default}
+.call.off:active{transform:none;box-shadow:0 4px 0 var(--green-d)}
 .pmore{display:block;width:calc(100% - 12px);margin:0 6px 4px;padding:10px;background:none;border:2px dashed #C9D2BE;color:#7A8691;font:inherit;font-weight:900;font-size:13px;cursor:pointer}
 
 /* settings line items */
@@ -1193,7 +1201,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111914,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111916,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1763,6 +1771,13 @@ let bossF='all',bossAll=false;
 function pfRow(o){const b=B[o.bid],x=st(o),good=!(b.rate>0),f=x.hold>0?Math.min(1,(o.stored||0)/x.hold):0,full=!good&&f>=.999;
  const where=b.w?WN[b.w]:`Tier ${b.tier} · ${TIERS[b.tier]}`,busy=o.busy?(o.busy==='build'?'Building':'Upgrading'):'';
  return`<div class="wrow" data-act="pfgo" data-bid="${b.id}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${where}${good?' · Good cause':''}</div>${good?`<div class="pr gc">${x.threat<0?'Cuts threat '+Math.abs(x.threat).toFixed(1)+'%':'Good cause'}</div>`:`<div class="wbar"><i class="${full?'full':''}" style="width:${(f*100).toFixed(1)}%"></i></div><div class="eta">${busy||(full?'Full':`${Math.floor(f*100)}% full`)}<span>${$m(x.rate)}/min</span></div>`}</div><div class="act"><span class="lv">LV ${o.level}</span></div></div>`}
+// collect every business at once (all worlds)
+const colAllAmt=()=>s.owned.reduce((a,o)=>{const b=B[o.bid];return a+(b&&b.rate>0&&!o.busy?(o.stored||0)+(o.safe||0):0)},0);
+const colAllBtn=()=>{const a=colAllAmt();return`<div class="call${a>=1?'':' off'}" data-act="bosscollect" role="button"><span class="amt num"><i class="coin"></i><b>${$m(a)}</b></span><span class="go"><i class="coin"></i>COLLECT ALL</span></div>`};
+function bossCollect(){let a=0,n=0;for(const o of s.owned){const b=B[o.bid];if(!b||!(b.rate>0)||o.busy)continue;const v=(o.stored||0)+(o.safe||0);if(v<1)continue;a+=v;n++;o.stored=0;o.safe=0}
+ if(a<1)return toast('Nothing to collect yet. Bills are on their way.');bank(a);s.earned+=a;s.collects=(s.collects||0)+n;vib(20);save();
+ toast(`Collected ${$m(a)} from ${n} business${n>1?'es':''}`,'good');const t=$('cash')&&$('cash').closest('.t');if(t){t.classList.add('bump');setTimeout(()=>t.classList.remove('bump'),180)}
+ upd();const w=$('cAllW');if(w)w.innerHTML=colAllBtn();const p=$('pfw');if(p)p.innerHTML=pfBody()}
 function pfBody(){const L=s.owned.filter(o=>B[o.bid]).filter(o=>{const g=!(B[o.bid].rate>0);return bossF==='all'||(bossF==='good')===g})
   .sort((a,c)=>{const A=B[a.bid],C=B[c.bid];return (C.w-A.w)||(C.tier-A.tier)||(st(c).rate-st(a).rate)});
  const nb=s.owned.filter(o=>B[o.bid]&&B[o.bid].rate>0).length,ng=s.owned.length-nb,show=bossAll?L:L.slice(0,8);
@@ -1776,7 +1791,7 @@ function bossBody(){return bossView==='acct'?acctView():bossView==='data'?dataVi
 function bossMain(){const pic=s.avatar?`<img src="${s.avatar}" alt="">`:BOSS_SVG,signed=cloudOn()&&cloudUser,nst=notifState(),ntx={unsupported:'Open from your Home Screen icon to use these',blocked:'Blocked in iPhone Settings',signin:'Sign in to turn these on',ask:'Off',on:'On'}[nst];
  return`<div class="bprof"><label class="bav" aria-label="Change profile picture">${pic}<input type="file" class="avf" accept="image/*"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><div class="who"><b>${esc(s.name||'Boss')}${s.tril?`<i class="tclub btag${s.tril.n===1?'':' g'}" data-act="plaque" role="button" aria-label="Your Trillionaire badge">${s.tril.n?'T#'+s.tril.n:'T'}</i>`:''}</b><small>Net worth ${$m(nw())}</small><span class="lk"><label class="avl">${s.avatar?'Change photo':'Add photo'}<input type="file" class="avf" accept="image/*"></label>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
  <div class="statgrid num"><div class="rl" data-act="ranks"><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
- <div class="bsec">My empire<span>${$m(income())}/min</span></div><div id="pfw">${pfBody()}</div>
+ <div class="bsec">My empire<span>${$m(income())}/min</span></div><div id="cAllW">${colAllBtn()}</div><div id="pfw">${pfBody()}</div>
  <div class="bsec">Account &amp; settings</div>
  <div class="sgrp">
   <div class="srow" data-act="bossview" data-v="acct" role="button">${sico('user')}<span class="st"><b>Account details</b><small>${signed?esc(cloudUser.email||'Signed in')+' · <span id="syncst">'+syncText()+'</span>':cloudOn()?'Not signed in · progress stays on this device':'Name and photo'}</small></span>${signed?'<button type="button" class="mini" data-act="syncnow">Sync now</button>':''}${CHEV}</div>
@@ -2257,6 +2272,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'bossmore':{bossAll=true;const w=$('pfw');if(w)w.innerHTML=pfBody();break}
   case'pfgo':{const b=B[bid];if(!b)break;const i=s.owned.findIndex(o=>o.bid===bid);if(i<0)break;if((b.w|0)!==(s.world|0)&&worldOpen(b.w|0)){s.wlast=s.wlast||{};s.wlast[b.w|0]=bid;travel(b.w|0)}s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();stageSig='';upd();break}
   case'plaque':if(s.tril){if(ovKind==='boss'){}trilShow(true)}break;
+  case'bosscollect':bossCollect();break;
   case'avpick':document.querySelector('.bav .avf')?.click();break;
   case'avdel':delete s.avatar;save();hud();{const el=$('sb');if(el&&ovKind==='boss')el.innerHTML=bossBody()}toast('Profile picture removed');break;
   case'savename':{const v=$('pn').value.trim();if(v){s.name=v;save();toast('Name saved','good')}bossView='main';const sb=$('sb');if(sb&&ovKind==='boss')sb.innerHTML=bossBody();else closeOv();break}
@@ -2663,7 +2679,7 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
  if(got.length===1)toast(`${got[0]} complete! Claim your crystals in the mailbox.`,'good');else if(got.length>1)toast(`${got.length} goals complete! Claim your crystals in the mailbox.`,'good');
  const r=myRank();if(lastRank&&r<lastRank){const below=board()[r];toast(`You passed ${below?below[1]:'a rival'}. Now #${r} on the rich list!`,'good')}lastRank=r}
 function upd(){hud();mapBtnUpd();try{stTag()}catch(e){}if(sigNow()!==stageSig)renderStage();else updStage();
- try{wishTick()}catch(e){}try{gwUi()}catch(e){}if(ovKind==='shop'||ovKind==='store'){sbThr();const c=$('sbCash'),g=$('sbGem');if(c)c.textContent=money(s.cash);if(g)g.textContent=Math.floor(s.gems).toLocaleString('en-US');const sb=$('sb');if(sb&&ovKind==='shop')sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
+ try{wishTick()}catch(e){}if(ovKind==='boss'){const w=$('cAllW');if(w){const a=colAllAmt(),b=w.querySelector('b');if(b){const t=$m(a);if(b.textContent!==t)b.textContent=t}const c=w.firstChild;if(c)c.classList.toggle('off',a<1)}}try{gwUi()}catch(e){}if(ovKind==='shop'||ovKind==='store'){sbThr();const c=$('sbCash'),g=$('sbGem');if(c)c.textContent=money(s.cash);if(g)g.textContent=Math.floor(s.gems).toLocaleString('en-US');const sb=$('sb');if(sb&&ovKind==='shop')sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
 function whatsNew(){if(s.seenBuild===BUILD)return false;const fresh=s.seenBuild==null&&!(s.earned>0)&&s.owned.length<2;s.seenBuild=BUILD;save();if(fresh||!NOTES.length)return false;dialog("What's new",`<p>Your game just updated.</p>${notesHTML(NOTES)}`,`<button class="yes" data-act="close">Nice</button>`);return true}
 // Trillionaire: celebrate the first time you reach $1T, and claim your place in the club (#1 is the first ever)
 async function trilClaim(push){if(!supa||!cloudUser||!s.tril||s.tril.n||trilBusy)return;trilBusy=true;
