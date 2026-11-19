@@ -929,6 +929,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .t-boss img[hidden]{display:none}
 .bprof{display:flex;align-items:center;gap:14px;padding:14px 14px 8px}
 .bav{position:relative;width:76px;height:76px;flex:none;border:4px solid #fff;background:var(--green);box-shadow:0 0 0 3px var(--lime);cursor:pointer}
+.avf{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0;z-index:3}
+.avl{position:relative;overflow:hidden;font-size:12px;font-weight:900;color:var(--teal);text-decoration:underline;cursor:pointer}
 .bav img,.bav svg{width:100%;height:100%;display:block;object-fit:cover}
 .bav .cam{position:absolute;right:-9px;bottom:-9px;width:28px;height:28px;border-radius:50%;background:var(--lime);border:3px solid #fff;display:grid;place-items:center}
 .bav .cam svg{width:15px;height:15px;fill:none;stroke:var(--green-d);stroke-width:2.4}
@@ -1186,7 +1188,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111911,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111912,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1767,7 +1769,7 @@ const sico=(k)=>`<span class="si"><svg viewBox="0 0 24 24">${SI[k]}</svg></span>
 let bossView='main';
 function bossBody(){return bossView==='acct'?acctView():bossView==='data'?dataView():bossMain()}
 function bossMain(){const pic=s.avatar?`<img src="${s.avatar}" alt="">`:BOSS_SVG,signed=cloudOn()&&cloudUser,nst=notifState(),ntx={unsupported:'Open from your Home Screen icon to use these',blocked:'Blocked in iPhone Settings',signin:'Sign in to turn these on',ask:'Off',on:'On'}[nst];
- return`<div class="bprof"><label class="bav" for="avIn" aria-label="Change profile picture">${pic}<span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><input type="file" id="avIn" accept="image/*" hidden><div class="who"><b>${esc(s.name||'Boss')}</b><small>${s.tril?(s.tril.n===1?'First ever Trillionaire':s.tril.n?'Trillionaire #'+s.tril.n:'Trillionaire Club'):'Net worth '+$m(nw())}</small><span class="lk"><button type="button" data-act="avpick">${s.avatar?'Change photo':'Add photo'}</button>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
+ return`<div class="bprof"><label class="bav" aria-label="Change profile picture">${pic}<input type="file" class="avf" accept="image/*"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><div class="who"><b>${esc(s.name||'Boss')}</b><small>${s.tril?(s.tril.n===1?'First ever Trillionaire':s.tril.n?'Trillionaire #'+s.tril.n:'Trillionaire Club'):'Net worth '+$m(nw())}</small><span class="lk"><label class="avl">${s.avatar?'Change photo':'Add photo'}<input type="file" class="avf" accept="image/*"></label>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
  <div class="statgrid num"><div class="rl" data-act="ranks"><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
  <div class="bsec">My empire<span>${$m(income())}/min</span></div><div id="pfw">${pfBody()}</div>
  <div class="bsec">Account &amp; settings</div>
@@ -1791,9 +1793,9 @@ function dataView(){return BACK()+`<div class="shead">Save &amp; progress</div>
  <div class="sgrp"><div class="srow" data-act="backupask" role="button">${sico('back')}<span class="st"><b>Back up or move my save</b><small>Get a code to carry your game to another device</small></span>${CHEV}</div></div>
  <div class="sgrp" style="margin-top:14px"><div class="srow warn" data-act="resetask" role="button">${sico('wipe')}<span class="st"><b>Reset all progress</b><small>Start again from nothing</small></span>${CHEV}</div></div><div style="height:18px"></div>`}
 // profile picture: pick a photo, crop it square and shrink it so it saves and syncs with the game
-function avatarFile(f){if(!f||!/^image\//.test(f.type))return toast('Pick a photo','bad');const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const z=160,c=document.createElement('canvas');c.width=c.height=z;const g=c.getContext('2d'),m=Math.min(im.width,im.height);
-  g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,z,z);s.avatar=c.toDataURL('image/jpeg',.82);save();hud();if(ovKind==='boss'){const el=$('sb');if(el){const y=el.scrollTop;el.innerHTML=bossBody();el.scrollTop=y}}toast('Profile picture updated','good');try{if(cloudUser)cloudPush()}catch(e){}};im.onerror=()=>toast("Couldn't read that photo",'bad');im.src=r.result};r.readAsDataURL(f)}
-document.addEventListener('change',e=>{if(e.target&&e.target.id==='avIn'){avatarFile(e.target.files&&e.target.files[0]);e.target.value=''}});
+function avatarFile(f){if(!f)return;if(f.type&&!/^image\//.test(f.type))return toast('Pick a photo','bad');const url=URL.createObjectURL(f);{const im=new Image();im.onload=()=>{URL.revokeObjectURL(url);const z=160,c=document.createElement('canvas');c.width=c.height=z;const g=c.getContext('2d'),m=Math.min(im.width,im.height);
+  g.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,z,z);s.avatar=c.toDataURL('image/jpeg',.82);save();hud();if(ovKind==='boss'){const el=$('sb');if(el){const y=el.scrollTop;el.innerHTML=bossBody();el.scrollTop=y}}toast('Profile picture updated','good');try{if(cloudUser)cloudPush()}catch(e){}};im.onerror=()=>{URL.revokeObjectURL(url);toast("Couldn't read that photo. Try a different one.",'bad')};im.src=url}}
+document.addEventListener('change',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('avf')){const f=e.target.files&&e.target.files[0];avatarFile(f);try{e.target.value=''}catch(x){}}});
 function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
  dialog('Back up your save',`<p class="s">Copy this code and keep it somewhere safe. Paste it on another phone or browser to carry on where you left off.</p>
  <textarea id="bk" readonly style="width:100%;height:84px;font:600 11px/1.3 monospace;border:3px solid var(--lime);padding:8px;resize:none;word-break:break-all">${code}</textarea>
@@ -2249,7 +2251,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'bossf':{bossF=el.dataset.v;bossAll=false;const w=$('pfw');if(w)w.innerHTML=pfBody();break}
   case'bossmore':{bossAll=true;const w=$('pfw');if(w)w.innerHTML=pfBody();break}
   case'pfgo':{const b=B[bid];if(!b)break;const i=s.owned.findIndex(o=>o.bid===bid);if(i<0)break;if((b.w|0)!==(s.world|0)&&worldOpen(b.w|0)){s.wlast=s.wlast||{};s.wlast[b.w|0]=bid;travel(b.w|0)}s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();stageSig='';upd();break}
-  case'avpick':$('avIn')?.click();break;
+  case'avpick':document.querySelector('.bav .avf')?.click();break;
   case'avdel':delete s.avatar;save();hud();{const el=$('sb');if(el&&ovKind==='boss')el.innerHTML=bossBody()}toast('Profile picture removed');break;
   case'savename':{const v=$('pn').value.trim();if(v){s.name=v;save();toast('Name saved','good')}bossView='main';const sb=$('sb');if(sb&&ovKind==='boss')sb.innerHTML=bossBody();else closeOv();break}
   case'howto':howto();break;
