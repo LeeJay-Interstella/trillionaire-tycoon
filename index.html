@@ -894,11 +894,35 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .st-inside div svg{width:30px;height:30px;flex:none;filter:grayscale(1)}
 .tool .tag.lk{background:#14191A;color:#fff;display:flex;align-items:center;justify-content:center;padding:2px 4px}.tool .tag.lk svg{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:3}
 .st-soon{margin:12px 14px 0;padding:10px 12px;background:#E9F1FB;border:2px dashed #2F6DB5;border-radius:10px;font-size:12.5px;font-weight:700;color:#1F4E86;line-height:1.4}
+
+/* trillionaire celebration */
+#trilfx{position:fixed;inset:0;z-index:95;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:radial-gradient(60% 40% at 50% 40%,#3A2E0E 0%,#0E1112 72%);color:#fff;padding:24px;gap:10px;animation:tfin .35s ease}
+@keyframes tfin{from{opacity:0}}
+#trilfx>*:not(.rays):not(.cf){position:relative;z-index:2}
+#trilfx .rays{position:absolute;left:50%;top:40%;width:1600px;height:1600px;margin:-800px 0 0 -800px;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(242,193,78,.17) 0 8deg,transparent 8deg 20deg);-webkit-mask:radial-gradient(circle,#000 14%,transparent 58%);mask:radial-gradient(circle,#000 14%,transparent 58%);animation:trays 40s linear infinite;z-index:0}
+@keyframes trays{to{transform:rotate(360deg)}}
+#trilfx .cf{position:absolute;top:-20px;width:12px;height:8px;border-radius:2px;animation:cfall linear infinite;z-index:1}
+@keyframes cfall{to{transform:translateY(112vh) rotate(720deg)}}
+#trilfx .plq{width:min(300px,78vw);aspect-ratio:1.6;border-radius:18px;background:linear-gradient(135deg,#2A2A2A 0%,#0A0A0A 60%,#1C1C1C 100%);border:4px solid #F2C14E;color:#F2C14E;display:flex;flex-direction:column;justify-content:space-between;padding:16px 20px;box-shadow:0 10px 0 rgba(0,0,0,.5),0 0 70px rgba(242,193,78,.5);overflow:hidden;text-align:left;margin-bottom:14px;animation:tplq .9s cubic-bezier(.2,1.5,.4,1) both;transform:rotate(-4deg)}
+#trilfx .plq.gold{background:linear-gradient(135deg,#FFE08A 0%,#F2C14E 55%,#D9A42E 100%);border-color:#0E1112;color:#0E1112;box-shadow:0 10px 0 rgba(0,0,0,.5),0 0 70px rgba(242,193,78,.45)}
+@keyframes tplq{0%{transform:scale(.3) rotate(-24deg);opacity:0}100%{transform:rotate(-4deg);opacity:1}}
+#trilfx .plq .pt{display:flex;width:100%;color:inherit;justify-content:space-between;align-items:center;font-weight:900;font-size:15px;letter-spacing:.16em}
+#trilfx .plq .pt svg{width:26px;height:26px}
+#trilfx .plq .pn{font-weight:900;font-size:86px;line-height:.85;letter-spacing:-2px}
+#trilfx .plq .pn small{display:block;font-size:18px;letter-spacing:.14em;margin-top:8px}
+#trilfx .plq .sh{position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.3) 47%,transparent 58%);background-size:300% 100%;animation:tshine 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes tshine{0%,40%{background-position:120% 0}100%{background-position:-60% 0}}
+#trilfx h2{margin:0;font-weight:900;font-size:clamp(28px,8.5vw,44px);line-height:.95;letter-spacing:-1px;color:#F2C23A;text-shadow:0 4px 0 #6b4f00}
+#trilfx .amt{font-weight:900;font-size:clamp(34px,10.5vw,56px);white-space:nowrap;line-height:1;color:#fff}
+#trilfx .rk{background:#F2C23A;color:#111;font-weight:900;font-size:14px;letter-spacing:.5px;padding:6px 12px;border-radius:4px;text-transform:uppercase}
+#trilfx p{margin:0;max-width:320px;font-size:15px;line-height:1.45;opacity:.9}
+#trilfx button{margin-top:14px;background:#F2C23A;color:#111;border:0;font:inherit;font-weight:900;font-size:18px;padding:14px 34px;border-radius:10px;box-shadow:0 5px 0 #8a6a00;cursor:pointer}
+/*tc*/.nwrow .tclub.g{background:#F2C14E;color:#0E1112;border-color:#0E1112}.nwrow .tclub{display:inline-block;margin-left:6px;background:#0b0b0b;color:#F2C23A;border:1px solid #F2C23A;font-style:normal;font-weight:900;font-size:9px;line-height:1;padding:2px 4px;border-radius:3px;vertical-align:1px;letter-spacing:.3px}
 </style>
 
 <div id="app">
   <header class="hud">
-    <div class="t t-nw"><small class="nwrow"><span>Net worth</span><span class="rate num" id="nwrate"></span></small><b class="num"><i class="coin"></i><span id="nw">0</span></b></div>
+    <div class="t t-nw"><small class="nwrow"><span id="nwlab">Net worth</span><span class="rate num" id="nwrate"></span></small><b class="num"><i class="coin"></i><span id="nw">0</span></b></div>
     <button class="t t-boss" data-act="boss" aria-label="Boss profile and settings">
       <svg viewBox="0 0 20 20" shape-rendering="crispEdges"><rect x="6" y="3" width="8" height="8" fill="#F2C99A"/><rect x="6" y="3" width="8" height="2" fill="#5A3B22"/><rect x="7" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="9" width="4" height="1" fill="#B85C3A"/><rect x="4" y="12" width="12" height="8" fill="#2C7526"/><rect x="9" y="12" width="2" height="6" fill="#F5B946"/></svg>
       <small>Boss</small></button>
@@ -1112,7 +1136,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111906,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111908,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1390,7 +1414,7 @@ function ratePulse(){const r=$('nwrate');if(!r||!r.textContent)return;
    sp.style.cssText=`position:absolute;left:${cx+(Math.random()-.5)*b.width*.7}px;top:${cy}px;width:${z}px;height:${z}px;margin:${-z/2}px 0 0 ${-z/2}px`;
    sp.innerHTML=`<svg viewBox="0 0 20 20" width="100%" height="100%"><path d="M10 0L12.4 7.6 20 10 12.4 12.4 10 20 7.6 12.4 0 10 7.6 7.6z" fill="${i%2?'#FFFFFF':'#D7F542'}"/></svg>`;L.appendChild(sp);
    sp.animate([{transform:'translate(0,0) scale(.3) rotate(0deg)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(1) rotate(120deg)`,opacity:1,offset:.55},{transform:`translate(${Math.cos(a)*d*1.3}px,${Math.sin(a)*d*1.3+8}px) scale(.2) rotate(200deg)`,opacity:0}],{duration:520+Math.random()*180,easing:'cubic-bezier(.2,.8,.4,1)'}).onfinish=()=>sp.remove()}}catch(e){}}
-function hud(){pmUI();dealUI();$('nw').textContent=money(nw());
+function hud(){pmUI();dealUI();$('nw').textContent=money(nw());{const l=$('nwlab'),h=s.tril?'Net worth<i class="tclub'+(s.tril.n===1?'':' g')+'">'+(s.tril.n?'T#'+s.tril.n:'T')+'</i>':'Net worth';if(l&&l.innerHTML!==h)l.innerHTML=h}
  {const r=$('nwrate'),inc=income(),jailed=!!(s.jail&&s.jail.until>now());
   const tr=jailed?0:tapRate(),tot=inc+tr,tapping=tr>inc*.002;
   rateT={v:tot,base:inc,on:!jailed&&tot>0,sfx:boostOn()?` · ${s.boostX||2}×`:''};if(rateV===null||jailed)rateV=tot;
@@ -2527,7 +2551,19 @@ function checkAch(){const got=[];for(const[id,t,,f]of ACH){if(!s.ach[id]&&f()){s
 function upd(){hud();mapBtnUpd();try{stTag()}catch(e){}if(sigNow()!==stageSig)renderStage();else updStage();
  try{wishTick()}catch(e){}try{gwUi()}catch(e){}if(ovKind==='shop'||ovKind==='store'){sbThr();const c=$('sbCash'),g=$('sbGem');if(c)c.textContent=money(s.cash);if(g)g.textContent=Math.floor(s.gems).toLocaleString('en-US');const sb=$('sb');if(sb&&ovKind==='shop')sb.querySelectorAll('[data-act=ask]').forEach(el=>{const b=B[+el.dataset.bid];el.classList.toggle('off',!canPay(b,buyPrice(b)))})}}
 function whatsNew(){if(s.seenBuild===BUILD)return false;const fresh=s.seenBuild==null&&!(s.earned>0)&&s.owned.length<2;s.seenBuild=BUILD;save();if(fresh||!NOTES.length)return false;dialog("What's new",`<p>Your game just updated.</p>${notesHTML(NOTES)}`,`<button class="yes" data-act="close">Nice</button>`);return true}
-function tick(){if(!clockReady){hud();return}dealTick();if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}if(s.gcRefund&&!ovKind&&s.name){const f=s.gcRefund;delete s.gcRefund;save();dialog('Good causes updated',f.map(([n,a,m,r])=>`<p><span class="hl">${esc(n.toUpperCase())}</span> now maxes out at level ${m}, so it's moved from level ${a} to ${m}. You've been refunded <span class="hl num">${$m(r)}</span> for the extra upgrades.</p>`).join('')+`<p class="s">Early good causes now give a bigger cut with each upgrade, up to level 10.</p>`,`<button class="ok" data-act="close">Got it</button>`)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your manager was on shift, so your get-out-of-jail-free card kept you out and the money kept coming!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){jailHid=false;if(ovKind&&ovKind!=='jail'&&ovKind!=='splash')closeOv();openJail();vib([60,40,60])}else if(s.jail&&!jailHid&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();updPill();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
+// Trillionaire: celebrate the first time you reach $1T, and claim your place in the club (#1 is the first ever)
+async function trilClaim(push){if(!supa||!cloudUser||!s.tril||s.tril.n||trilBusy)return;trilBusy=true;
+ try{if(push)await cloudPush(true);const{data,error}=await supa.rpc('claim_trillion');if(!error&&data){const had=s.tril.n;s.tril.n=+data;save();hud();if(!had&&trilShown)toast(s.tril.n===1?'You are the first ever Trillionaire!':'You are Trillionaire #'+s.tril.n,'good')}}catch(e){}trilBusy=false}
+let trilBusy=false,trilShown=false;
+function trilCheck(){if(s.tril||!s.name||ovKind==='splash'||!(nw()>=1e12||(s.wopen||0)>=1))return;s.tril={at:now()};save();
+ Promise.race([trilClaim(true),new Promise(r=>setTimeout(r,5000))]).then(trilShow,trilShow)}
+function trilShow(){if(trilShown||$('trilfx'))return;trilShown=true;const n=s.tril&&s.tril.n,C=['#F2C14E','#4FB6EC','#C6F432','#F2694B','#fff'];let cf='';
+ for(let i=0;i<34;i++)cf+=`<i class="cf" style="left:${(Math.random()*100).toFixed(1)}%;background:${C[i%5]};animation-duration:${(3+Math.random()*4).toFixed(2)}s;animation-delay:${(-Math.random()*7).toFixed(2)}s"></i>`;
+ const crown='<svg viewBox="0 0 24 24"><path d="M3 18l2-10 5 5 2-7 2 7 5-5 2 10z" fill="currentColor" stroke="'+(n===1?'#0E1112':'#F2C14E')+'" stroke-width="1.2" stroke-linejoin="round"/><rect x="3" y="18.5" width="18" height="3" rx="1" fill="currentColor"/></svg>';
+ const d=document.createElement('div');d.id='trilfx';d.setAttribute('role','dialog');
+ d.innerHTML=`<div class="rays"></div>${cf}<div class="plq${n===1?'':' gold'}"><div class="sh"></div><div class="pt"><span>TRILLIONAIRE</span>${crown}</div><div class="pn">${n?'#'+n:'$1T'}<small>${n===1?'FIRST EVER':'CLUB MEMBER'}</small></div></div><h2>YOU'RE A<br>TRILLIONAIRE!</h2>${n===1?'<p>Nobody got here before you. The black #1 badge is yours for good.</p>':`<p>Welcome to the club, ${esc(s.name)}. Your badge sits next to your net worth.</p>`}<p style="font-size:13px;opacity:.75">Bullion Bay is open. Tap the map to travel there.</p><button type="button">Take a bow</button>`;
+ d.querySelector('button').onclick=()=>d.remove();document.body.appendChild(d);try{navigator.vibrate&&navigator.vibrate([60,40,120])}catch(e){}}
+function tick(){if(!clockReady){hud();return}dealTick();if(!s.tril||(!s.tril.n&&!trilBusy&&cloudUser&&Math.random()<.002))try{s.tril?trilClaim():trilCheck()}catch(e){}if(pmWant&&!s.pm)enterPM();if(pmLater&&!ovKind){const a=pmLater;pmLater=null;dialog(...a)}if(s.gcRefund&&!ovKind&&s.name){const f=s.gcRefund;delete s.gcRefund;save();dialog('Good causes updated',f.map(([n,a,m,r])=>`<p><span class="hl">${esc(n.toUpperCase())}</span> now maxes out at level ${m}, so it's moved from level ${a} to ${m}. You've been refunded <span class="hl num">${$m(r)}</span> for the extra upgrades.</p>`).join('')+`<p class="s">Early good causes now give a bigger cut with each upgrade, up to level 10.</p>`,`<button class="ok" data-act="close">Got it</button>`)}const wasJ=!!s.jail;const adv=advance(now());if(s.jail&&!wasJ&&adv&&adv.dt>60000&&s.name)jailNote={dt:adv.dt,gained:adv.gained,raided:true};if(s.dodged&&ovKind!=='splash'){toast(s.dodged>1?`Your get-out-of-jail-free cards kept you out of jail ${s.dodged} times!`:'The police came knocking. Your manager was on shift, so your get-out-of-jail-free card kept you out and the money kept coming!','good');s.dodged=0;save()}updPerkUI();if(s.jail&&!wasJ){jailHid=false;if(ovKind&&ovKind!=='jail'&&ovKind!=='splash')closeOv();openJail();vib([60,40,60])}else if(s.jail&&!jailHid&&!ovKind&&!pmLater&&!pendingWelcome)openJail();if(s.jail)updJail();updPill();if(!ovKind&&!s.jail&&s.name&&!pendingWelcome&&!pmLater)whatsNew();checkAch();upd()}
 // with an account, catch up only once the server has said what time it really is (or after 6s if offline)
 let clockReady=!CLOCK_GUARD;
 function catchUp(boot){const wasJ0=!!s.jail;const away=advance(now(),true);
