@@ -94,7 +94,8 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 .tool .tbar>i{display:block;height:100%;border-radius:3px;background:#7FD3FF;transition:width .3s linear}
 .tool .tbar.run>i{background:var(--lime)}
 .tool .tag.bt{top:auto;bottom:-8px;left:50%;transform:translateX(-50%);z-index:2;box-shadow:0 1px 0 rgba(0,0,0,.2)}
-.tool:has(.tbar:not([hidden])) svg{margin-top:5px}
+.tool .ttim{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);padding:1px 4px;background:#14191A;color:#fff;font-style:normal;font-size:9.5px;font-weight:900;line-height:12px;letter-spacing:.2px;white-space:nowrap;pointer-events:none;z-index:2}
+.tool .ttim.run{background:var(--lime);color:var(--green-d)}
 .dot{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
 .tag.sm{font-size:8px;top:auto;bottom:-8px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--ink)}
 
@@ -916,8 +917,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
     <div class="tools">
       <button class="tool" data-act="store" aria-label="Store"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="tag lime" id="storeTag">NEW</span></button>
       <button class="tool" data-act="shop" aria-label="Buy businesses"><svg viewBox="0 0 24 24"><path d="M3 21h18M4 21V10h6v11M14 21V5h6v16M6 13h2M6 17h2M16 8h2M16 12h2M16 16h2"/></svg></button>
-      <button class="tool" data-act="free" aria-label="Free gift"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12"/><path d="M3 13h18M12 9v12M12 9c-2-4-7-4-6-1s6 1 6 1c2-4 7-4 6-1s-6 1-6 1"/></svg><span class="tag" id="freeTag">FREE</span><i class="tbar" id="freeBar" hidden><i></i></i></button>
-      <button class="tool" data-act="boost" aria-label="Income boost"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg><span class="tag lime bt" id="boostTag" hidden>2X</span><i class="tbar" id="boostBar" hidden><i></i></i></button>
+      <button class="tool" data-act="free" aria-label="Free gift"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12"/><path d="M3 13h18M12 9v12M12 9c-2-4-7-4-6-1s6 1 6 1c2-4 7-4 6-1s-6 1-6 1"/></svg><span class="tag" id="freeTag">FREE</span><i class="ttim num" id="freeBar" hidden></i></button>
+      <button class="tool" data-act="boost" aria-label="Income boost"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg><span class="tag lime" id="boostTag" hidden>2X</span><i class="ttim num" id="boostBar" hidden></i></button>
       <button class="tool" data-act="ranks" aria-label="Rich list"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21v-6h4v6M10 21V9h4v12M15 21v-9h4v9"/></svg></button>
       <button class="tool" data-act="mail" aria-label="Mailbox"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="M3 6l9 7 9-7"/></svg><span class="dot" id="mailDot" hidden>!</span></button>
       <button class="tool" data-act="daily" id="dailyTool" aria-label="Daily chance"><svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="1.5"/><path d="M10 9.3a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6.9v.8M12 15.6v.2"/></svg><span class="dot" id="dailyDot" hidden>!</span></button>
@@ -1108,7 +1109,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111901,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111904,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1396,11 +1397,10 @@ function hud(){pmUI();dealUI();$('nw').textContent=money(nw());
  const fit=(id,t)=>{const e=$(id).parentElement,n=t.length;e.style.fontSize=n>6?'15px':n>4?'18px':''};fit('gm',String(s.gems));fit('cash',money(s.cash));
  const th=threat(),thv=Math.round(threatRaw()-(cleanOn()?20:0));$('thr').textContent=(thv<0?'−'+(-thv):thv)+'%';{const t=$('thrT'),lv=thrLevel(th);t.classList.toggle('hot',th>0);for(let i=1;i<=4;i++)t.classList.toggle('l'+i,lv===i)}
  const t_=now(),fr=s.freeAt<=t_;$('freeTag').textContent='FREE';$('freeTag').hidden=!fr;
- {const b=$('freeBar');b.hidden=fr;if(!fr)b.firstChild.style.width=Math.max(0,Math.min(100,(1-(s.freeAt-t_)/6e5)*100))+'%';$('freeTag').parentElement.setAttribute('aria-label',fr?'Free gift ready':'Free gift in '+dur((s.freeAt-t_)/1000))}
- $('boostTag').hidden=!boostOn();$('boostTag').textContent=(s.boostX||2)+'X';
+ {const b=$('freeBar');b.hidden=fr;if(!fr)b.textContent=dur(Math.ceil((s.freeAt-t_)/1000));$('freeTag').parentElement.setAttribute('aria-label',fr?'Free gift ready':'Free gift in '+dur((s.freeAt-t_)/1000))}
+ $('boostTag').hidden=true;
  {const b=$('boostBar'),on=boostOn(),rec=!on&&s.boostReady>t_;b.hidden=!on&&!rec;b.classList.toggle('run',on);
-  if(on){const rem=s.boostUntil-t_,tot=rem>18e4?Math.ceil(rem/18e5)*18e5:18e4;b.firstChild.style.width=Math.max(0,Math.min(100,rem/tot*100))+'%'}
-  else if(rec)b.firstChild.style.width=Math.max(0,Math.min(100,(1-(s.boostReady-t_)/9e5)*100))+'%'}
+  if(on){const r=Math.ceil((s.boostUntil-t_)/1000);b.textContent=(s.boostX||2)+'X '+(r>=3600?dur(r):Math.floor(r/60)+':'+String(r%60).padStart(2,'0'))}else if(rec)b.textContent=dur(Math.ceil((s.boostReady-t_)/1000))}
  const cr=s.chestAt<=now();$('chestT').textContent=cr?'OPEN!':dur((s.chestAt-now())/1000);
  $('mailDot').hidden=!ACH.some(a=>s.ach[a[0]]===1);
  $('dailyDot').hidden=!dcReady()||(CLOCK_GUARD&&!clockChecked);{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
