@@ -943,7 +943,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .statgrid .rl{cursor:pointer}
 .bbadge{display:inline-flex;align-items:center;gap:7px;margin-top:5px;background:linear-gradient(135deg,#2A2A2A,#0A0A0A 60%,#1C1C1C);border:2px solid #F2C14E;color:#F2C14E;padding:4px 9px 4px 8px;border-radius:7px;font:inherit;cursor:pointer;transform:rotate(-2deg);box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .bbadge.g{background:linear-gradient(135deg,#FFE08A,#F2C14E 55%,#D9A42E);border-color:#0E1112;color:#0E1112}
-.lb .av{overflow:hidden}.lb .av img{width:100%;height:100%;object-fit:cover;display:block}
+.lb .av{overflow:hidden}
+.lbsw{background:#E5484D}.lbsw>.lb{position:relative;z-index:1;transition:transform .2s;touch-action:pan-y}.lbsw>.lb.drag{transition:none}.lb .av img{width:100%;height:100%;object-fit:cover;display:block}
 .tclub.btag{display:inline-block;vertical-align:5px;margin-left:8px;background:#0b0b0b;color:#F2C23A;border:1.5px solid #F2C23A;font-style:normal;font-weight:900;font-size:12px;line-height:1;padding:4px 6px;border-radius:4px;letter-spacing:.3px;cursor:pointer}.tclub.btag.g{background:#F2C14E;color:#0E1112;border-color:#0E1112}
 .bprof .who .bbadge{display:flex;width:max-content;max-width:100%}.bprof .who .bbadge b{display:inline;color:inherit;font-size:17px;white-space:nowrap;overflow:visible}.bprof .who .bbadge+.lk{display:flex}
 .bbadge span{font-size:8px;font-weight:900;letter-spacing:.14em}.bbadge b{font-size:17px;font-weight:900;line-height:1}.bbadge i{font-style:normal;font-size:8px;font-weight:900;letter-spacing:.12em}
@@ -1202,7 +1203,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026111919,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026111920,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1644,8 +1645,8 @@ function wishBadge(n){const t=document.querySelector('.tool[data-act="shop"]');i
 function wishPing(b){document.querySelector('.wtoast')?.remove();const d=document.createElement('div');d.className='wtoast';d.innerHTML=`<div class="h">${HEART}</div><div><small>Wishlist</small>${esc(b.name)} is ready to buy</div><button type="button" data-act="wishbuy" data-bid="${b.id}">BUY</button>`;const tb=$('toasts');tb.prepend(d);vib(15);setTimeout(()=>d.remove(),6000)}
 // swipe: wishlist rows slide right to show Remove; the ready banner flicks up to dismiss
 let wsw=null,wNoClick=0;const WDEL=88;
-function wClose(ex){document.querySelectorAll('#sb .wrow.open').forEach(r=>{if(r!==ex){r.classList.remove('open');r.style.transform=''}})}
-document.addEventListener('pointerdown',e=>{const t=e.target.closest('.wtoast');const r=!t&&e.target.closest('#sb .wrow');if(!t&&!r){wClose();return}
+function wClose(ex){document.querySelectorAll('#sb .wsw>.open').forEach(r=>{if(r!==ex){r.classList.remove('open');r.style.transform=''}})}
+document.addEventListener('pointerdown',e=>{const t=e.target.closest('.wtoast');const r=!t&&e.target.closest('#sb .wsw>.wrow,#sb .wsw>.lb');if(!t&&!r){wClose();return}
  wsw={el:t||r,kind:t?'t':'r',x:e.clientX,y:e.clientY,base:r&&r.classList.contains('open')?WDEL:0,on:false,d:0}},{passive:true});
 document.addEventListener('pointermove',e=>{if(!wsw)return;const dx=e.clientX-wsw.x,dy=e.clientY-wsw.y;
  if(!wsw.on){if(wsw.kind==='r'&&Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)){wsw.on=true;wClose(wsw.el)}else if(wsw.kind==='t'&&dy<-6){wsw.on=true}else if(Math.abs(dy)>10&&wsw.kind==='r'){wsw=null;return}else return;wsw.el.classList.add('drag')}
@@ -1726,7 +1727,8 @@ function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=[['None','var(--
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
 function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
  const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
- return`<div class="lb${id==='@me'?' you':''}${fr?' fr':''}${p<=3?' top':''}"><div class="pos">${p}</div><div class="av" style="background:${col}">${(()=>{const a=id==='@me'?s.avatar:fr&&fr.avatar;return a&&/^data:image\/(jpeg|png|webp);base64,/.test(a)?`<img src="${a}" alt="">`:esc(n.replace(/["']/g,'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())})()}</div><div class="who"><b>${esc(n)}</b><small>${esc(sub)}</small></div><div class="v num">${$m(v)}${showRemove&&fr?`<button class="frx" data-act="unfriend" data-v="${fr.user_id}" aria-label="Remove ${esc(n)}">✕</button>`:''}</div></div>`}
+ const row=`<div class="lb${id==='@me'?' you':''}${fr?' fr':''}${p<=3?' top':''}"><div class="pos">${p}</div><div class="av" style="background:${col}">${(()=>{const a=id==='@me'?s.avatar:fr&&fr.avatar;return a&&/^data:image\/(jpeg|png|webp);base64,/.test(a)?`<img src="${a}" alt="">`:esc(n.replace(/["']/g,'').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())})()}</div><div class="who"><b>${esc(n)}</b><small>${esc(sub)}</small></div><div class="v num">${$m(v)}</div></div>`;
+ return showRemove&&fr?`<div class="wsw lbsw"><button type="button" class="wdel" data-act="unfriend" data-v="${fr.user_id}" tabindex="-1" aria-label="Remove ${esc(n)}"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Remove</button>${row}</div>`:row}
 function friendsBody(){
  if(!cloudOn())return`<div class="pad"><p>Friends need online saves, which aren't set up for this game.</p></div>`;
  if(!cloudUser)return`<div class="pad"><p><b>Play against your friends</b></p><p class="s" style="text-align:left">Sign in to invite friends with a private code. Only people you connect with can see your name and net worth.</p><button class="bigbtn" data-act="auth" data-v="in">Sign in</button></div>`;
