@@ -1083,9 +1083,17 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .gx-tap{position:absolute;bottom:max(28px,env(safe-area-inset-bottom));font-size:13px;font-weight:800;letter-spacing:.6px;color:#EBD9B0;opacity:0;transition:opacity .4s}
 #gildfx.ready .gx-tap{opacity:.85;animation:gxbl 1.6s ease-in-out infinite}@keyframes gxbl{50%{opacity:.4}}
 @media (prefers-reduced-motion:reduce){.gx-rays{animation:none;opacity:1}.gx-b{animation-duration:.01s}}
+
+#stage.gilded #art svg{animation:gglowart 2.8s ease-in-out infinite}
+@keyframes gglowart{0%,100%{filter:drop-shadow(0 0 6px #FFD45A55) brightness(1)}50%{filter:drop-shadow(0 0 18px #FFD45ACC) brightness(1.1)}}
+.gspark{position:absolute;inset:8% 14% 22% 10%;pointer-events:none;z-index:3}
+.gspark i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;background:#FFF6C8;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);opacity:0;animation:gtw 2.2s ease-in-out infinite;filter:drop-shadow(0 0 4px #FFD45A)}
+@keyframes gtw{0%,100%{transform:scale(.2) rotate(0);opacity:0}45%{transform:scale(1) rotate(45deg);opacity:1}70%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){#stage.gilded #art svg,.gspark i{animation:none}}
 </style>
 
 <div id="app">
+  <svg width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true" focusable="false"><defs><filter id="gildf" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%"><feColorMatrix type="matrix" values=".40 .78 .15 0 .05  .30 .58 .11 0 .01  .10 .20 .04 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="gamma" amplitude="1.08" exponent=".9" offset="0"/><feFuncG type="gamma" amplitude="1.04" exponent=".95" offset="0"/><feFuncB type="gamma" amplitude="1" exponent="1.1" offset="0"/></feComponentTransfer></filter></defs></svg>
   <header class="hud">
     <div class="t t-nw"><small class="nwrow"><span id="nwlab">Net worth</span><span class="rate num" id="nwrate"></span></small><b class="num"><i class="coin"></i><span id="nw">0</span></b></div>
     <button class="t t-boss" data-act="boss" aria-label="Boss profile and settings">
@@ -1315,7 +1323,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112009,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112010,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1404,7 +1412,7 @@ function gildSvg(svg){return svg.replace(/#([0-9a-fA-F]{6})\b/g,(m,h)=>{const r=
   if(g>r+12&&g>bl+12)return m;const L=(.3*r+.59*g+.11*bl)/255,S=[[0,[90,52,6]],[.35,[176,112,22]],[.6,[230,165,40]],[.8,[250,206,90]],[1,[255,244,196]]];
   let i=0;while(i<S.length-2&&L>S[i+1][0])i++;const[a,ca]=S[i],[z,cz]=S[i+1],t=Math.max(0,Math.min(1,(L-a)/(z-a)));
   return'#'+ca.map((c,k)=>Math.round(c+(cz[k]-c)*t).toString(16).padStart(2,'0')).join('')})
- .replace(/<image /g,'<image style="filter:sepia(1) saturate(3.2) hue-rotate(-14deg) brightness(.93) contrast(1.18)" ')}
+ .replace(/<image /g,'<image filter="url(#gildf)" ')}
 const gw=(b,svg)=>isGild(b)?gildSvg(svg):svg;
 function st(o){const b=B[o.bid],L=o.level,old=b.pt===1,G=isGild(b)?2:1,g=(x,i,l)=>x*Math.pow(UPG,l-1)*G;
  return{rate:g(b.rate,b.iE,L),hold:g(b.hold,b.iC,L),threat:thrAt(b,L),up:!(b.rate>0)?(old?Math.ceil:x=>x)(b.price*Math.pow(1+b.iP,L)):old?Math.ceil(b.price*UP0*Math.pow(UPC,L-1)):b.price*UP0*Math.pow(UPC,L-1),upTime:Math.min(UPMAX,b.time*(1+b.iT*L)),
@@ -1593,7 +1601,7 @@ let stageSig='',stackN=-1,VIEW={sc:1,ox:0,oy:0};
 function sigNow(){const o=cur();return(s.world|0)+'|'+freePlots(s.world|0)+'|'+landIn(s.world|0)+'|p'+plotSel+'|'+(o?`${o.bid}|${o.busy||''}|${o.level}|${s.owned.length}|${s.cur}`:'none|'+s.owned.length)}
 function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML='';$('tube').hidden=true;artEl.dataset.p='';
  let L='';
- {const g=isGood(o),G=grp(g),nb=grp(false).length,ng=grp(true).length,both=nb>0&&ng>0;stage.classList.toggle('good',!!o&&g);
+ {const g=isGood(o),G=grp(g),nb=grp(false).length,ng=grp(true).length,both=nb>0&&ng>0;stage.classList.toggle('good',!!o&&g);stage.classList.toggle('gilded',!!o&&!o.busy&&isGild(B[o.bid]));if(o&&!o.busy&&isGild(B[o.bid]))L+=`<div class="gspark" aria-hidden="true">${[[34,40,0],[62,34,.5],[70,58,1.1],[28,62,1.5],[50,26,.9],[44,70,.3],[58,48,1.8]].map(([x,y,d])=>`<i style="left:${x}%;top:${y}%;animation-delay:${d}s"></i>`).join('')}</div>`;
  if(both)L+=`<div class="vtog" role="group" aria-label="Show businesses or good causes"><button data-act="vbiz" class="${g?'':'on'}" aria-pressed="${!g}" aria-label="Businesses (${nb})"><svg viewBox="0 0 24 24"><path d="M3 21V9l6-3v15M9 21V4l8 3v14M3 21h18"/></svg>${nb}</button><button data-act="vgood" class="${g?'on':''}" aria-pressed="${g}" aria-label="Good causes (${ng})"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>${ng}</button></div>`;
  const WL=inWorldList()?wList():null,cnt=WL?WL.length:G.length;
  if(cnt>1)L+=`<button class="arrow l" data-act="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="arrow r" data-act="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
