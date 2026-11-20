@@ -1217,7 +1217,8 @@ const plotOwned=(w,i)=>!!w&&(plotSet(w).includes(i)||!!own(sitesIn(w)[i]));
 const landIn=w=>{if(!w)return 0;let n=0;for(let i=0;i<plotsIn(w);i++)if(plotOwned(w,i))n++;return n};
 const freePlots=w=>{if(!w)return 1;const ids=sitesIn(w);let n=0;for(let i=0;i<ids.length;i++)if(plotOwned(w,i)&&!own(ids[i]))n++;return n};
 const nextPlot=w=>{for(let i=0;i<plotsIn(w);i++)if(!plotOwned(w,i))return i;return -1};
-const hasSite=b=>!b.w||plotOwned(b.w,siteIx(b));
+// land was retired: new worlds work like Downtown, so every business can be bought straight away
+const hasSite=b=>true;
 const PLOT=[0,1,2,3,4].map(w=>{const ps=B.filter(b=>b.w===w&&b.rate>0&&!b.pt).map(b=>b.price);return ps.length?[Math.min(...ps),Math.max(...ps)]:[0,0]});
 const plotPrice=(w,i)=>{const[lo,hi]=PLOT[w],n=plotsIn(w);return Math.round(.4*lo*Math.pow(hi/lo,Math.min(i,n-1)/Math.max(1,n-1)))};
 const T10=['dst','dnm','mgs','bkb','mrd','avl','ttr','asg','pdr','afe'],T11=['pln','pym','voc','ddm','cct'];
@@ -1250,7 +1251,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112002,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112003,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1269,7 +1270,7 @@ function unpack(raw){let d;try{d=typeof raw==='string'?JSON.parse(raw):raw}catch
  const seen=new Set();st.owned=st.owned.filter(o=>!seen.has(o.bid)&&seen.add(o.bid));
  st.cur=Math.max(0,Math.min(st.cur|0,st.owned.length-1));st.tier=Math.max(1,Math.min(8,st.tier|0||1));
  st.wopen=Math.max(0,Math.min(4,st.wopen|0));st.world=Math.max(0,Math.min(st.wopen,st.world|0));
- {const l={};for(const k of[1,2,3,4]){const v=(st.land||{})[k]|0;if(v>0)l[k]=v}st.land=l}if(!(st.landVal>=0))st.landVal=0;{const pl={};for(const k of[1,2,3,4]){const a=(st.plots||{})[k];if(Array.isArray(a))pl[k]=[...new Set(a.filter(i=>Number.isInteger(i)&&i>=0&&i<60))]}st.plots=pl}
+ {const l={};for(const k of[1,2,3,4]){const v=(st.land||{})[k]|0;if(v>0)l[k]=v}st.land=l}if(!(st.landVal>=0))st.landVal=0;if(st.landVal>0){const v=st.landVal;st.cash=(st.cash||0)+v;st.landVal=0;st.land={};st.plots={};setTimeout(()=>{try{toast(`Your land was paid back: ${$m(v)}`,'good')}catch(e){}},2500)}for(const o of st.owned||[])if(o&&o.dig){delete o.dig;o.end=now()+(o.total||0)}{const pl={};for(const k of[1,2,3,4]){const a=(st.plots||{})[k];if(Array.isArray(a))pl[k]=[...new Set(a.filter(i=>Number.isInteger(i)&&i>=0&&i<60))]}st.plots=pl}
  ['cash','gems','earned','taps'].forEach(k=>{if(!isFinite(st[k])||st[k]<0)st[k]=0});
  // Nov 2026: tier 2-6 good causes now max out at level 10. Anything above drops to 10 and the extra upgrades are refunded
  // at the price they cost (each 60% more than the last).
@@ -1464,7 +1465,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
  if(WL&&cnt>1){const i=WL.findIndex(e=>plotSel!=null?e.p===plotSel:e.b===s.cur);if(i>=0)L+=`<div class="pager num">${i+1} / ${cnt}</div>`}
  else if(o&&!both&&G.length>1)L+=`<div class="pager num">${G.indexOf(s.cur)+1} / ${G.length}</div>`;}
  L+=`<div class="boost num" id="boostChip" hidden></div>`;
- if(!o&&(s.world|0)){const w=s.world|0,ps=wPlots(w),pi=plotSel!=null&&ps.includes(plotSel)?plotSel:ps[0];
+ if(false){const w=s.world|0,ps=wPlots(w),pi=plotSel!=null&&ps.includes(plotSel)?plotSel:ps[0];
   if(pi==null){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';panel.innerHTML=`<div class="uc">${CONE}<div><h2>All plots built</h2><p>${WN[w]} is full</p></div></div>`}
   else{const have=landIn(w),stt=plotOwned(w,pi)?'sold':'sale',pr=plotPrice(w,pi),n=plotsIn(w);
   artEl.innerHTML=onStage(stagePlot(w,stt,pi),-80,1.3);artEl.dataset.act=stt==='sold'?'plotview':'landask';artEl.dataset.w=w;artEl.dataset.i=pi;
@@ -1473,7 +1474,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    :stt==='sale'?`<div class="uc">${CONE}<div><h2>Plot ${pi+1} · For sale</h2><p>Site for ${esc(sb.name)}</p></div></div><button class="bigbtn num ${s.cash>=pr?'':'off'}" data-act="landask" data-w="${w}" data-i="${pi}">Buy plot ${pi+1} · ${COIN} ${money(pr)}</button>`:''}
  }else if(!o){artEl.innerHTML=onStage(lotArt(),-80,1.3);artEl.dataset.act='shop';
   if(!s.seenShop)L+=`<div class="getmore" id="getmore" data-act="shop"><span>GET MORE<br>BUSINESS HERE</span><i></i></div>`;
-  {const w=s.world|0,fp=freePlots(w);panel.innerHTML=w?`<div class="uc">${CONE}<div><h2>${fp>0?'Your land':'Land for sale'}</h2><p>${fp>0?`${fp} free plot${fp>1?'s':''}`:'Buy a plot to build'}</p></div></div><button class="bigbtn" data-act="shop">${fp>0?'Build a business':'Buy land'}</button>`:
+  {const w=s.world|0;panel.innerHTML=w?`<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Build a business</button>`:
   `<div class="uc">${CONE}<div><h2>Empty lot</h2><p>Ready to build</p></div></div><button class="bigbtn" data-act="shop">Buy your first business</button>`}
  }else if(o.busy&&o.dig){const b=B[o.bid];artEl.dataset.act='site';
   L+=`<div class="callout"><div class="timer">EXCAVATING</div><div class="lbl">TAP TO DIG · <span id="digpct">0%</span></div></div><div class="digtrack"><i id="digbar"></i></div>`;
@@ -1663,7 +1664,7 @@ function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)ret
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(!hasSite(b))return needLand(b);
  if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
- if(Array.isArray(s.wish))s.wish=s.wish.filter(c=>c!==b.code);pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);if(b.w){const ps=plotSet(b.w),ix=siteIx(b);if(!ps.includes(ix))ps.push(ix)}const dg=b.w&&!(s.dug||{})[b.code]?{n:0,need:24,seam:seamRoll(),f:0}:null;s.owned.push(Object.assign({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+(dg?DIGW:bt),total:bt},dg?{dig:dg}:{}));s.cur=s.owned.length-1;plotSel=null;closeOv();vib(20);save();upd()}
+ if(Array.isArray(s.wish))s.wish=s.wish.filter(c=>c!==b.code);pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);const dg=false?{n:0,need:24,seam:seamRoll(),f:0}:null;s.owned.push(Object.assign({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+(dg?DIGW:bt),total:bt},dg?{dig:dg}:{}));s.cur=s.owned.length-1;plotSel=null;closeOv();vib(20);save();upd()}
 function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
  pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;closeOv();save();upd()}
@@ -1674,7 +1675,7 @@ const grpKey=i=>{const b=B[s.owned[i].bid];return b.tier*1e6+b.id};
 const grp=g=>s.owned.map((o,i)=>i).filter(i=>B[s.owned[i].bid].w===(s.world|0)&&isGood(s.owned[i])===g).sort((x,y)=>grpKey(x)-grpKey(y));
 const wPlots=w=>sitesIn(w).map((id,i)=>own(id)?-1:i).filter(i=>i>=0);
 const inWorldList=()=>(s.world|0)&&(plotSel!=null||!(cur()&&isGood(cur())));
-function wList(){const w=s.world|0;return grp(false).map(b=>({b})).concat(wPlots(w).map(p=>({p})))}
+function wList(){const w=s.world|0;return grp(false).map(b=>({b}))}
 function step(d){if(inWorldList()){const L=wList();if(L.length<2)return;let i=L.findIndex(e=>plotSel!=null?e.p===plotSel:e.b===s.cur);if(i<0)i=0;const e=L[(i+d+L.length)%L.length];if(e.p!=null)plotSel=e.p;else{plotSel=null;s.cur=e.b}stageSig='';upd();return}
  const o=cur();if(!o)return;const L=grp(isGood(o));if(L.length<2)return;const p=Math.max(0,L.indexOf(s.cur));s.cur=L[(p+d+L.length)%L.length];upd()}
 function showGroup(g){const o=cur();if(o&&isGood(o)===g)return;if(o){s.vLast=s.vLast||{};s.vLast[isGood(o)?'g':'b']=o.bid}const L=grp(g);if(!L.length)return;const w=(s.vLast||{})[g?'g':'b'];const i=s.owned.findIndex(x=>x.bid===w);s.cur=L.includes(i)?i:L[0];vib(8);upd()}
@@ -1816,11 +1817,11 @@ const shopTabs=()=>`<div class="shoptabs">${shopTabs2()}${shopF==='wish'?'':tier
 function tierSpy(){const sb=$('sb');if(!sb)return;const st=sb.querySelector('.shoptabs'),top=sb.getBoundingClientRect().top+(st?st.offsetHeight:0)+6;let cur=0;sb.querySelectorAll('.tierh[data-t]').forEach(h=>{if(h.getBoundingClientRect().top<=top)cur=+h.dataset.t});if(!cur){const f=sb.querySelector('.tierh[data-t]');cur=f?+f.dataset.t:0}sb.querySelectorAll('.tierjump button').forEach(b=>b.classList.toggle('on',+b.dataset.t===cur))}
 function tierGo(t){const sb=$('sb'),h=sb&&sb.querySelector(`.tierh[data-t="${t}"]`);if(!h)return;const st=sb.querySelector('.shoptabs');sb.scrollTo({top:sb.scrollTop+h.getBoundingClientRect().top-sb.getBoundingClientRect().top-(st?st.offsetHeight:0),behavior:'smooth'})}
 function shopBody(){let h=shopTabs(),lockedShown=0;const w=s.world|0;if(shopF==='wish')return h+wishBody();
- if(w){h+=landSec(w);const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
+ if(w){const bs=B.filter(b=>b.w===w&&shopOK(b)).sort((a,b)=>a.tier-b.tier||(a.secret-b.secret)||a.price-b.price);
   if(w===4){for(const t of[9,10,11]){const g=bs.filter(b=>b.tier===t);if(!g.length)continue;h+=`<div class="tierh"><b>${SDG[t]}</b><span>${g.filter(b=>own(b.id)).length}/${g.length}</span></div><div class="grid">${g.map(card).join('')}</div>`}}
   else if(bs.length)h+=`<div class="tierh"><b>${WN[w]}</b><span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span></div><div class="grid">${bs.map(card).join('')}</div>`;
   return h}
- if(shopF==='all')for(let k=1;k<=4;k++)if(worldOpen(k)&&landIn(k)<plotsIn(k))h+=landSec(k,true);
+
  for(let t=1;t<TIERS.length;t++){const open=t<=s.tier,bs=B.filter(b=>b.tier===t&&shopOK(b));if(!bs.length)continue;
   h+=`<div class="tierh" data-t="${t}"><b>Tier ${t} · ${TIERS[t]}</b>${open?`<span>${bs.filter(b=>own(b.id)).length}/${bs.length}</span>`:`<span class="num">${esc(tierHint(t))}</span>`}</div>`;
   h+=`<div class="grid">${bs.map(card).join('')}</div>`}
@@ -3008,7 +3009,7 @@ function travel(w){if(!worldOpen(w))return;plotSel=null;const o=cur();s.wlast=s.
  const want=s.wlast[w];let i=s.owned.findIndex(x=>x.bid===want);if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w&&!isGood(x));if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w);if(i>=0)s.cur=i;
  paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
 function mapBtnUpd(){const b=document.querySelector('.mapbtn');if(!b)return;b.setAttribute('aria-label','World map: '+WN[s.world|0]);let d=b.querySelector('.wdot');const nu=(s.wopen|0)>(s.wseen|0);if(nu&&!d){d=document.createElement('i');d.className='wdot';b.appendChild(d)}else if(!nu&&d)d.remove()}
-function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'<div class="dio">'+worldLand(WORLDS[w],false)+'</div>'}</div><p>You've reached ${$m(WU[w])}. Buy land in ${WN[w]} and build ${plotsIn(w)} new businesses. Everything you own keeps earning while you're there.</p>`,`<button class="no" data-act="close">Later</button><button class="ok" data-act="travelto" data-w="${w}">Travel there</button>`,'wodlg');const d=document.querySelector('.dlg');if(d)d.classList.add('wodlg')}
+function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'<div class="dio">'+worldLand(WORLDS[w],false)+'</div>'}</div><p>You've reached ${$m(WU[w])}. There are ${plotsIn(w)} new businesses to build in ${WN[w]}. Everything you own keeps earning while you're there.</p>`,`<button class="no" data-act="close">Later</button><button class="ok" data-act="travelto" data-w="${w}">Travel there</button>`,'wodlg');const d=document.querySelector('.dlg');if(d)d.classList.add('wodlg')}
 function buyLand(wi,pi){const w=wi==null?s.world|0:wi;if(!w||!worldOpen(w))return;if(s.jail)return jailNag();const i=pi==null||isNaN(pi)?nextPlot(w):pi;if(i<0||plotOwned(w,i))return;const p=plotPrice(w,i);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
  s.cash-=p;ev('land',{world:w,price:Math.round(p)});s.landVal=(s.landVal||0)+p;plotSet(w).push(i);s.land[w]=landIn(w);vib(20);toast(`Plot ${i+1} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}else if(landFromShop){const y=shopY;openShop();const s2=$('sb');if(s2)s2.scrollTop=y}else closeOv();if((s.world|0)===w)plotSel=i;stageSig='';upd()}
 function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter(o=>B[o.bid].w===i).length;
