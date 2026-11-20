@@ -301,7 +301,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 #elsewhere{z-index:90;background:rgba(14,40,20,.94);color:#fff;padding:28px;gap:14px}#elsewhere[hidden]{display:none}#elsewhere .ew-i{font-size:54px;line-height:1}#elsewhere h3{font-size:26px;font-weight:900;margin:0}#elsewhere p{margin:0;max-width:320px;font-size:15px;line-height:1.45;opacity:.9}#elsewhere .dc-bb{width:auto;min-width:220px;margin-top:8px;background:var(--lime);color:var(--green-d)}
 .fullscreen{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden}
 #splash{background:linear-gradient(180deg,#96BCF9 0%,#FFE1EC 47%,#FFFFFF 100%);cursor:pointer}
-#splash .splogo{width:min(80vw,440px);height:auto;margin-top:-4vh;filter:drop-shadow(0 10px 18px rgba(74,33,120,.18));animation:splogo .7s cubic-bezier(.3,1.5,.5,1) both,spfloat 3.6s ease-in-out .7s infinite}
+#splash .splogo{position:relative;z-index:2;width:min(80vw,440px);height:auto;margin-top:-4vh;filter:drop-shadow(0 10px 18px rgba(74,33,120,.18));animation:splogo .7s cubic-bezier(.3,1.5,.5,1) both,spfloat 3.6s ease-in-out .7s infinite}
 @keyframes splogo{from{transform:scale(.6);opacity:0}}@keyframes spfloat{50%{transform:translateY(-8px)}}
 #splash .tap{color:#4A2178;font-size:15px;letter-spacing:1.5px;opacity:.8}
 .logo span{font-size:1.25em;color:var(--lime);text-shadow:0 6px 0 var(--lime-d)}
@@ -1094,6 +1094,19 @@ input.nm:focus{outline:none;border-color:var(--green)}
 @keyframes gtw{0%,100%{transform:scale(.2) rotate(0);opacity:0}45%{transform:scale(1) rotate(45deg);opacity:1}70%{opacity:.6}}
 @media (prefers-reduced-motion:reduce){#stage.gilded #art svg,.gspark i{animation:none}}
 .st .gl{color:#B7791F}
+
+#splash .spf{position:absolute;top:0;width:var(--s);height:calc(var(--s)*.6);z-index:1;pointer-events:none;animation:spfall linear infinite;perspective:220px}
+#splash .spf.front{z-index:3}
+@keyframes spfall{from{transform:translateY(-12vh)}to{transform:translateY(112vh)}}
+#splash .sps{width:100%;height:100%;animation:spsway ease-in-out infinite alternate}
+@keyframes spsway{from{transform:translateX(calc(var(--sx)*-1)) rotate(calc(var(--tz)*-1))}to{transform:translateX(var(--sx)) rotate(var(--tz))}}
+#splash .spl,#splash .spt{width:100%;height:100%;transform-style:preserve-3d}
+#splash .spl{animation:spflut ease-in-out infinite alternate}
+@keyframes spflut{from{transform:rotate(var(--r0)) rotateX(calc(var(--fx)*-1))}to{transform:rotate(var(--r0)) rotateX(var(--fx)) rotateY(20deg)}}
+#splash .spt{animation:sptumb linear infinite}
+@keyframes sptumb{from{transform:rotate(var(--r0)) rotate3d(1,.35,0,0deg)}to{transform:rotate(var(--r0)) rotate3d(1,.35,0,360deg)}}
+#splash .spf svg{width:100%;height:100%;display:block}
+@media (prefers-reduced-motion:reduce){#splash .spf{display:none}}
 </style>
 
 <div id="app">
@@ -1327,7 +1340,7 @@ MIS.forEach(([g,steps],gi)=>steps.forEach(([d,f,r],i)=>ACH.push(['m'+gi+'_'+i,g+
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112013,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112015,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2449,8 +2462,13 @@ function updPill(){const p=$('jailpill');if(!p)return;const on=!!(s.jail&&ovKind
 function release(m,how,cost){jailNote=null;jailOut(how||'served',now(),cost);if(s.jail&&s.jail.mgr)s.mgrUntil-=Math.max(0,s.jail.until-now());s.jail=null;s.coolUntil=now()+COOL;closeJail();toast(m,'good');save();upd()}
 
 /* intro */
-function splash(){ovKind='splash';const tc=document.querySelector('meta[name=theme-color]');if(tc){tc.dataset.was=tc.dataset.was||tc.content;tc.content='#96BCF9'}
- ovl.innerHTML=`<div class="fullscreen" id="splash" data-act="begin"><img class="splogo" src="img/tt-logo.webp" alt="Trillionaire Tycoon" decoding="async" fetchpriority="high"><div class="tap">${s.name?'TAP TO CONTINUE':'TAP TO START'}</div></div>`}
+// falling money like real paper: each bill drops at its own pace, drifts side to side and tilts into the drift, and flutters or tumbles as it goes
+function splash(){ovKind='splash';const R=(a,b)=>a+Math.random()*(b-a);let rain='';for(let i=0;i<38;i++){const sz=R(28,70),front=i%6===0,fall=R(7,13)*(front?.8:1)*(1.15-sz/140),tumble=Math.random()<.4;
+ rain+=`<div class="spf${front?' front':''}" style="left:${R(-4,96).toFixed(1)}%;--s:${sz.toFixed(0)}px;opacity:${front?.95:(.5+sz/150).toFixed(2)};animation-duration:${fall.toFixed(2)}s;animation-delay:${(-R(0,fall)).toFixed(2)}s">`+
+  `<div class="sps" style="--sx:${R(14,46).toFixed(0)}px;--tz:${R(14,32).toFixed(0)}deg;animation-duration:${R(1.6,3.2).toFixed(2)}s;animation-delay:${(-R(0,3)).toFixed(2)}s">`+
+  `<div class="${tumble?'spt':'spl'}" style="--r0:${R(0,360).toFixed(0)}deg;--fx:${R(35,70).toFixed(0)}deg;animation-duration:${(tumble?R(1.4,2.8):R(.9,1.8)).toFixed(2)}s;animation-delay:${(-R(0,2)).toFixed(2)}s">${BILL}</div></div></div>`}
+ const tc=document.querySelector('meta[name=theme-color]');if(tc){tc.dataset.was=tc.dataset.was||tc.content;tc.content='#96BCF9'}
+ ovl.innerHTML=`<div class="fullscreen" id="splash" data-act="begin">${rain}<img class="splogo" src="img/tt-logo.webp" alt="Trillionaire Tycoon" decoding="async" fetchpriority="high"><div class="tap">${s.name?'TAP TO CONTINUE':'TAP TO START'}</div></div>`}
 function askName(){dialog("What's your name, boss?",`<p class="s">It goes on the rich list next to the competition.</p><input class="nm" id="on" maxlength="20" placeholder="Your name" autocomplete="off">`,`<button class="yes" data-act="named">Start</button>`,'name');setTimeout(()=>$('on')?.focus(),60)}
 function welcome(r,arr){dialog('Welcome back, boss',`<p>You were away for <span class="hl">${dur(r.dt/1000)}</span></p><p>Your businesses made<br><span class="hlg num" style="font-size:26px">${COIN} ${money(r.gained)}</span></p>${r.done?`<p class="s">${r.done} construction job${r.done>1?'s':''} finished.</p>`:''}${arr?'<p class="s" style="color:var(--red)">The authorities paid you a visit while you were gone.</p>':''}${(()=>{const m=mgrOn()||(s.mgrUntil||0)>now()-r.dt,sf=s.owned.reduce((a,o)=>a+(o.safe||0),0);
   return m?`<p class="s">${mgrOn()?'Your manager is still on duty':'Your manager was on duty'}, so full businesses kept earning.${sf>=1?` <b class="num">${$m(sf)}</b> is waiting in the safes.`:''}</p>`:'<p class="s">Businesses stop earning once they hit max capacity. A manager keeps them earning past full.</p>'})()}`,`<button class="yes" data-act="close">Nice!</button>`)}
