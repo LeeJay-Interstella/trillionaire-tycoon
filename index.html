@@ -1087,7 +1087,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 #gildfx.ready .gx-tap{opacity:.85;animation:gxbl 1.6s ease-in-out infinite}@keyframes gxbl{50%{opacity:.4}}
 @media (prefers-reduced-motion:reduce){.gx-rays{animation:none;opacity:1}.gx-b{animation-duration:.01s}}
 
-#stage.gilded #art svg{animation:gglowart 2.8s ease-in-out infinite}
+#stage.gilded #art svg{filter:drop-shadow(0 0 12px #FFD45A99)}
 @keyframes gglowart{0%,100%{filter:drop-shadow(0 0 6px #FFD45A55) brightness(1)}50%{filter:drop-shadow(0 0 18px #FFD45ACC) brightness(1.1)}}
 .gspark{position:absolute;inset:8% 14% 22% 10%;pointer-events:none;z-index:3}
 .gspark i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;background:#FFF6C8;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);opacity:0;animation:gtw 2.2s ease-in-out infinite;filter:drop-shadow(0 0 4px #FFD45A)}
@@ -1110,6 +1110,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
 
 .t-nw{cursor:pointer;position:relative}.nwv{position:absolute;right:10px;bottom:8px;font-size:9.5px;font-weight:900;letter-spacing:.6px;padding:3px 7px;background:#0002;color:#E7F7D5;pointer-events:none}
 .nwv.on{background:#E5484D;color:#fff;animation:nwvp 1.6s ease-in-out infinite}@keyframes nwvp{50%{transform:scale(1.06)}}
+
+.vaultcover #app{visibility:hidden}
 </style>
 
 <div id="app">
@@ -1376,7 +1378,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112206,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112207,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2789,6 +2791,8 @@ button:active:not(:disabled){transform:translateY(2px)}
 
 #app{max-width:none;width:100%;height:100%;margin:0;background:transparent;font-family:Montserrat,system-ui,sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.gstars i,.gpulse,.spark,.club .shine{animation:none!important}}
+
+#app.awarding #view{visibility:hidden}
 `;
 const ICON={
   flag:'<path d="M6 21V4M6 4h11l-2 4 2 4H6" />',
@@ -2936,17 +2940,17 @@ function fromBox(d){
 function thud(){$('#app').classList.add('jolt');if(navigator.vibrate)navigator.vibrate(25);setTimeout(()=>$('#app').classList.remove('jolt'),260)}
 /* game → gallery: doors grow out of Net Worth, glint, swing open into the room */
 function enterGallery(){
-  if(busy)return;busy=true;const d=$('#doors');if(RM){S.screen='gallery';render();busy=false;autoAward();return}
+  if(busy)return;busy=true;const d=$('#doors');if(RM){S.screen='gallery';render();busy=false;cover(true);autoAward();return}
   d.className='doors on slam';                                    // doors start edge-on (unseen) and swing shut
   setTimeout(()=>{d.className='doors on hold';thud();S.screen='gallery';render()},550);
   setTimeout(()=>{d.className='doors on open'},550+650);
-  setTimeout(()=>{d.className='doors';busy=false;autoAward()},550+650+1000);
+  setTimeout(()=>{d.className='doors';busy=false;cover(true);autoAward()},550+650+1000);
 }
 /* gallery → game: doors slam shut, then shrink back into the Net Worth box */
 function leaveGallery(){
-  if(busy)return;busy=true;const d=$('#doors');{const dm=$('.dim');if(dm)dm.remove()}if(RM){S.screen='game';render();busy=false;unmount();return}
+  if(busy)return;busy=true;const d=$('#doors');{const dm=$('.dim');if(dm)dm.remove()}if(RM){cover(false);S.screen='game';render();busy=false;unmount();return}
   d.className='doors on slam';
-  setTimeout(()=>{d.className='doors on hold';thud();S.screen='game';render()},550);
+  setTimeout(()=>{d.className='doors on hold';thud();cover(false);S.screen='game';render()},550);
   // the doors swing open again onto the game (the room behind is already gone)
   setTimeout(()=>{d.className='doors on open'},550+650);
   setTimeout(()=>{d.className='doors';busy=false;unmount()},550+650+1000);
@@ -2959,25 +2963,28 @@ function through(change){
   setTimeout(()=>{d.className='doors on open'},550+780);
   setTimeout(()=>{d.className='doors';busy=false},550+780+1000);
 }
+function cover(on){document.documentElement.classList.toggle('vaultcover',!!on)}
 function award(){
   if($('.award'))return;
   const a=document.createElement('div');a.className='award';
   const sparks=Array.from({length:14},(_,i)=>`<i class="spark" style="left:${8+Math.random()*84}%;top:${12+Math.random()*70}%;animation-delay:${(Math.random()*2.4).toFixed(2)}s"></i>`).join('');
   a.innerHTML=`${sparks}<div class="ttl">YOU'VE BEEN AWARDED<b>Trillionaire</b></div>
     <div style="position:relative"><span class="cglow"></span>
-    <div class="stage gpulse" id="stage"><div class="slab" id="slab">
+    <div class="stage" id="stage"><div class="slab" id="slab">
       <div class="face ff">${plaqueFront()}</div>
       <div class="face fb">${plaqueBack()}</div>
       <div class="side sl"></div><div class="side sr"></div><div class="side st"></div><div class="side sb"></div></div></div>
     ${gstars()}</div>
     <div class="floorlight"></div><div class="hint">DRAG TO SPIN · TAP TO FLIP</div><button class="close" data-a="awardClose">CLOSE</button>`;
-  $('#app').appendChild(a);
+  $('#app').appendChild(a);$('#app').classList.add('awarding');
   // spin: slow auto-rotation, drag to throw it round, eases back to the slow spin
-  let ang=-25,vel=0.35,tilt=0,drag=null,raf;
+  let ang=-25,vel=0.35,tilt=0,drag=null,raf,last=performance.now();
   const slab=$('#slab'),stage=$('#stage');
-  const tick=()=>{ if(flip){ const k=Math.min(1,(performance.now()-flip.t0)/650),e=1-Math.pow(1-k,3); ang=flip.from+(flip.to-flip.from)*e; if(k>=1)flip=null; }
-    else if(!drag){ vel+= ((RM?0:0.35)-vel)*0.02; ang+=vel; tilt*=0.94; }
-    slab.style.transform=`rotateX(${tilt}deg) rotateY(${ang}deg)`; raf=requestAnimationFrame(tick); };
+  // vel is degrees per 1/60 s; f scales each step by the real time since the last frame
+  const tick=()=>{ const t=performance.now(),f=Math.min(3,(t-last)/16.667);last=t;
+    if(flip){ const k=Math.min(1,(t-flip.t0)/650),e=1-Math.pow(1-k,3); ang=flip.from+(flip.to-flip.from)*e; if(k>=1)flip=null; }
+    else if(!drag){ vel+= ((RM?0:0.35)-vel)*(1-Math.pow(0.98,f)); ang+=vel*f; tilt*=Math.pow(0.94,f); }
+    slab.style.transform=`rotateX(${tilt.toFixed(2)}deg) rotateY(${ang.toFixed(2)}deg)`; raf=requestAnimationFrame(tick); };
   let moved=0,flip=null;
   stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,t:performance.now()};moved=0;flip=null;stage.setPointerCapture(e.pointerId)});
   stage.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y,dt=Math.max(16,performance.now()-drag.t);
@@ -3076,7 +3083,7 @@ function bindClicks(){VR.addEventListener('click',e=>{
     case'xclaim':{const w=WINGS[S.wing],x=w.kind==='world'?WORLDW[w.w].items[+b.dataset.k]:LEGACY[+b.dataset.k];if(x.st!==1)return;$('.dim').remove();claimId(x.id);break}
     case'item':sheet(+b.dataset.k);break;
     case'club':award();break;
-    case'awardClose':{const a=$('.award');if(a){a._stop&&a._stop();a.remove()}break}
+    case'awardClose':{const a=$('.award');if(a){a._stop&&a._stop();a.remove()}$('#app').classList.remove('awarding');break}
     case'close':{const d=$('.dim');if(d)d.remove();break}
     case'claim':{const a=ACH[+b.dataset.k];if(a.st!==1)return;$('.dim').remove();claimId(a.id);break}
     case'mclaim':{const m=MIS[+b.dataset.k];if(m.st!==1)return;$('.dim').remove();claimId(m.ids[m.idx]);break}
@@ -3088,7 +3095,7 @@ function mount(){if(host)return;host=document.createElement('div');host.id='vaul
  VR.querySelectorAll('.tee').forEach(e=>e.innerHTML='<img src="vault/v1/vault-emblem.webp" alt="">');bindClicks();
  addEventListener('resize',()=>{if(host.style.display!=='none')place()})}
 function place(){const a=document.getElementById('app').getBoundingClientRect();Object.assign(host.style,{left:a.left+'px',top:a.top+'px',width:a.width+'px',height:a.height+'px',display:'block'})}
-function unmount(){if(!host)return;host.style.display='none';const v=$('#view');if(v)v.innerHTML='';const aw=$('.award');if(aw){aw._stop&&aw._stop();aw.remove()}if(ovKind==='vault')ovKind=null;S.screen='game';upd()}
+function unmount(){if(!host)return;cover(false);host.style.display='none';const v=$('#view');if(v)v.innerHTML='';const aw=$('.award');if(aw){aw._stop&&aw._stop();aw.remove()}if(ovKind==='vault')ovKind=null;S.screen='game';upd()}
 function open(){if(busy)return;if(ovKind&&ovKind!=='vault')closeOv();mount();place();ovKind='vault';build();S.screen='game';render();enterGallery()}
 /* rewards waiting: trophies, the current step of each mission, world medals and days played */
 function count(){let n=0;for(const[id]of TROPHIES)if(s.ach[id]===1)n++;
