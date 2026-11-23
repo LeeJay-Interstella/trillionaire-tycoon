@@ -1396,7 +1396,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112403,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112404,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1792,6 +1792,15 @@ function collect(){const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return 
 const TAP_SEC=1,TAP_GAP=90;let tapLast=0;
 const TAP2_MIN=30,tapMul=()=>now()<(s.tapUntil||0)?2:1; // Double taps perk: every earning tap is worth twice as much
 const tapFmt=v=>v<10?'$'+v.toFixed(2):$m(v);
+function claimFx(c,g,why){const btn=$('claimBtn'),r=btn?btn.getBoundingClientRect():{left:innerWidth/2-40,top:innerHeight/2,width:80,height:0};
+ bank(c,1);s.earned+=c;s.gems+=g;gemLog(g,why);vib(12);closeOv();save();
+ const tgt=$('cash').getBoundingClientRect(),n=10,sx=r.left+r.width/2-31,sy=r.top;
+ for(let i=0;i<n;i++){const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=(sx+(Math.random()*50-25))+'px';f.style.top=(sy+(Math.random()*10-5))+'px';f.style.zIndex=90;document.body.appendChild(f);
+  const dx=tgt.left+tgt.width*.25-sx,dy=tgt.top-sy,lift=-60-Math.random()*40,side=(Math.random()-.5)*80;
+  const an=f.animate?.([{transform:'translate(0,0) rotate(0) scale(1)'},{transform:`translate(${dx*.35+side}px,${dy*.35+lift}px) rotate(${-20+Math.random()*40}deg) scale(1.05)`,offset:.4},{transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*30-15}deg) scale(.35)`,opacity:.3}],{duration:620,delay:i*40,easing:'cubic-bezier(.3,.1,.6,1)',fill:'forwards'});
+  const done=()=>{f.remove();if(i===n-1){const t=$('cash').closest('.t');if(t){t.classList.add('bump');setTimeout(()=>t.classList.remove('bump'),160)}}};if(an)an.onfinish=done;else done()}
+ cashTween=performance.now();floaty(r.left+r.width/2,r.top,'+'+$m(c));
+ const gm=$('gm');if(gm){const gr=gm.getBoundingClientRect();setTimeout(()=>tapFloat(gr.left+gr.width/2,gr.top+10,'+'+g+' 💎','#9FE3FF'),300)}upd()}
 function tapFloat(x,y,txt,col){const f=document.createElement('div');f.className='tapfloat num';f.textContent=txt;if(col)f.style.color=col;f.style.left=(x+(Math.random()*24-12))+'px';f.style.top=(y-28)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1100)}
 
 // ---- Tap glow: light pulse, flash, squash, rays, ground ring, sparkles and a cash pop when you tap a business to earn.
@@ -3232,15 +3241,17 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'mgrtap':{const m=s.mgr.train;if(!m||!mgrOn())return;const cut=Math.max(1300,m.total*.005);m.left-=cut;s.taps++;vib(5);floaty(e.clientX||innerWidth/2,e.clientY||innerHeight/2,'-'+(cut/1000).toFixed(1)+'s','#1F3A5F');if(m.left<=0)finishTrain();upd();break}
   case'perkuse':usePerk(el.dataset.v);break;
   case'claim':{const id=el.dataset.v,A=ACH.find(x=>x[0]===id);if(s.ach[id]!==1)return;s.ach[id]=2;s.gems+=A[4];gemLog(A[4],'Awards');toast(`+${A[4]} crystals`,'good');$('sb').innerHTML=mailBody();upd();break}
-  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);bank(c,1);s.gems+=2;gemLog(2,'Free gifts');s.freeAt=now()+6e5;
-   dialog('Free gift!',`<p>You got<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">2 crystals</span></p><p class="s">Come back in 10 minutes for another one.</p>`,`<button class="yes" data-act="close">Thanks</button>`);upd();break}
+  case'free':{if(s.freeAt>now())return toast(`Next free gift in ${dur((s.freeAt-now())/1000)}`);const c=Math.max(50,income()*2);
+   dialog('Free gift!',`<p>Your gift is<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">2 crystals</span></p><p class="s">Come back in 10 minutes for another one.</p>`,`<button class="yes" data-act="claimfree" id="claimBtn">Claim</button>`);break}
+  case'claimfree':{if(s.freeAt>now())return closeOv();const c=Math.max(50,income()*2);s.freeAt=now()+6e5;claimFx(c,2,'Free gifts');break}
   case'boost':{if(boostOn())return toast(`${s.boostX||2}X income active for ${dur((s.boostUntil-now())/1000)}`);
    if(s.boostReady<=now())dialog('Income boost',`<p>Double all income for <span class="hl">3 minutes</span>.</p><p class="s">Free to use. Recharges 15 minutes after you use it.</p>`,`<button class="no" data-act="close">Later</button><button class="yes" data-act="doboost">Boost</button>`);
    else dialog('Income boost',`<p>Your free boost recharges in <span class="hl">${dur((s.boostReady-now())/1000)}</span>.</p><p>Boost now for <span class="hl">${GEM} 5</span>?</p>`,`<button class="no" data-act="close">No</button><button class="yes" data-act="paidboost" ${s.gems<5?'disabled':''}>Yes</button>`);break}
   case'doboost':s.boostX=2;s.boostUntil=now()+18e4;s.boostReady=now()+9e5;closeOv();toast('2X income for 3 minutes!','good');upd();break;
   case'paidboost':if(s.gems<5)return;s.gems-=5;gemLog(-5,'3-min boosts');ev('perk',{k:'boost3'});s.boostX=2;s.boostUntil=now()+18e4;closeOv();toast('2X income for 3 minutes!','good');upd();break;
-  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);bank(c,1);s.gems+=10;gemLog(10,'Treasure chest');s.chestAt=now()+4*36e5;
-   dialog('Treasure chest',`<p>Inside you find<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">10 crystals</span></p><p class="s">A new chest arrives every 4 hours.</p>`,`<button class="yes" data-act="close">Awesome</button>`);upd();break}
+  case'chest':{if(s.chestAt>now())return toast(`The chest unlocks in ${dur((s.chestAt-now())/1000)}`);const c=Math.max(500,income()*15);
+   dialog('Treasure chest',`<p>Inside you find<br><span class="hlg num" style="font-size:24px">${COIN} ${money(c)}</span><br>and <span class="hl">10 crystals</span></p><p class="s">A new chest arrives every 4 hours.</p>`,`<button class="yes" data-act="claimchest" id="claimBtn">Claim</button>`);break}
+  case'claimchest':{if(s.chestAt>now())return closeOv();const c=Math.max(500,income()*15);s.chestAt=now()+4*36e5;claimFx(c,10,'Treasure chest');break}
   case'boss':bossAll=false;bossView='main';acctSig='';sheet('Boss',bossBody(),'boss');break;
   case'bossview':{if(ovKind!=='boss'){bossView=el.dataset.v||'main';sheet('Boss',bossBody(),'boss');break}bossView=el.dataset.v||'main';const sb=$('sb');if(sb){sb.innerHTML=bossBody();sb.scrollTop=bossView==='main'?sb.scrollHeight:0}break}
   case'signoutask':dialog('Sign out?',`<p>You're about to sign out of <b>${esc(cloudUser&&cloudUser.email||'your account')}</b>.</p><p class="s">Your progress is saved to your account first. This device stops syncing until you sign in again.</p>`,`<button class="no" data-act="bossview" data-v="main">Cancel</button><button class="yes" data-act="signoutgo">Sign out</button>`);break;
