@@ -1,4 +1,5 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Trillionaire"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Trillionaire Tycoon</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Trillionaire"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+</style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Montserrat:wght@600;700;800;900&display=swap">
@@ -722,12 +723,27 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .dm.in{align-self:flex-start;background:#2C3537;color:#EEF1EE;border-bottom-left-radius:5px}
 .dm.out{align-self:flex-end;background:var(--green);color:#fff;border-bottom-right-radius:5px}
 .dm .g{color:#7EDB6F}.dm small{font-size:12px;color:#9AA39D}
-.dm.dcard{padding:10px 14px 12px;min-width:62%}
-.dcard .dbig{font-family:var(--num,inherit);font-size:30px;font-weight:900;color:#7EDB6F;line-height:1.05;letter-spacing:-.5px}
-.dcard .dflow{font-size:13px;color:#C9D0CB;margin-top:2px}.dcard .dflow b{color:#fff}
-.dsys .g{color:#7EDB6F}
-.dcard .dchips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
-.dcard .dchip{font-size:12px;font-weight:900;padding:4px 9px;border-radius:99px;background:#1C2425;display:inline-flex;gap:5px;align-items:center}
+.sheet.drawer{justify-content:flex-end;align-items:center;animation:dimin .25s ease-out}@keyframes dimin{from{background:#5f5f5f00}}
+.sheet.drawer .sheet-in{margin:0;height:auto;max-height:88%;width:100%;max-width:520px;border-radius:24px 24px 0 0;overflow:hidden;box-shadow:0 -10px 40px #0008;animation:dup .34s cubic-bezier(.2,.9,.25,1)}
+@keyframes dup{from{transform:translateY(100%)}}
+.sheet.drawer.out{pointer-events:none;transition:background .25s;background:#5f5f5f00}.sheet.drawer.out .sheet-in{transition:transform .25s ease-in;transform:translateY(105%)!important}
+.sheet.drawer .sheet-h{position:relative;padding-top:20px;touch-action:none;cursor:grab}
+.sheet.drawer .sheet-h:before{content:"";position:absolute;top:8px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:9px;background:#4A5557}
+.sheet.drawer .sheet-b{flex:0 1 auto;min-height:0;padding-bottom:0}
+.sheet.drawer .dthread{flex:0 1 auto;padding:14px 14px 8px;gap:7px}
+.sheet.drawer .dquick{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.dthread>:last-child{margin-bottom:4px}
+.dcard{align-self:stretch;margin:4px 0 2px;background:#1E2728;border:1px solid #2F3B3C;border-radius:18px;padding:14px 16px 12px}
+.dcard>small,.drun>small{display:block;font-size:10.5px;font-weight:900;letter-spacing:1.6px;color:#8E9893}
+.dcard .dbig{font-family:var(--num,inherit);font-size:32px;font-weight:900;color:#7EDB6F;line-height:1.05;letter-spacing:-.5px;margin:2px 0 10px}
+.drows{display:flex;flex-direction:column}.drows>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid #2B3637;font-size:14px}
+.drows span{color:#A9B2AD;font-weight:700}.drows b{color:#fff;font-weight:900}.drows .g,.drr .g{color:#7EDB6F}
+.dcard .dnote{margin-top:6px;font-size:12px;font-weight:700;color:#A9B2AD;opacity:1}
+.dstat{align-self:center;font-size:13px;font-weight:800;color:#C9D0CB;padding:6px 0}.dstat b{color:#fff}.dstat .g{color:#7EDB6F}
+.drun{align-self:stretch;background:#1A2223;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.drr{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;color:#EEF1EE}.drr .n{flex:1}.drr .t{color:#F5B946;min-width:44px;text-align:right}
+.dav.s{width:28px;height:28px;font-size:15px}
+.dempty{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:22px 10px 26px;color:#A9B2AD;font-size:13px;font-weight:700}.dempty b{color:#fff;font-size:16px}.dempty .dico{font-size:34px;margin-bottom:4px}
 .dsys{align-self:center;font-size:11px;font-weight:800;color:#9AA39D;padding:4px 0;text-align:center}
 .dsys b{color:#F5B946}.dsys.bad{color:#FF8A73}
 .dempty{margin:auto 0;font-size:13px;line-height:1.5}
@@ -792,6 +808,8 @@ input.nm:focus{outline:none;border-color:var(--green)}
   .sheet{align-items:center;justify-content:center;padding:40px 0}
   .sheet-in{margin:0;height:auto;max-height:100%;width:min(900px,92vw);box-shadow:0 20px 60px #0006}
   .sheet .grid{grid-template-columns:repeat(4,1fr)}
+  .sheet.drawer{align-items:center;justify-content:flex-end;padding:0}
+  .sheet.drawer .sheet-in{width:100%;max-width:520px;max-height:88%;box-shadow:0 -10px 40px #0008}
   #toasts{top:120px}
 }
 @media (orientation:landscape) and (max-height:520px) and (pointer:coarse){
@@ -1378,7 +1396,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112208,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112401,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1882,7 +1900,7 @@ function showGroup(g){const o=cur();if(o&&isGood(o)===g)return;if(o){s.vLast=s.v
 /* ================= overlays ================= */
 const ovl=$('ovl');let ovKind=null;
 let nextUp=null;
-function closeOv(){if(ovKind==='deals'){dealChat=null;if((s.dealPaid||[]).length)collectDeals(true)}ovl.innerHTML='';ovKind=null;if(nextUp){const f=nextUp;nextUp=null;setTimeout(f,250)}}
+function closeOv(){if(ovKind==='deals'){dealChat=null;if((s.dealPaid||[]).length)collectDeals(true);const dr=ovl.querySelector('.sheet.drawer');if(dr){dr.classList.add('out');dr.removeAttribute('data-act');ovl.parentNode.insertBefore(dr,ovl.nextSibling);setTimeout(()=>dr.remove(),260)}}ovl.innerHTML='';ovKind=null;if(nextUp){const f=nextUp;nextUp=null;setTimeout(f,250)}}
 function dialog(title,body,btns,kind){ovKind=kind||'dlg';ovl.innerHTML=`<div class="dim" data-act="dimclose"><div class="dlg"><h3>${title}</h3><div class="body">${body}${btns?`<div class="btns">${btns}</div>`:''}</div></div></div>`}
 function sheet(title,body,kind){ovKind=kind;ovl.innerHTML=`<div class="sheet" data-act="dimclose"><div class="sheet-in"><div class="sheet-h"><svg viewBox="0 0 24 24" style="opacity:.0"><path d="M0 0"/></svg><h3>${title}</h3><button data-act="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div><div class="sheet-b" id="sb">${body}</div></div></div>`}
 
@@ -1908,7 +1926,7 @@ function bizInfo(bid){const b=B[bid];if(!b)return;const p=buyPrice(b),gp=gemPay(
   <div class="binfo num">${b.rate>0?row('Earning',$m(b.rate)+'/min','#3E9B37')+row('Max hold',$m(b.hold),'#3E9B37')+row('Fills in',dur(fill*60)):row('Earning','None')}
   ${row('Build time',dur(b.time))}${row('Threat',(b.threat<0?'−'+Math.abs(b.threat):'+'+b.threat)+'%',thrCol(b.threat))}${pay?row('Pays back in','~'+dur(pay*60)):''}
   ${gemTapBiz(b)?row('Lucky taps',GEM+' crystals','#2F8DC0'):''}</div>
-  ${b.threat<0?'<p class="s">Lowers your threat for good, and taps add goodwill. Can never be sold.</p>':b.threat>=50?'<p class="s">High heat: watch your threat.</p>':''}`;
+  ${b.threat<0?'<p class="s">Lowers your threat for good, and taps add goodwill. Can never be sold.</p>':b.threat>=50?'<p class="s">Adds a lot of threat: watch your threat.</p>':''}`;
  const own_=own(b.id),btn=own_?`<button class="ok" data-act="infoclose">Owned · Lv ${own_.level}</button>`:available(b)?`<button class="yes num" data-act="infobuy" data-bid="${bid}" ${canPay(b,p)?'':'disabled'}>${gp?GEM:COIN} ${money(p)}</button>`:`<button class="ok" disabled>${b.w?'World locked':'Locked'}</button>`;
  const btns=`<button class="no" data-act="infoclose">Close</button>${btn}`;
  if(ovKind==='shop'){shopBack=($('sb')||{}).scrollTop||0;stackDialog(esc(b.name),body,btns,'askbuy')}else dialog(esc(b.name),body,btns)}
@@ -2065,7 +2083,7 @@ function thrTip(){const opts=[];
 function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=[['None','var(--green)'],['Very low','#2F8DC0'],['Low','#E8901E'],['Medium','#E04B3A'],['High','#C8372D'],['Very high','#C8372D']][th<=0?0:th<10?1:th<30?2:th<50?3:th<70?4:5];
  const lv=thrLevel(th),tk=`<span>Police attention</span><span>${heat[0]}</span>`.repeat(8);
  dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(th)<0?'−'+Math.round(-th):Math.round(th)}%</span></p><div class="tkr l${lv}${lv>=4?' flash':''}" role="status" aria-label="Police attention: ${heat[0]}"><div class="tkt">${tk}</div></div><p class="s">The higher your threat, the more often the police raid you. Get caught and you go to jail, where your businesses stop earning. At 50% threat or more, 90% of your cash is seized too. After you get out, they leave you alone for a while.</p>
- ${th<0?`<p class="s" style="color:var(--green)">You're below zero: your good causes cover more than your risky businesses, so the police leave you alone and shady deals carry no risk.</p>`:''}${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}${th>0?thrTip():''}<p class="s">Under 30% you're rarely raided, and above 100% raids get no more frequent. Gardens, libraries, hospitals and every world's good causes bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
+ ${th<0?`<p class="s" style="color:var(--green)">You're below zero: your good causes cover more than your risky businesses, so the police leave your businesses alone. Shady deals still carry their own threat.</p>`:''}${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}${th>0?thrTip():''}<p class="s">Under 30% you're rarely raided, and above 100% raids get no more frequent. Gardens, libraries, hospitals and every world's good causes bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
 function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
  const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
@@ -2447,7 +2465,7 @@ function jailNoteHTML(){const n=jailNote;if(!n||!s.jail)return'';const ago=now()
 const GAVEL=`<svg class="gavel" viewBox="0 0 120 100" aria-hidden="true"><g transform="rotate(-28 60 40)"><rect x="56" y="34" width="56" height="9" rx="4" fill="#8A4A1E"/><rect x="22" y="14" width="44" height="46" rx="5" fill="#E7892E"/><rect x="22" y="14" width="44" height="12" rx="5" fill="#C9681C"/><rect x="22" y="48" width="44" height="12" rx="5" fill="#C9681C"/><rect x="30" y="26" width="14" height="22" fill="#F5D24A"/></g><rect x="30" y="80" width="56" height="9" rx="2" fill="#C9681C"/><rect x="38" y="72" width="40" height="10" rx="2" fill="#E7892E"/><rect x="38" y="72" width="16" height="10" rx="2" fill="#F5D24A"/></svg>`;
 const SCALES=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v17M7 20h10M4 7h16M6 7l-3 7h6zM18 7l-3 7h6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>`;
 function openJail(){if(ovKind==='jail')return;ovKind='jail';const j=s.jail;
- ovl.innerHTML=`<div class="fullscreen" id="jail">${jailNoteHTML()}<div class="jhd">${GAVEL}<h2>CONVICTED!</h2><p>${j.sev==='deal'?`Caught in the middle of ${j.who||'a shady'}${j.who?'\'s':''} deal. With your threat at ${j.th}% while it ran, you took ${typeof j.risk==='string'?`a ${j.risk}`:'a'} risk of getting caught.`:`Your ${j.th}% threat caught up with you.`}${j.loss?` Fined <b class="num">${$m(j.loss)}</b>.`:''}</p></div>
+ ovl.innerHTML=`<div class="fullscreen" id="jail">${jailNoteHTML()}<div class="jhd">${GAVEL}<h2>CONVICTED!</h2><p>${j.sev==='deal'?`Caught in the middle of ${j.who||'a shady'}${j.who?'\'s':''} deal. ${typeof j.risk==='string'?`The deal's threat was ${j.risk}, with your own threat at ${j.th}%.`:`Your threat was ${j.th}% while it ran.`}`:`Your ${j.th}% threat caught up with you.`}${j.loss?` Fined <b class="num">${$m(j.loss)}</b>.`:''}</p></div>
  <div class="jwarn" id="jwarn" hidden></div>
  <div class="jexit">${s.perks.jail?`<button class="freecard" data-act="jailcard">${PICON.jail}<span>USE GET-OUT-OF-JAIL-FREE CARD<small>You have ${s.perks.jail}</small></span></button>`:''}
  <button class="jb law" data-act="lawyer">${SCALES}<span>CALL LAWYER<small id="jlaw"></small></span></button>
@@ -3524,10 +3542,23 @@ async function signOut(){try{await cloudPush();await disablePush();await supa.au
 // Pay now, get paid in 3-5 minutes. Every deal adds threat while it runs and can get you busted;
 // the bust risk comes from your threat with the deal's heat added, times the contact's danger (good causes give cover: at 0% or below, no risk);
 // a bust gives a sentence twice the time the deal has left. Still in jail when it pays out = it's lost.
-const DEAL_T=[ // tier: chance, back, seconds, threat, max bust chance over the whole deal
- {k:'Low',w:40,x:1.4,sec:300,add:5,bust:.1},{k:'Medium',w:35,x:2,sec:240,add:12,bust:.25},{k:'High',w:25,x:3,sec:180,add:25,bust:.5}];
+// Each deal has its own threat: the chance of getting caught while it runs. It starts at the tier's floor, rises with your
+// own threat, and good causes can't push it below the floor, so a deal is never free money. The stake grows with your
+// income (minutes of earnings), and getting caught costs the stake plus a fine on the promised payout, plus jail.
+const DEAL_T=[ // tier: chance, stake (minutes of income), back, seconds, threat added while running, deal threat floor/cap, fine as part of the payout
+ {k:'Low',w:40,mins:15,x:1.4,sec:300,add:5,floor:.05,cap:.25,fine:.5},
+ {k:'Medium',w:35,mins:30,x:2,sec:240,add:12,floor:.15,cap:.45,fine:.75},
+ {k:'High',w:25,mins:60,x:3,sec:180,add:25,floor:.30,cap:.65,fine:1}];
 const DEAL_WHO=[['Margot','Accountant','👩‍💼'],['Vinnie','Knows a guy','🧔'],['Big Tony','Local legend','🕶️']];
-const DEAL_TXT=[["Quick paperwork trick. Nobody will look twice. Probably.", "Got a client who pays early. Easy money.", "A tax refund came through early. Don't ask whose.", "I found a loophole. A tiny one, before anyone closes it.", "Invoices that pay themselves. Well, almost.", "A charity gala needs a donation. Wear something nice.", "Currency swap at a very friendly rate. Paperwork's done.", "Small creative accounting job. Keep the receipts. Actually, don't."], ["A truck of lemons fell off a lorry. Keep your head down.", "Front-row concert tickets, no questions asked.", "Designer handbags. Very real. Mostly.", "My cousin's got a van full of tellies.", "Horse in the 3:15 can't lose. I know the horse.", "Crate of vintage watches. Very vintage.", "The parking meters downtown are broken. Mine aren't.", "Bloke's selling a boat, needs cash today."], ["Card game in the back room. Cops are already sniffing around.", "Shipment at the docks. Don't tell anyone.", "The casino cameras go down for maintenance in a minute.", "One painting, no paperwork. Very hot.", "Underground race tonight. My driver doesn't lose.", "The mayor owes me a favour. Cops are watching him too.", "Gold bars, still warm. Don't ask.", "Diamond exchange, back door, one time only. Move fast."]];
+const DEAL_TXT=[
+ ["Quick paperwork trick. Nobody will look twice. Probably.","Got a client who pays early. Easy money.","A tax refund came through early. Don't ask whose.","I found a loophole. A tiny one, before anyone closes it.","Invoices that pay themselves. Well, almost.","A charity gala needs a donation. Wear something nice.","Currency swap at a very friendly rate. Paperwork's done.","Small creative accounting job. Keep the receipts. Actually, don't.","Offshore account needs a quick top-up. Sunny place, very quiet.","Two sets of books, one happy ending.","An auditor owes me lunch. Long lunch.","Expense claims for a yacht we don't own. Yet.","A shell company needs a shell. You'd be perfect.","Year-end bonus scheme. The year ends whenever I say.","Rounding errors add up if you round enough of them.","A pension fund wants to diversify. Into you."],
+ ["A truck of lemons fell off a lorry. Keep your head down.","Front-row concert tickets, no questions asked.","Designer handbags. Very real. Mostly.","My cousin's got a van full of tellies.","Horse in the 3:15 can't lose. I know the horse.","Crate of vintage watches. Very vintage.","The parking meters downtown are broken. Mine aren't.","Bloke's selling a boat, needs cash today.","Pallet of trainers, all left feet. I've got a buyer for left feet.","Mate at the airport says a suitcase got lost. Lucky us.","Phones still in the wrapper. Box says they're phones.","A food truck that sells more than food.","Football shirts signed by someone. Definitely someone.","Scrap metal, very shiny scrap metal.","Fireworks for a wedding that isn't happening.","A warehouse is clearing out. Tonight. Bring a van."],
+ ["Card game in the back room. Cops are already sniffing around.","Shipment at the docks. Don't tell anyone.","The casino cameras go down for maintenance in a minute.","One painting, no paperwork. Very hot.","Underground race tonight. My driver doesn't lose.","The mayor owes me a favour. Cops are watching him too.","Gold bars, still warm. Don't ask.","Diamond exchange, back door, one time only. Move fast.","Armoured van takes a new route today. I picked the route.","A rival's safe opens on a birthday. I know the birthday.","Private auction on a boat. Boat leaves in five.","The vault downtown has a new guard. He's my nephew.","A crown turned up. Nobody's asked whose head it's from.","Horse race is fixed. The horses don't know yet.","Container 47. Don't open it. Just pay for it.","Somebody's selling a whole island. Cash only."]];
+const DEAL_HI=[["Hi, boss.","Quick one, boss.","Got a minute?","Morning, boss. Or evening. I don't sleep.","Discreet opportunity for you.","Psst."],["Oi, boss!","Alright, boss?","You'll like this one.","Boss, listen.","Don't hang up.","Got something for you."],["Boss.","Listen carefully.","Keep this quiet.","We need to talk. Now.","Big one tonight.","You in or out?"]];
+const DEAL_YES=[["Lovely. I'll handle the paperwork. 🧾","Wise choice. Numbers never lie. Mine do. 📊","Done. Act natural.","Splendid. Shred this message."],["Nice one, boss. 🤝","Sorted. Keep your phone on.","Knew you would. Leave it with me.","Proper. I'll be in touch."],["Good. Nobody saw anything. 🕶️","Smart. Don't call me, I'll call you.","Pleasure, boss. 🤝","It's done. Stay away from the windows."]];
+const DEAL_NO=[["Suit yourself. The loophole won't wait.","Fine. More for my other clients.","Noted. Filed under 'missed out'."],["Your loss, boss. 🤷","No worries. Someone'll bite.","Fair enough. Plenty more lemons."],["Shame. I'll find someone braver.","You'll regret that.","Your call. Don't make it a habit."]];
+const DEAL_PAID=[["Funds cleared, boss. Squeaky clean. 🧾","All filed. Here's your cut.","The numbers worked out. They always do.","Paid in full. Nobody's any the wiser."],["Sold every last one. 😎","Told you I know a guy. Here you go.","Easy money, like I said.","Van's empty, pockets are full."],["The house paid out. Big night. 🎩","Nobody saw a thing. Here's yours.","Clean job. Count it.","Told you. I don't lose."]];
+const dPick=(L,k)=>{const r=s.dealSeen=s.dealSeen||{},seen=r[k]||[],ok=L.filter(x=>!seen.includes(x)),x=(ok.length?ok:L)[Math.floor(Math.random()*(ok.length||L.length))];r[k]=[x,...seen].slice(0,Math.max(1,Math.floor(L.length/2)));return x};
 const DEAL_STAKE=15,DEAL_LIFE=20*6e4,DEAL_MAX=3;
 let dealChat=null;
 const dealsOpen=()=>s.owned.length>=3&&income()>0;
@@ -3539,18 +3570,20 @@ function dealTick(){if(!dealsOpen())return;const t=now();if(!s.deals)s.deals=[];
  if(!s.dealNext){s.dealNext=t+(5+Math.random()*10)*6e4;s.dealTier=pickTier()}
  if(s.deal&&t>=s.deal.exp){s.dealLog.unshift({at:s.deal.exp,txt:`${s.deal.who}'s offer expired`});s.dealLog.length=Math.min(s.dealLog.length,5);dealSchedule(s.deal.exp);s.deal=null;save()}
  let guard=0;while(!s.deal&&t>=s.dealNext&&guard++<50){const at=s.dealNext;if(t<at+DEAL_LIFE){s.deal=makeDeal(at,s.dealTier||0);vib([40,60,40]);save()}else dealSchedule(at+DEAL_LIFE)}}
-function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*DEAL_STAKE)),pay=Math.round(cost*T.x),tx=DEAL_TXT[tier][Math.floor(Math.random()*DEAL_TXT[tier].length)];
- return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,bust:T.bust,at,exp:at+DEAL_LIFE,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
-// risk over the whole deal: threat (with the deal's heat included) x the contact's danger, capped per tier
+function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*T.mins)),pay=Math.round(cost*T.x),tx=dPick(DEAL_TXT[tier],'t'+tier),hi=dPick(DEAL_HI[tier],'h'+tier);
+ return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,fine:Math.round(pay*T.fine),at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
+// a deal's threat over the whole deal: the tier's floor, plus your threat (with the deal's own added threat) x the contact's danger, capped per tier
 const DEAL_DNG=[.2,.4,.7];
-const dealRisk=(tier,th)=>Math.min(DEAL_T[tier].bust,Math.max(0,th)*DEAL_DNG[tier]/100);
-const riskTxt=r=>r<=0?'0%':r<.01?'under 1%':Math.round(r*100)+'%';
+const dealRisk=(tier,th)=>{const T=DEAL_T[tier];return Math.min(T.cap,T.floor+Math.max(0,th)*DEAL_DNG[tier]/100)};
+const riskTxt=r=>Math.round(r*100)+'%';
+const dcol=r=>r<.15?'#F5D24A':r<.35?'#F5A23A':'#FF6B57';
+const dealFine=d=>d.fine!=null?d.fine:Math.round(d.pay*DEAL_T[d.tier].fine);
 // chance of a bust at one 30-second check, so the whole deal has that risk
 const heatAt=c=>(s.deals||[]).reduce((a,d)=>a+(c>=d.start&&c<d.end?d.add:0),0);
 const dealTh=c=>Math.max(0,threatRaw()-dealHeat()+heatAt(c)-(c<(s.cleanUntil||0)?20:0));
 const dealP=(d,th)=>1-Math.pow(1-dealRisk(d.tier,th),30/d.sec);
-function dealBust(c){const th=dealTh(c);if(th<=0)return null;for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,th))return d}return null}
-function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at)));s.jail={until:at+ms,total:ms,sev:'deal',loss:0,th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:0,threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
+function dealBust(c){const th=dealTh(c);for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,th))return d}return null}
+function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,(1+d.tier)*2*(d.end-at))),loss=Math.min(Math.max(0,s.cash),dealFine(d));s.cash-=loss;s.jail={until:at+ms,total:ms,sev:'deal',loss,th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:Math.round(loss),threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
@@ -3560,24 +3593,32 @@ function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
  const paid=(s.dealPaid||[]).length;b.hidden=!(off||run.length||paid);if(b.hidden)return;const dd=$('dealDot');dd.hidden=!(off||paid);dd.textContent=paid?'$':'1';dd.classList.toggle('cash',!!paid);b.classList.toggle('buzz',off||!!paid);
  const tg=$('dealTag');tg.hidden=!run.length;if(run.length)tg.textContent=dur((run[0].end-t)/1000);
- b.style.top='';if(ovKind==='deals'){const r=$('dealRun');if(r)r.innerHTML=dealRunHTML(dealSkip());const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const rk=$('dealRk');if(rk&&k)rk.textContent=riskTxt(dealRisk(k.tier,threatAt(t)));const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
+ b.style.top='';if(ovKind==='deals'){document.querySelectorAll('.drun .t').forEach((e,i)=>{const L=(s.deals||[]).filter(d=>d.end>t&&d!==dealSkip());if(L[i])e.textContent=dur((L[i].end-t)/1000)});const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const rk=$('dealRk');if(rk&&k)rk.textContent=riskTxt(dealRisk(k.tier,dealTh(t)));const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
 const dealSkip=()=>dealChat&&dealChat.reply==='in'?(s.deals||[]).find(x=>x.at===dealChat.offer.at):null;
 const bandCol=t=>t<10?'#7FD0F2':t<30?'#F5A63A':t<50?'#FF6B5A':'#FF4D3D';
-function dealRunHTML(skip){const t=now();return(s.deals||[]).filter(d=>d.end>t&&d!==skip).map(d=>`<div class="dsys">⏱ ${esc(d.who)}'s deal: ${$m(d.pay)} in <b class="num">${dur((d.end-t)/1000)}</b> · ${riskTxt(dealRisk(d.tier,threatAt(t)))} risk</div>`).join('')}
-function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now();
- if(!d){const log=(s.dealLog||[]).slice(0,3);return`<div class="dthread"><div id="dealRun">${dealRunHTML()}</div><div class="dsys dempty">No deals right now.<br>Your contacts usually text every hour or two.</div>${log.map(l=>`<div class="dsys${l.bad?' bad':''}">${esc(l.txt)}</div>`).join('')}</div>`}
- const after=Math.round(threatRaw()-(cleanOn()?20:0)+(c&&c.reply==='in'?0:d.add)),col=bandCol(after),run=c&&c.reply==='in'?(s.deals||[]).find(x=>x.at===d.at):null;
- const inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
- let h=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(d.text))+
-  `<div class="dm in dcard"><div class="dbig num">+${$m(d.pay-d.cost)}</div><div class="dflow num"><b>${$m(d.cost)}</b> → <b>${$m(d.pay)}</b> · ${d.sec/60} min</div><div class="dchips"><span class="dchip" style="color:${col}">${d.tier===2?'🚨':d.tier===1?'👀':'🤫'} Heat +${d.add}%</span>${dealRisk(d.tier,after)<=0?`<span class="dchip" style="color:#7EDB6F">😇 0% risk</span>`:`<span class="dchip" style="color:${col}">🚔 ${riskTxt(dealRisk(d.tier,after))} risk</span>`}</div></div>`;
- if(c&&c.reply==='in')h+=out(`I'm in 💸`)+inc(`Pleasure, boss. 🤝`)+(run?`<div class="dsys">⏱ <b class="g num">${$m(d.pay)}</b> in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b> · <span id="dealRk">${riskTxt(dealRisk(run.tier,threatAt(t)))}</span> risk</div>`:`<div class="dsys">✓ Paid out</div>`);
- else if(c&&c.reply==='pass')h+=out('Not this time.')+inc("Your loss. I'll find someone else 🤷");
- else h+=`<div class="dsys">Offer expires in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
+function dealRunHTML(skip){const t=now(),L=(s.deals||[]).filter(d=>d.end>t&&d!==skip);if(!L.length)return'';
+ return`<div class="drun"><small>RUNNING</small>${L.map(d=>`<div class="drr"><span class="dav s">${d.em}</span><span class="n">${esc(d.who)}</span><b class="g num">${$m(d.pay)}</b><span class="num t">${dur((d.end-t)/1000)}</span></div>`).join('')}</div>`}
+function dealCard(d,th){const r=dealRisk(d.tier,th);
+ return`<div class="dcard"><small>PROFIT</small><div class="dbig num">+${$m(d.pay-d.cost)}</div><div class="drows">
+ <div><span>You pay</span><b class="num">${$m(d.cost)}</b></div>
+ <div><span>You get back</span><b class="num g">${$m(d.pay)}</b></div>
+ <div><span>Pays out in</span><b>${d.sec/60} min</b></div>
+ <div><span>Deal threat</span><b style="color:${dcol(r)}" id="dealRk">${riskTxt(r)}</b></div>
+ <div><span>Fine if caught</span><b class="num" style="color:#F2A08A">${$m(dealFine(d))}</b></div></div>
+ <div class="dnote">🚔 Adds +${d.add}% to your threat while it runs</div></div>`}
+function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now(),inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
+ if(!d){const r=dealRunHTML();return`<div class="dthread">${r}<div class="dempty"><div class="dico">📵</div><b>No offers right now</b><span>Your contacts usually text every hour or two.</span></div></div>`}
+ const yes=c&&c.reply==='in',run=yes?(s.deals||[]).find(x=>x.at===d.at):null;
+ const th=yes&&run?dealTh(t):Math.max(0,threatRaw()-(cleanOn()?20:0)+d.add);
+ let h=(d.hi?inc(esc(d.hi)):'')+inc(esc(d.text))+dealCard(d,th);
+ if(yes)h+=out(esc(c.me||"I'm in 💸"))+inc(esc(c.line||'Pleasure, boss. 🤝'))+(run?`<div class="dstat">⏱ <b class="g num">${$m(d.pay)}</b> in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b></div>`:`<div class="dstat">✓ Paid out</div>`);
+ else if(c&&c.reply==='pass')h+=out(esc(c.me||'Not this time.'))+inc(esc(c.line||'Your loss.'));
+ else h+=`<div class="dstat">Offer ends in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
  const busy=(s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX,poor=s.cash<d.cost;
- return`<div class="dthread"><div id="dealRun">${dealRunHTML(run)}</div>${h}</div>`+(c?'':`<div class="dquick"><button class="dqr no" data-act="dealno">Not this time</button><button class="dqr yes" data-act="dealyes"${busy||poor?' disabled':''}>${busy?'3 deals running':poor?'Not enough cash':`I'm in 💸 ${$m(d.cost)}`}</button></div>`)}
-const PAID_TXT={Margot:['Funds cleared, boss. Squeaky clean. 🧾','Told you it was easy money.'],Vinnie:['Sold every last one. 😎','Told you I know a guy.'],'Big Tony':['The house paid out. Big night. 🎩','Nobody saw a thing.']};
-function paidBody(){const L=s.dealPaid||[],tot=L.reduce((a,d)=>a+d.pay,0),inc=x=>`<div class="dm in">${x}</div>`;
- let h='';for(const d of L){const t=PAID_TXT[d.who]||['Pleasure doing business, boss.',''];h+=`<div class="dsys">${new Date(d.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`+inc(esc(t[0]))+inc(`Here's your <b class="g">${$m(d.pay)}</b>, as promised. ${esc(t[1])}`)}
+ return`<div class="dthread">${dealRunHTML(run)}${h}</div>`+(c?'':`<div class="dquick"><button class="dqr no" data-act="dealno">Not this time</button><button class="dqr yes" data-act="dealyes"${busy||poor?' disabled':''}>${busy?'3 deals running':poor?'Not enough cash':`I'm in · ${$m(d.cost)}`}</button></div>`)}
+function paidBody(){const L=s.dealPaid||[],tot=L.reduce((a,d)=>a+d.pay,0),d=L[0],line=d.line||(d.line=dPick(DEAL_PAID[Math.max(0,DEAL_WHO.findIndex(w=>w[0]===d.who))],'p'));
+ let h=`<div class="dm in">${esc(line)}</div>`;
+ if(L.length>1)h+=`<div class="drun">${L.map(x=>`<div class="drr"><span class="dav s">${x.em}</span><span class="n">${esc(x.who)}</span><b class="g num">${$m(x.pay)}</b></div>`).join('')}</div>`;
  h+=`<div class="dpay"><small>PAYOUT${L.length>1?' · '+L.length+' DEALS':''}</small><b class="num">${$m(tot)}</b><span>+${$m(L.reduce((a,d)=>a+d.pay-d.cost,0))} profit</span></div>`;
  return`<div class="dthread">${h}</div><div class="dquick one"><button class="dqr cash" data-act="dealcollect" id="dealCollect">COLLECT ${$m(tot)} 💰</button></div>`}
 function collectDeals(auto){const L=s.dealPaid||[];if(!L.length)return;const tot=L.reduce((a,d)=>a+d.pay,0);s.dealPaid=[];bank(tot,1);s.earned+=tot;vib([30,40,30]);
@@ -3587,13 +3628,22 @@ function collectDeals(auto){const L=s.dealPaid||[];if(!L.length)return;const tot
    const an=f.animate?.([{transform:'translate(0,0) rotate(0) scale(1)'},{transform:`translate(${(Math.random()-.5)*120}px,${-80-Math.random()*60}px) rotate(${Math.random()*60-30}deg) scale(1.1)`,offset:.35},{transform:`translate(${tg.left-r.left-r.width/2+30}px,${tg.top-r.top}px) rotate(0) scale(.35)`,opacity:.3}],{duration:700,delay:i*45,easing:'cubic-bezier(.3,.1,.6,1)',fill:'forwards'});if(an)an.onfinish=()=>f.remove();else f.remove()}
   tapFloat(r.left+r.width/2,r.top,'+'+$m(tot));setTimeout(()=>{if(ovKind==='deals')closeOv()},650)}
  save();upd()}
-function openDeals(){if((s.dealPaid||[]).length){const d=s.dealPaid[0];dealChat=null;sheet(esc(d.who),paidBody(),'deals');const sh=document.querySelector('.sheet-in');if(sh)sh.classList.add('burner');const h=document.querySelector('.sheet-h h3');if(h)h.innerHTML=`<span class="dav">${d.em}</span><span class="dwho">${esc(d.who)}<small>${esc(d.role)}</small></span>`;const th=document.querySelector('.dthread');if(th)th.scrollTop=th.scrollHeight;return}
- const d=dealChat?dealChat.offer:s.deal;sheet(d?esc(d.who):'Burner phone',dealBody(),'deals');const sh=document.querySelector('.sheet-in');if(sh)sh.classList.add('burner');
- const h=document.querySelector('.sheet-h h3');if(h&&d)h.innerHTML=`<span class="dav">${d.em}</span><span class="dwho">${esc(d.who)}<small>${esc(d.role)}</small></span>`;
+function dealHead(em,who,role){return`<span class="dav">${em}</span><span class="dwho">${esc(who)}<small>${esc(role)}</small></span>`}
+function openDeals(){const paid=(s.dealPaid||[]).length,d=paid?s.dealPaid[0]:(dealChat?dealChat.offer:s.deal);if(paid)dealChat=null;
+ const body=paid?paidBody():dealBody(),head=d?dealHead(d.em,d.who,d.role):dealHead('📱','Burner phone','Your contacts');
+ let sb=ovKind==='deals'&&document.querySelector('.sheet.drawer #sb');
+ if(sb){sb.innerHTML=body;document.querySelector('.sheet.drawer .sheet-h h3').innerHTML=head}
+ else{sheet('',body,'deals');const sh=document.querySelector('.sheet');sh.classList.add('drawer');sh.querySelector('.sheet-in').classList.add('burner');sh.querySelector('.sheet-h h3').innerHTML=head;dragClose(sh)}
  const th=document.querySelector('.dthread');if(th)th.scrollTop=th.scrollHeight}
+// pull the drawer down to close it
+function dragClose(sh){const inn=sh.querySelector('.sheet-in'),hd=sh.querySelector('.sheet-h');let y0=null,dy=0;
+ hd.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;y0=e.clientY;dy=0;inn.style.transition='none';hd.setPointerCapture(e.pointerId)});
+ hd.addEventListener('pointermove',e=>{if(y0==null)return;dy=Math.max(0,e.clientY-y0);inn.style.transform=`translateY(${dy}px)`});
+ const end=()=>{if(y0==null)return;y0=null;inn.style.transition='transform .2s ease-out';if(dy>80)closeOv();else inn.style.transform=''};
+ hd.addEventListener('pointerup',end);hd.addEventListener('pointercancel',end)}
 function dealYes(){const d=s.deal,t=now();if(!d)return;if(s.cash<d.cost)return toast('Not enough cash for this deal','bad');if((s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX)return toast('You already have 3 deals running','bad');
- s.cash-=d.cost;(s.deals=s.deals||[]).push(Object.assign({},d,{start:t,end:t+d.sec*1000}));dealChat={offer:d,reply:'in'};s.deal=null;dealSchedule(t);vib(15);save();upd();openDeals()}
-function dealNo(){const d=s.deal;if(!d)return;dealChat={offer:d,reply:'pass'};s.deal=null;dealSchedule(now());save();upd();openDeals()}
+ s.cash-=d.cost;(s.deals=s.deals||[]).push(Object.assign({},d,{start:t,end:t+d.sec*1000}));dealChat={offer:d,reply:'in',me:dPick(["I'm in 💸","Count me in.","Deal. 🤝","Let's do it.","Go on then."],'me'),line:dPick(DEAL_YES[d.tier],'y'+d.tier)};s.deal=null;dealSchedule(t);vib(15);save();upd();openDeals()}
+function dealNo(){const d=s.deal;if(!d)return;dealChat={offer:d,reply:'pass',me:dPick(['Not this time.','I\'ll pass.','Too risky for me.','Not today.'],'mn'),line:dPick(DEAL_NO[d.tier],'n'+d.tier)};s.deal=null;dealSchedule(now());save();upd();openDeals()}
 // countdowns in the open chat are refreshed by dealUI on every tick
 
 /* ================= offline: pending earnings ================= */
