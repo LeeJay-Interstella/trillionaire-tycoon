@@ -1396,7 +1396,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112401,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112403,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2509,7 +2509,7 @@ function lawyerCall(){const j=s.jail;if(!j||lawSpinning)return;const calls=j.cal
   if(k==='free'){const sl=$('lawslot');if(sl)sl.classList.add('win');$('lawpop')&&($('lawpop').querySelector('.lpm').innerHTML='<span><b>Case thrown out!</b></span>');setTimeout(()=>release('Your lawyer got the case thrown out. Free to go!','lawyer',cost?cost+' crystals':'free call'),900);return}
   if(k==='cut25'||k==='cut50'){const left=Math.max(0,j.until-now()),cut=left*(k==='cut25'?.25:.5);j.until-=cut}
   j.prevK=k;save();if(ovKind==='jail'){lawOpen();const sl=$('lawslot');if(sl)sl.classList.add('win')}updJail()},ms+80)}
-function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Still in jail then and you lose your <b class="num">${$m(run[0].cost)}</b> stake <b>and</b> the <b class="num">${$m(run[0].pay)}</b> payout.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=(s.jail.calls?`${GEM} ${LAW_GEMS} per call · try again`:'First call free');if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`;const lb=document.querySelector('#jail .law');if(lb)lb.disabled=false}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
+function updJail(){if(!s.jail||ovKind!=='jail')return;const l=(s.jail.until-now())/1000;{const w=$('jwarn'),h=$('jhint'),t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,b)=>a.end-b.end);if(w){w.hidden=!run.length;if(run.length)w.innerHTML=`⚠ ${esc(run[0].who)}'s deal pays out in <b class="num">${dur((run[0].end-t)/1000)}</b>. Get out before then, or it's seized and you lose your <b class="num">${$m(run[0].cost)}</b> stake <b>and</b> the <b class="num">${$m(run[0].pay)}</b> return.`}if(h)h.hidden=!run.length}$('jt').textContent=jdur(l);{const a=$('jlaw'),b=$('jbribe');if(a)a.innerHTML=(s.jail.calls?`${GEM} ${LAW_GEMS} per call · try again`:'First call free');if(b)b.innerHTML=`${COIN} ${money(bribeCost())}`;const lb=document.querySelector('#jail .law');if(lb)lb.disabled=false}$('jb').style.width=Math.min(100,100-l*1000/s.jail.total*100)+'%'}
 const lawyerCost=()=>s.jail?Math.max(1,Math.ceil((s.jail.until-now())/600000)):1; // 1 crystal per 10 minutes left (3 at most)
 const bribeCost=()=>{if(!s.jail)return 100;const f=Math.min(1,Math.max(0,(s.jail.until-now())/s.jail.total));return Math.max(200,s.cash*.06*f,(s.jail.law&&s.jail.law.fee||0)*2)}; // 6% of your cash for a full sentence (always at least double the lawyer's fee), less as you serve it
 function closeJail(){if(ovKind==='jail')closeOv();jailHid=false;updPill()}
@@ -3541,10 +3541,10 @@ async function signOut(){try{await cloudPush();await disablePush();await supa.au
 // A contact texts an offer every 1-2 hours (not overnight). It expires after 20 minutes.
 // Pay now, get paid in 3-5 minutes. Every deal adds threat while it runs and can get you busted;
 // the bust risk comes from your threat with the deal's heat added, times the contact's danger (good causes give cover: at 0% or below, no risk);
-// a bust gives a sentence twice the time the deal has left. Still in jail when it pays out = it's lost.
+// a bust costs nothing by itself: a sentence twice the time the deal has left. Still in jail when a deal pays out = it's seized (stake and return lost).
 // Each deal has its own threat: the chance of getting caught while it runs. It starts at the tier's floor, rises with your
 // own threat, and good causes can't push it below the floor, so a deal is never free money. The stake grows with your
-// income (minutes of earnings), and getting caught costs the stake plus a fine on the promised payout, plus jail.
+// income (minutes of earnings). Getting caught means jail; a deal that pays out while you're inside is seized.
 const DEAL_T=[ // tier: chance, stake (minutes of income), back, seconds, threat added while running, deal threat floor/cap, fine as part of the payout
  {k:'Low',w:40,mins:15,x:1.4,sec:300,add:5,floor:.05,cap:.25,fine:.5},
  {k:'Medium',w:35,mins:30,x:2,sec:240,add:12,floor:.15,cap:.45,fine:.75},
@@ -3571,7 +3571,7 @@ function dealTick(){if(!dealsOpen())return;const t=now();if(!s.deals)s.deals=[];
  if(s.deal&&t>=s.deal.exp){s.dealLog.unshift({at:s.deal.exp,txt:`${s.deal.who}'s offer expired`});s.dealLog.length=Math.min(s.dealLog.length,5);dealSchedule(s.deal.exp);s.deal=null;save()}
  let guard=0;while(!s.deal&&t>=s.dealNext&&guard++<50){const at=s.dealNext;if(t<at+DEAL_LIFE){s.deal=makeDeal(at,s.dealTier||0);vib([40,60,40]);save()}else dealSchedule(at+DEAL_LIFE)}}
 function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*T.mins)),pay=Math.round(cost*T.x),tx=dPick(DEAL_TXT[tier],'t'+tier),hi=dPick(DEAL_HI[tier],'h'+tier);
- return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,fine:Math.round(pay*T.fine),at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
+ return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
 // a deal's threat over the whole deal: the tier's floor, plus your threat (with the deal's own added threat) x the contact's danger, capped per tier
 const DEAL_DNG=[.2,.4,.7];
 const dealRisk=(tier,th)=>{const T=DEAL_T[tier];return Math.min(T.cap,T.floor+Math.max(0,th)*DEAL_DNG[tier]/100)};
@@ -3583,11 +3583,11 @@ const heatAt=c=>(s.deals||[]).reduce((a,d)=>a+(c>=d.start&&c<d.end?d.add:0),0);
 const dealTh=c=>Math.max(0,threatRaw()-dealHeat()+heatAt(c)-(c<(s.cleanUntil||0)?20:0));
 const dealP=(d,th)=>1-Math.pow(1-dealRisk(d.tier,th),30/d.sec);
 function dealBust(c){const th=dealTh(c);for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,th))return d}return null}
-function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,(1+d.tier)*2*(d.end-at))),loss=Math.min(Math.max(0,s.cash),dealFine(d));s.cash-=loss;s.jail={until:at+ms,total:ms,sev:'deal',loss,th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:Math.round(loss),threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
+function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at))),loss=0;s.jail={until:at+ms,total:ms,sev:'deal',th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:Math.round(loss),threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
-  if(jailed){s.dealLog.unshift({at:d.end,txt:`Lost ${d.who}'s deal: you were in jail`,bad:1});if(!quiet)toast(`🚔 You were in jail when ${d.who}'s deal paid out. The ${$m(d.cost)} is gone.`,'bad')}
+  if(jailed){s.dealLog.unshift({at:d.end,txt:`Lost ${d.who}'s deal: you were in jail`,bad:1});if(!quiet)toast(`🚔 You were in jail when ${d.who}'s deal paid out. It was seized: the ${$m(d.cost)} stake and ${$m(d.pay)} return are gone.`,'bad')}
   else{(s.dealPaid=s.dealPaid||[]).push({who:d.who,role:d.role,em:d.em,pay:d.pay,cost:d.cost,at:d.end});s.dealLog.unshift({at:d.end,txt:`${d.who} paid ${$m(d.pay)}`});if(!quiet){vib([40,60,40]);toast(`📱 ${d.who}: your money's ready, boss`,'good');if(ovKind==='deals'){dealChat=null;setTimeout(openDeals,60)}}}
   s.dealLog.length=Math.min(s.dealLog.length,5)}}
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
@@ -3604,8 +3604,8 @@ function dealCard(d,th){const r=dealRisk(d.tier,th);
  <div><span>You get back</span><b class="num g">${$m(d.pay)}</b></div>
  <div><span>Pays out in</span><b>${d.sec/60} min</b></div>
  <div><span>Deal threat</span><b style="color:${dcol(r)}" id="dealRk">${riskTxt(r)}</b></div>
- <div><span>Fine if caught</span><b class="num" style="color:#F2A08A">${$m(dealFine(d))}</b></div></div>
- <div class="dnote">🚔 Adds +${d.add}% to your threat while it runs</div></div>`}
+ <div><span>If caught</span><b style="color:#F2A08A">Jail</b></div></div>
+ <div class="dnote">🔒 Still in jail when it pays out? It's seized.<br>🚔 Adds +${d.add}% to your threat while it runs</div></div>`}
 function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now(),inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
  if(!d){const r=dealRunHTML();return`<div class="dthread">${r}<div class="dempty"><div class="dico">📵</div><b>No offers right now</b><span>Your contacts usually text every hour or two.</span></div></div>`}
  const yes=c&&c.reply==='in',run=yes?(s.deals||[]).find(x=>x.at===d.at):null;
