@@ -1511,7 +1511,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112407,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112410,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1632,7 +1632,9 @@ const gwAtO=o=>Math.min(+o.gw||0,gwMax(o));
 const gwAt=()=>s.owned.reduce((a,o)=>a+(o.gw&&isGood(o)&&!gcBuilding(o)?gwAtO(o):0),0);
 const gwLeft=o=>{if(gwAtO(o)>=gwMax(o)-1e-9)return'Maxed · upgrade for more';const e=Math.floor(gwEn(o));return e>=GW_DAY?`${GW_DAY}/${GW_DAY} ready`:`${e}/${GW_DAY} · +1 in ${dur(Math.ceil(gwNext(o)/1e3))}`};
 const gwPct=v=>v>=1?v.toFixed(1):v>=.1?v.toFixed(2):v>=.01?v.toFixed(3):v.toFixed(4);
-const threatRaw=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)+dealHeat()-gwAt();
+const threatBase=()=>s.owned.reduce((a,o)=>a+(gcBuilding(o)?0:st(o).threat),0)-gwAt();
+// shady is shady: while a deal runs, good causes stop covering you and your threat counts up from zero
+const threatRaw=()=>{const b=threatBase(),h=dealHeat();return h>0?Math.max(0,b)+h:b};
 const threat=()=>Math.max(0,threatRaw()-(cleanOn()?20:0));
 const nw=()=>s.cash+(s.landVal||0)+(s.dealPaid||[]).reduce((a,d)=>a+d.pay,0)+s.owned.reduce((a,o)=>a+o.stored+o.inv+(o.safe||0),0);
 let friends=[],friendsLoaded=false;
@@ -1716,7 +1718,7 @@ function floaty(x,y,txt,col){const f=document.createElement('div');f.className='
 function chance(c){let x=(Math.floor(c/1000)^s.seed)>>>0;x=Math.imul(x^x>>>16,0x45d9f3b);x=Math.imul(x^x>>>16,0x45d9f3b);x^=x>>>16;return(x>>>0)/4294967296}
 const RAID=.03,COOL=30*6e4; // raid odds per 30-second check (was .3), and no raids for 30 minutes after you get out
 const caught=(th,c)=>th>0&&chance(c)<Math.pow(Math.min(th,100)/100,2)*RAID; // capped: past 100% threat raids get no more frequent
-const threatAt=c=>Math.max(0,threatRaw()-(c<(s.cleanUntil||0)?20:0));
+const threatAt=c=>{const b=threatBase(),h=heatAt(c);return Math.max(0,(h>0?Math.max(0,b)+h:b)-(c<(s.cleanUntil||0)?20:0))};
 function sentence(th,n){let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;const sev=th<20?'low':th<50?'mid':'high';return{sev,sec:sev==='low'?row[1]:sev==='mid'?row[2]:row[3],row}}
 function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0;let quiet=s.jail?s.jail.until+COOL:(s.coolUntil||0),cards=s.perks.jail||0;
  const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0,bld:gcBuilding(o)?o.end:0}));
@@ -2207,7 +2209,7 @@ function thrTip(){const opts=[];
 function threatDlg(){const th=threatRaw()-(cleanOn()?20:0),heat=[['None','var(--green)'],['Very low','#2F8DC0'],['Low','#E8901E'],['Medium','#E04B3A'],['High','#C8372D'],['Very high','#C8372D']][th<=0?0:th<10?1:th<30?2:th<50?3:th<70?4:5];
  const lv=thrLevel(th),tk=`<span>Police attention</span><span>${heat[0]}</span>`.repeat(8);
  dialog('Threat level',`<p>Your threat is <span class="hl num">${Math.round(th)<0?'−'+Math.round(-th):Math.round(th)}%</span></p><div class="tkr l${lv}${lv>=4?' flash':''}" role="status" aria-label="Police attention: ${heat[0]}"><div class="tkt">${tk}</div></div><p class="s">The higher your threat, the more often the police raid you. Get caught and you go to jail, where your businesses stop earning. At 50% threat or more, 90% of your cash is seized too. After you get out, they leave you alone for a while.</p>
- ${th<0?`<p class="s" style="color:var(--green)">You're below zero: your good causes cover more than your risky businesses, so the police leave your businesses alone. Shady deals still carry their own threat.</p>`:''}${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}${th>0?thrTip():''}<p class="s">Under 30% you're rarely raided, and above 100% raids get no more frequent. Gardens, libraries, hospitals and every world's good causes bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
+ ${th<0?`<p class="s" style="color:var(--green)">You're below zero: your good causes cover more than your risky businesses, so the police leave your businesses alone. While a shady deal runs, good causes don't cover you: your threat starts from zero and the deal's threat is added on top.</p>`:''}${cleanOn()?`<p class="s" style="color:var(--green)">Clean record: −20% threat for ${dur((s.cleanUntil-now())/1000)}.</p>`:''}${s.perks.jail?`<p class="s" style="color:var(--green)">You have ${s.perks.jail} get-out-of-jail-free card${s.perks.jail>1?'s':''}.</p>`:''}${th>0?thrTip():''}<p class="s">Under 30% you're rarely raided, and above 100% raids get no more frequent. Gardens, libraries, hospitals and every world's good causes bring it down.</p>`,`<button class="ok" data-act="close">Got it</button>`)}
 const ago=t=>{const d=(now()-new Date(t).getTime())/1000;return d<120?'playing now':d<3600?Math.floor(d/60)+'m ago':d<86400?Math.floor(d/3600)+'h ago':Math.floor(d/86400)+'d ago'};
 function lbRow([p,id,n,c,v,col],showRemove){const fr=friends.find(x=>'@f:'+x.user_id===id);
  const sub=fr?`Friend · ${ago(fr.last_played)}`:c;
@@ -4012,9 +4014,9 @@ async function signOut(){try{await cloudPush();await disablePush();await supa.au
 // own threat, and good causes can't push it below the floor, so a deal is never free money. The stake grows with your
 // income (minutes of earnings). Getting caught means jail; a deal that pays out while you're inside is seized.
 const DEAL_T=[ // tier: chance, stake (minutes of income), back, seconds, threat added while running, deal threat floor/cap, fine as part of the payout
- {k:'Low',w:40,mins:15,x:1.4,sec:300,add:5,floor:.05,cap:.25,fine:.5},
- {k:'Medium',w:35,mins:30,x:2,sec:240,add:12,floor:.15,cap:.45,fine:.75},
- {k:'High',w:25,mins:60,x:3,sec:180,add:25,floor:.30,cap:.65,fine:1}];
+ {k:'Low',w:40,mins:15,x:1.4,sec:300,add:5,floor:.05,cap:.40,sz:3,szAdd:2,fine:.5},
+ {k:'Medium',w:35,mins:30,x:2,sec:240,add:12,floor:.15,cap:.65,sz:4,szAdd:3,fine:.75},
+ {k:'High',w:25,mins:60,x:3,sec:180,add:25,floor:.30,cap:.80,sz:5,szAdd:5,fine:1}];
 const DEAL_WHO=[['Margot','Accountant','👩‍💼'],['Vinnie','Knows a guy','🧔'],['Big Tony','Local legend','🕶️']];
 const DEAL_TXT=[
  ["Quick paperwork trick. Nobody will look twice. Probably.","Got a client who pays early. Easy money.","A tax refund came through early. Don't ask whose.","I found a loophole. A tiny one, before anyone closes it.","Invoices that pay themselves. Well, almost.","A charity gala needs a donation. Wear something nice.","Currency swap at a very friendly rate. Paperwork's done.","Small creative accounting job. Keep the receipts. Actually, don't.","Offshore account needs a quick top-up. Sunny place, very quiet.","Two sets of books, one happy ending.","An auditor owes me lunch. Long lunch.","Expense claims for a yacht we don't own. Yet.","A shell company needs a shell. You'd be perfect.","Year-end bonus scheme. The year ends whenever I say.","Rounding errors add up if you round enough of them.","A pension fund wants to diversify. Into you."],
@@ -4037,19 +4039,24 @@ function dealTick(){if(!dealsOpen())return;const t=now();if(!s.deals)s.deals=[];
  if(s.deal&&t>=s.deal.exp){s.dealLog.unshift({at:s.deal.exp,txt:`${s.deal.who}'s offer expired`});s.dealLog.length=Math.min(s.dealLog.length,5);dealSchedule(s.deal.exp);s.deal=null;save()}
  let guard=0;while(!s.deal&&t>=s.dealNext&&guard++<50){const at=s.dealNext;if(t<at+DEAL_LIFE){s.deal=makeDeal(at,s.dealTier||0);vib([40,60,40]);save()}else dealSchedule(at+DEAL_LIFE)}}
 function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*T.mins)),pay=Math.round(cost*T.x),tx=dPick(DEAL_TXT[tier],'t'+tier),hi=dPick(DEAL_HI[tier],'h'+tier);
- return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add:T.add,at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
+ const dec=Math.max(0,Math.log10(Math.max(1,pay-cost))-6),add=Math.max(T.add,Math.round((T.add+dec*(T.szAdd||0))*(.75+Math.random()*.6)));
+ return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add,at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
 // a deal's threat over the whole deal: the tier's floor, plus your threat (with the deal's own added threat) x the contact's danger, capped per tier
 const DEAL_DNG=[.2,.4,.7];
-const dealRisk=(tier,th)=>{const T=DEAL_T[tier];return Math.min(T.cap,T.floor+Math.max(0,th)*DEAL_DNG[tier]/100)};
+// bigger deals draw more attention: every 10x of profit above $1M adds the tier's sz points of threat
+const dealSize=d=>{const T=DEAL_T[d.tier],p=Math.max(1,(d.pay||0)-(d.cost||0));return Math.max(0,Math.log10(p)-6)*(T.sz||0)/100};
+const dealRisk=(d,th)=>{const T=DEAL_T[d.tier];return Math.min(T.cap,T.floor+dealSize(d)+Math.max(0,th)*DEAL_DNG[d.tier]/100)};
 const riskTxt=r=>Math.round(r*100)+'%';
 const dcol=r=>r<.15?'#F5D24A':r<.35?'#F5A23A':'#FF6B57';
 const dealFine=d=>d.fine!=null?d.fine:Math.round(d.pay*DEAL_T[d.tier].fine);
 // chance of a bust at one 30-second check, so the whole deal has that risk
 const heatAt=c=>(s.deals||[]).reduce((a,d)=>a+(c>=d.start&&c<d.end?d.add:0),0);
-const dealTh=c=>Math.max(0,threatRaw()-dealHeat()+heatAt(c)-(c<(s.cleanUntil||0)?20:0));
-const dealP=(d,th)=>1-Math.pow(1-dealRisk(d.tier,th),30/d.sec);
-function dealBust(c){const th=dealTh(c);for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,th))return d}return null}
-function dealArrest(at,d){if(cardDodge(at))return;const th=dealTh(at),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at))),loss=0;s.jail={until:at+ms,total:ms,sev:'deal',th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d.tier,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:Math.round(loss),threat:Math.round(th),risk:Math.round(dealRisk(d.tier,th)*100),mgr:mgrOn()?1:0});
+const dealTh=c=>Math.max(0,Math.max(0,threatBase())+heatAt(c)-(c<(s.cleanUntil||0)?20:0));
+// a deal's own added threat doesn't count twice towards its own chance of getting caught
+const ownTh=(d,c,th)=>Math.max(0,th-(c>=d.start&&c<d.end?d.add:0));
+const dealP=(d,th)=>1-Math.pow(1-dealRisk(d,th),30/d.sec);
+function dealBust(c){const th=dealTh(c);for(const d of s.deals||[]){if(c>=d.start&&c<d.end&&chance(c+7919+d.start%997)<dealP(d,ownTh(d,c,th)))return d}return null}
+function dealArrest(at,d){if(cardDodge(at))return;const th=ownTh(d,at,dealTh(at)),ms=Math.min(JAIL_MAX,Math.max(30000,2*(d.end-at))),loss=0;s.jail={until:at+ms,total:ms,sev:'deal',th:Math.round(th),who:d.who,risk:riskTxt(dealRisk(d,th))};s.arrests++;s.lastRaid=at;ev('bust',{sev:'deal',who:d.who,loss:Math.round(loss),threat:Math.round(th),risk:Math.round(dealRisk(d,th)*100),mgr:mgrOn()?1:0});
  if(s.shift&&at>=s.shift.start&&at<s.shift.end)s.shift.jails.push({at,th:Math.round(th),sec:Math.round(ms/1000)})}
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
@@ -4059,24 +4066,24 @@ function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
  const paid=(s.dealPaid||[]).length;b.hidden=!(off||run.length||paid);if(b.hidden)return;const dd=$('dealDot');dd.hidden=!(off||paid);dd.textContent=paid?'$':'1';dd.classList.toggle('cash',!!paid);b.classList.toggle('buzz',off||!!paid);
  const tg=$('dealTag');tg.hidden=!run.length;if(run.length)tg.textContent=dur((run[0].end-t)/1000);
- b.style.top='';if(ovKind==='deals'){document.querySelectorAll('.drun .t').forEach((e,i)=>{const L=(s.deals||[]).filter(d=>d.end>t&&d!==dealSkip());if(L[i])e.textContent=dur((L[i].end-t)/1000)});const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const rk=$('dealRk');if(rk&&k)rk.textContent=riskTxt(dealRisk(k.tier,dealTh(t)));const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
+ b.style.top='';if(ovKind==='deals'){document.querySelectorAll('.drun .t').forEach((e,i)=>{const L=(s.deals||[]).filter(d=>d.end>t&&d!==dealSkip());if(L[i])e.textContent=dur((L[i].end-t)/1000)});const cd=$('dealCd'),k=dealSkip();if(cd)cd.textContent=k&&k.end>t?dur((k.end-t)/1000):'paid out';const rk=$('dealRk');if(rk&&k)rk.textContent=riskTxt(dealRisk(k,ownTh(k,t,dealTh(t))));const ex=$('dealExp');if(ex&&s.deal)ex.textContent=dur(Math.max(0,s.deal.exp-t)/1000);if(!dealChat&&!s.deal&&$('dealExp'))openDeals()}}
 const dealSkip=()=>dealChat&&dealChat.reply==='in'?(s.deals||[]).find(x=>x.at===dealChat.offer.at):null;
 const bandCol=t=>t<10?'#7FD0F2':t<30?'#F5A63A':t<50?'#FF6B5A':'#FF4D3D';
 function dealRunHTML(skip){const t=now(),L=(s.deals||[]).filter(d=>d.end>t&&d!==skip);if(!L.length)return'';
  return`<div class="drun"><small>RUNNING</small>${L.map(d=>`<div class="drr"><span class="dav s">${d.em}</span><span class="n">${esc(d.who)}</span><b class="g num">${$m(d.pay)}</b><span class="num t">${dur((d.end-t)/1000)}</span></div>`).join('')}</div>`}
-function dealCard(d,th){const r=dealRisk(d.tier,th);
+function dealCard(d,th,live){const r=dealRisk(d,th),now_=Math.round(threatRaw()-(cleanOn()?20:0)),pc=v=>(v<0?'−':'')+Math.abs(v)+'%';
  return`<div class="dcard"><small>PROFIT</small><div class="dbig num">+${$m(d.pay-d.cost)}</div><div class="drows">
  <div><span>You pay</span><b class="num">${$m(d.cost)}</b></div>
  <div><span>You get back</span><b class="num g">${$m(d.pay)}</b></div>
  <div><span>Pays out in</span><b>${d.sec/60} min</b></div>
  <div><span>Deal threat</span><b style="color:${dcol(r)}" id="dealRk">${riskTxt(r)}</b></div>
  <div><span>If caught</span><b style="color:#F2A08A">Jail</b></div></div>
- <div class="dnote">🔒 Still in jail when it pays out? It's seized.<br>🚔 Adds +${d.add}% to your threat while it runs</div></div>`}
+ <div class="dnote">🔒 Still in jail when it pays out? It's seized.<br>🚔 ${live?`Adding +${d.add}% to your threat while it runs`:`Your threat: ${pc(now_)} → <b style="color:#FF8A73">${pc(Math.max(0,now_)+d.add)}</b> while it runs. Good causes don't cover deals`}${dealSize(d)>=.01?`<br>📈 Big money draws attention: +${Math.round(dealSize(d)*100)}% threat`:''}</div></div>`}
 function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now(),inc=x=>`<div class="dm in">${x}</div>`,out=x=>`<div class="dm out">${x}</div>`;
  if(!d){const r=dealRunHTML();return`<div class="dthread">${r}<div class="dempty"><div class="dico">📵</div><b>No offers right now</b><span>Your contacts usually text every hour or two.</span></div></div>`}
  const yes=c&&c.reply==='in',run=yes?(s.deals||[]).find(x=>x.at===d.at):null;
- const th=yes&&run?dealTh(t):Math.max(0,threatRaw()-(cleanOn()?20:0)+d.add);
- let h=(d.hi?inc(esc(d.hi)):'')+inc(esc(d.text))+dealCard(d,th);
+ const th=yes&&run?ownTh(run,t,dealTh(t)):dealTh(t);
+ let h=(d.hi?inc(esc(d.hi)):'')+inc(esc(d.text))+dealCard(d,th,yes&&!!run);
  if(yes)h+=out(esc(c.me||"I'm in 💸"))+inc(esc(c.line||'Pleasure, boss. 🤝'))+(run?`<div class="dstat">⏱ <b class="g num">${$m(d.pay)}</b> in <b class="num" id="dealCd">${dur((run.end-t)/1000)}</b></div>`:`<div class="dstat">✓ Paid out</div>`);
  else if(c&&c.reply==='pass')h+=out(esc(c.me||'Not this time.'))+inc(esc(c.line||'Your loss.'));
  else h+=`<div class="dstat">Offer ends in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
