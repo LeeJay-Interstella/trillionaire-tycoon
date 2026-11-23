@@ -79,6 +79,41 @@
 .mhero.out .mh-box{transform:translateY(160%);transition:transform .3s ease-in}
 .mhero.out .mh-name{opacity:0;transition:opacity .2s}
 @media (prefers-reduced-motion:reduce){.mh-rays{animation:none}}
+
+/* lesson pages */
+.lp{padding:12px max(14px,env(safe-area-inset-left,0px)) 28px;display:flex;flex-direction:column;gap:12px;font-family:Montserrat,sans-serif;color:#1E1E1E}
+.lp-back{align-self:flex-start;background:none;border:0;padding:4px 0;font:900 13px Montserrat,sans-serif;color:#2E7D32;letter-spacing:.3px}
+.lp-hd{display:flex;gap:12px;align-items:center}.lp-hd small{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#4A5250}.lp-hd h2{margin:2px 0 0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:30px;line-height:1.05}
+.lp-no{width:48px;height:48px;flex:none;background:#3FA34D;color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E}
+.lp-talk{display:flex;gap:10px;align-items:flex-end}
+.lp-f{width:82px;height:100px;flex:none}.lp-f img{width:100%;height:100%;object-fit:contain;display:block}.lp-f.s{width:40px;height:48px}
+.lp-talk p{position:relative;margin:0 0 10px;flex:1;background:#fff;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:12px 14px;font-size:15px;font-weight:800;line-height:1.45}
+.lp-talk p:before{content:"";position:absolute;left:-11px;bottom:14px;border:8px solid transparent;border-right:9px solid #1E1E1E;border-left:0}
+.lp-c{background:#fff;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:12px 14px}
+.lp-c small{display:block;font-size:11px;font-weight:900;letter-spacing:1.5px;margin-bottom:5px}
+.lp-c p{margin:0;font-size:14.5px;font-weight:700;line-height:1.45}.lp-c b{font-weight:900}
+.lp-c.you{border-color:#2E7D32;box-shadow:0 4px 0 #1E5E23;background:#EAF6EB}.lp-c.you small{color:#2E7D32}
+.lp-c.real small{color:#3A6FB0}
+.lp-c.quiz{background:#FFF8E1;border-color:#C98F1E;box-shadow:0 4px 0 #8A5A00}.lp-c.quiz small{color:#8A5A00}
+.lq-q{font-size:15.5px!important;font-weight:900!important;margin-bottom:10px!important}
+.lq{display:flex;flex-direction:column;gap:8px}
+.lq-o{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:#fff;border:3px solid #1E1E1E;box-shadow:0 3px 0 #1E1E1E;padding:10px 12px;font:800 14px Montserrat,sans-serif;color:#1E1E1E}
+.lq-o span{width:26px;height:26px;flex:none;display:grid;place-items:center;background:#1E1E1E;color:#fff;font-size:12px;font-weight:900}
+.lq-o:active{transform:translateY(2px);box-shadow:0 1px 0 #1E1E1E}
+.lq-o.good{background:#3FA34D;color:#fff;border-color:#1E5E23;box-shadow:0 3px 0 #1E5E23}.lq-o.good span{background:#fff;color:#2E7D32}
+.lq-o.bad{background:#FFE3DE;border-color:#C0392B;box-shadow:0 3px 0 #8E2A1F;color:#8E2A1F}.lq-o.bad span{background:#C0392B}
+.lq-o[disabled]{opacity:1}.lq-o[disabled]:not(.good){opacity:.45}
+.lq-o.shake{animation:lqshake .4s}
+@keyframes lqshake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.lq-why{background:none;padding:0;display:flex;gap:10px;align-items:center;margin-top:10px;font-size:13.5px;font-weight:800;line-height:1.4}
+.lq-why.good{color:#1E5E23}.lq-why.bad{color:#8E2A1F}
+.dark .lp{color:#EEF1EE}.dark .lp-talk p,.dark .lp-c,.dark .lq-o{background:#1E2728;color:#EEF1EE;border-color:#3A4647}.dark .lp-c.you{background:#16301A}.dark .lp-c.quiz{background:#2E2614}.dark .lp-hd small{color:#A9B2AD}
+
+.mt-tag.mile{background:#E9F7E6;color:#1E5E23}
+.mbk-r{display:flex;gap:10px;align-items:flex-start;background:#FFF8E1;border:3px solid #C98F1E;padding:10px 12px;font-family:Montserrat,sans-serif;color:#1E1E1E}
+.mbk-r .rn{flex:none;min-width:34px;font-weight:900;font-size:13px;color:#8A5A00}.mbk-r b{font-size:14px;font-weight:800;line-height:1.35}
+.mbk-r.lock{background:#E4E7E5;border:3px dashed #9AA39D;color:#4A5250;font-size:12.5px;font-weight:700}.mbk-r.lock .rn{color:#5E6662}
+.dark .mbk-r{background:#2E2614;color:#EEF1EE}.dark .mbk-r.lock{background:#161D1E;color:#A9B2AD}
 </style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1476,7 +1511,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112405,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112407,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3251,7 +3286,7 @@ const Mentor=(()=>{
  const LI={};LES.forEach((l,i)=>LI[l[0]]={i,id:l[0],t:l[1],h:l[2],b:l[3],e:l[4],say:l[5]});
  const SPECIAL={
   intro:{e:'happy',say:["Hello, boss! I'm Mr Tycoon.","I turned one lemonade stand into a trillion-dollar empire. Stick with me and I'll show you how it's done.","I'll pop up at the big moments, and everything I teach you goes in your Business Book."]},
-  catchup:{e:'proud',say:["Well, well. I've been watching your empire, boss. I'm Mr Tycoon.","You've learned a lot already. I've put {n} lessons in your Business Book, and each one you read pays 5 crystals.","From now on I'll pop up at the big moments. You can change how often in Settings."]}};
+  catchup:{e:'proud',say:["Well, well. I've been watching your empire, boss. I'm Mr Tycoon.","You've learned a lot already. I've put {n} lessons in your Business Book, and passing each one's quick quiz pays 5 crystals.","From now on I'll pop up at the big moments. You can change how often in Settings."]}};
  const PEEK=["Psst, boss. Got a minute?","Boss! Quick tip?","A word of advice, boss?","Got a sec? I've been crunching your numbers.","Boss, I spotted something."];
 
  const M=()=>{const m=s.mentor||(s.mentor={});m.mode=m.mode||'all';m.seen=m.seen||{};m.learned=m.learned||{};m.read=m.read||{};m.col=m.col||0;m.lastTip=m.lastTip||0;m.recent=m.recent||[];return m};
@@ -3267,10 +3302,10 @@ const Mentor=(()=>{
  const busy=()=>!!ovKind||heroOn||!!document.querySelector('#gildfx,.vaultcover,#splash');
  const canShow=()=>!box&&!busy()&&Date.now()-freeAt>1500;
 
- function show(o){if(box)close(true);hidePeek();const L=LI[o.id]||SPECIAL[o.id]||{},tip=o.tip;
+ function show(o){if(box)close(true);if(o&&(o.id||o.tip))M().lastSay=Date.now();hidePeek();const L=LI[o.id]||SPECIAL[o.id]||{},tip=o.tip;
   const pages=(tip?[tip.t]:(o.pages||L.say||[])).map(p=>fill(p,o.ctx)),e=(tip?tip.e:o.e||L.e)||'n',isL=!!LI[o.id]&&!tip;
   const el=document.createElement('div');el.id='mentor';el.className='mt'+(tip?' tip':'');
-  el.innerHTML=`<div class="mt-dim"></div><div class="mt-wrap"><div class="mt-face">${F(e)}</div><div class="mt-name">MR TYCOON</div><div class="mt-box" role="dialog" aria-label="Mr Tycoon says">${isL?`<div class="mt-tag">NEW LESSON · ${LI[o.id].t.toUpperCase()}</div>`:''}<p class="mt-txt" aria-live="polite"></p><div class="mt-foot"><span class="mt-step"></span><span class="mt-arr">▼</span></div><div class="mt-btns" hidden></div></div></div>`;
+  el.innerHTML=`<div class="mt-dim"></div><div class="mt-wrap"><div class="mt-face">${F(e)}</div><div class="mt-name">MR TYCOON</div><div class="mt-box" role="dialog" aria-label="Mr Tycoon says">${isL?`<div class="mt-tag">NEW LESSON · ${LI[o.id].t.toUpperCase()}</div>`:o.ruleTag?`<div class="mt-tag${o.ruleTag==='MILESTONE'?' mile':''}">${o.ruleTag}</div>`:''}<p class="mt-txt" aria-live="polite"></p><div class="mt-foot"><span class="mt-step"></span><span class="mt-arr">▼</span></div><div class="mt-btns" hidden></div></div></div>`;
   app().appendChild(el);box={el,pages,i:0,e,o,btns:o.btns||null,typing:false};if(o.point)point(o.point,null)
   el.addEventListener('click',ev=>{if(ev.target.closest('.mt-btns button'))return;if(box&&box.btns&&box.i===box.pages.length-1&&!box.typing)return;next()});
   requestAnimationFrame(()=>el.classList.add('in'));page();vib&&vib(10)}
@@ -3342,16 +3377,118 @@ const Mentor=(()=>{
   if(mgrOn())m.mgrWas=1;
   if(!box)for(const k in T){if(m.seen[k])continue;let r=false;try{r=T[k]()}catch(e){}if(r){moment(k,typeof r==='object'?r:{});if(k==='salary')m.mgrWas=0;break}}
   if(canShow()&&q.length){show(q.shift());return}
-  if(m.mode==='all'&&!box&&!peekEl&&!ovKind&&!q.length&&m.col>=6&&t-m.lastTip>8*6e4)showPeek()}
+  if(!box&&!q.length){try{sense()}catch(e){}if(box)return}
+  if(m.mode==='all'&&!box&&!peekEl&&!ovKind&&!q.length&&m.col>=6&&t-m.lastTip>8*6e4&&gap()>3*6e4)showPeek()}
 
+ // ---- lesson pages: the idea, your own numbers, the real world, and a quiz that pays 5 crystals ----
+ const earners=()=>s.owned.filter(o=>B[o.bid].rate>0),best=()=>earners().map(o=>[o,st(o)]).sort((a,b)=>b[1].rate-a[1].rate)[0],goodN=()=>s.owned.filter(o=>!(B[o.bid].rate>0)).length;
+ const stored=()=>s.owned.reduce((a,o)=>a+(o.stored||0)+(o.safe||0),0),ups=()=>s.owned.reduce((a,o)=>a+Math.max(0,(o.level||1)-1),0);
+ const LX={
+  revenue:{you:()=>{const b=best();return b?`Your empire brings in <b>${$m(income())}</b> a minute. Your top earner is <b>${B[b[0].bid].name}</b> at <b>${$m(b[1].rate)}</b> a minute.`:'Buy a business and its earning rate shows here.'},real:"Apple brings in around $1 billion of revenue every day.",q:"What is revenue?",a:["Money a business brings in","Money left over after costs","Money a business owes"],why:"Revenue is everything coming in. What's left after costs is profit."},
+  cashflow:{you:()=>`Your businesses are holding <b>${$m(stored())}</b> right now. You can't spend a penny of it until you collect.`,real:"Plenty of businesses that make a profit on paper still fail because they run out of cash.",q:"Your business has earned money you haven't collected. Can you spend it?",a:["No, collect it first","Yes, straight away","Only half of it"],why:"Money only counts once it's in your pocket. Collect first."},
+  capacity:{you:()=>{const b=best();if(!b)return'Every business shows its max capacity.';const x=b[1];return`<b>${B[b[0].bid].name}</b> holds up to <b>${$m(x.hold)}</b>. At <b>${$m(x.rate)}</b> a minute, it's full in about <b>${dur(x.hold/x.rate*60)}</b>.`},real:"A restaurant can only serve as many people as it has seats, however good the food is.",q:"What happens when a business is full?",a:["It stops earning","It earns double","It closes for good"],why:"A full business stops earning until you collect or a manager steps in."},
+  passive:{you:()=>`Right now your empire makes <b>${$m(income()*60)}</b> an hour, even while you sleep.`,real:"Rent from property and dividends from shares are two of the most common kinds of passive income.",q:"Which of these is passive income?",a:["Rent from a flat you own","Wages for working a shift","Winning a bet"],why:"Passive income keeps arriving without you working for it, like rent."},
+  reinvest:{you:()=>`You own <b>${s.owned.length}</b> businesses. Every one of them was paid for by the ones before it.`,real:"Amazon spent years putting its profits back into growth instead of paying them out.",q:"You've made a profit. Reinvesting it means...",a:["Buying more things that earn","Keeping it in a drawer","Giving it all away"],why:"Reinvesting puts your profit to work so it earns even more."},
+  roi:{you:()=>{const nb=nextBiz();return nb?`<b>${nb.name}</b> costs <b>${$m(nb.price)}</b> and earns <b>${$m(nb.rate)}</b> a minute, so it pays for itself in about <b>${dur(nb.price/nb.rate*60)}</b>.`:'Compare what things cost with how fast they pay you back.'},real:"Investors often compare deals by how many years each one takes to pay for itself.",q:"Upgrade A pays for itself in 1 hour. Upgrade B takes 5 hours. Which is the better return?",a:["Upgrade A","Upgrade B","They're the same"],why:"The faster your money comes back, the better the return."},
+  opportunity:{you:()=>`You have <b>${$m(s.cash)}</b> to spend. Whatever you buy with it, you can't buy something else.`,real:"Going to university costs the fees, plus the wages you could have earned instead.",q:"You buy a Lemonade Stand instead of a Gift Kiosk. The kiosk you didn't buy is your...",a:["Opportunity cost","Revenue","Asset"],why:"What you give up by choosing something else is the opportunity cost."},
+  compounding:{you:()=>`Your businesses have <b>${ups()}</b> upgrades between them, and each one multiplies what that business earns.`,real:"Albert Einstein is often said to have called compound interest the eighth wonder of the world, though there's no proof he ever said it.",q:"Growth on top of growth is called...",a:["Compounding","Inflation","Liquidity"],why:"Compounding is when what you've grown starts growing too."},
+  diversify:{you:()=>`You run <b>${earners().length}</b> different earning businesses across <b>${new Set(s.owned.map(o=>B[o.bid].tier)).size}</b> tiers.`,real:"\"Don't put all your eggs in one basket\" is one of the oldest bits of investing advice.",q:"Why own lots of different businesses?",a:["If one struggles, the others keep earning","They cost less","Your threat drops to zero"],why:"Spreading out means one bad day doesn't sink you."},
+  reputation:{you:()=>`Your threat is <b>${Math.round(threat())}%</b>, and <b>${goodN()}</b> good cause${goodN()===1?' is':'s are'} working to bring it down.`,real:"Companies spend millions on charity and community projects, partly to build trust in their name.",q:"What brings your threat down?",a:["Good causes","Shady deals","Upgrading risky businesses"],why:"Good causes protect your reputation and lower your threat."},
+  risk:{you:()=>"Big Tony's deals pay back 3× but carry up to 65% threat. Margot's pay 1.4× with far less.",real:"Shares usually grow more than a savings account over time, but they can also fall.",q:"A deal pays more than the others. What usually comes with it?",a:["More risk","Less risk","No change"],why:"Bigger rewards almost always come with bigger risks."},
+  legal:{you:()=>`You've been caught <b>${s.arrests||0}</b> time${(s.arrests||0)===1?'':'s'} so far.`,real:"Big companies keep whole teams of lawyers to make sure they follow the rules.",q:"What can breaking the rules cost a business?",a:["Fines, time and freedom","Nothing, if it's rich enough","Only a bit of reputation"],why:"Getting caught costs time, money and freedom, whoever you are."},
+  delegation:{you:()=>mgrOn()?"Your manager is on duty, so full businesses keep earning while you're away.":"A manager keeps full businesses earning while you're away.",real:"Most big companies are run by thousands of people their founder has never met.",q:"Delegation means...",a:["Trusting others with the work","Doing everything yourself","Selling the business"],why:"Delegating frees you to grow instead of doing every job yourself."},
+  salary:{you:()=>"Your manager takes a cut of what they earn you, and you keep the rest.",real:"For many businesses, paying staff is the single biggest cost.",q:"A manager costs you $10 and earns you $50. Worth it?",a:["Yes","No","Only on Mondays"],why:"If someone earns you more than they cost, hiring them pays."},
+  scale:{you:()=>`You own <b>${s.owned.length}</b> businesses earning <b>${$m(income())}</b> a minute. A new one costs you far fewer minutes of income than your first did.`,real:"Supermarkets buy in huge amounts, so each item costs them less than it would cost a corner shop.",q:"Economies of scale means growing bigger makes each item...",a:["Cheaper","More expensive","Slower to make"],why:"The bigger you are, the cheaper each unit gets."},
+  investing:{you:()=>{const g=s.gild?Object.keys(s.gild).length:0;return g?`<b>${g}</b> of your businesses ${g===1?'is':'are'} gilded and earn double forever.`:'Gild a business with gold and it earns double forever.'},real:"Over the long run, the stock market has grown despite crashes along the way.",q:"Investing means...",a:["Spending now to earn more later","Spending everything now","Hiding your money"],why:"Investing gives up a little today for a lot more tomorrow."},
+  assets:{you:()=>`You have <b>${Math.floor(s.gold||0).toLocaleString('en-US')}</b> gold in your vault.`,real:"Central banks around the world hold thousands of tonnes of gold in reserve.",q:"Which of these is an asset?",a:["Gold you own","Money you owe","An unpaid bill"],why:"An asset is something you own that holds its value."},
+  networth:{you:()=>`Your net worth is <b>${$m(nw())}</b>, but only <b>${$m(s.cash)}</b> of that is cash.`,real:"Most of a billionaire's wealth is usually in company shares, not cash in the bank.",q:"Net worth is...",a:["The value of everything you own","Just your cash","This month's income"],why:"Net worth counts everything, not just the cash in your pocket."},
+  liquidity:{you:()=>`You can spend <b>${$m(s.cash)}</b> right now, out of <b>${$m(nw())}</b> in total.`,real:"A house can be worth a lot, but it can take months to sell.",q:"Which is the most liquid?",a:["Cash","A house","A factory"],why:"Cash is the most liquid. You can spend it straight away."},
+  expansion:{you:()=>{const w=(s.wopen||0)+1;return`You've opened <b>${w}</b> world${w===1?'':'s'} so far.`},real:"Coca-Cola is sold in more than 200 countries and territories.",q:"Moving into a new market brings...",a:["New customers and new risks","Guaranteed profit","Lower threat"],why:"Expansion means new chances, and new risks to manage."},
+  luck:{you:()=>`Your daily chance streak is <b>${(s.dc&&s.dc.streak)||0}</b> day${((s.dc&&s.dc.streak)||0)===1?'':'s'}.`,real:"Casinos are designed so that over time, the house always wins.",q:"What wins over time?",a:["Strategy","Luck","Neither"],why:"Luck helps now and then. Strategy wins in the end."},
+  philanthropy:{you:()=>`You fund <b>${goodN()}</b> good cause${goodN()===1?'':'s'}.`,real:"More than 200 of the world's richest people have signed the Giving Pledge, promising to give most of their wealth away.",q:"Philanthropy means...",a:["Giving to help others","Avoiding tax","Buying out rivals"],why:"Philanthropy is giving to help others, and it builds trust."},
+  rest:{you:()=>`While you rest, your empire makes <b>${$m(income()*60)}</b> an hour, up to what it can hold.`,real:"Studies link a good night's sleep with better decisions.",q:"Does your empire keep earning while you're away?",a:["Yes, up to what it can hold","No, never","Only if you pay crystals"],why:"Your businesses keep earning until they're full."},
+  legacy:{you:()=>s.tril?`You reached $1 trillion${s.tril.n?` as Trillionaire #${s.tril.n}`:''}.`:'Reach $1 trillion to make your mark.',real:"Many founders are remembered far more for what they built than for how much money they made.",q:"Your legacy is...",a:["What you built and how you built it","How much cash you have","Your threat level"],why:"Money comes and goes. What you built stays."}};
+ const order=(id,n)=>{let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;const o=[...Array(n).keys()];for(let i=n-1;i>0;i--){h=(h*1103515245+12345)>>>0;const j=h%(i+1);[o[i],o[j]]=[o[j],o[i]]}return o};
+ let quizPick=null,quizWrong=null;
+ function lessonPage(id){const L=LI[id],X=LX[id],m=M(),done=!!m.read[id];let you='';try{you=X.you()}catch(e){you=''}
+  const ord=order(id,3),opts=ord.map(k=>{const ok=k===0,picked=quizPick===k||(done&&ok),wrong=quizWrong===k;return`<button type="button" class="lq-o${picked&&ok?' good':''}${wrong?' bad':''}" data-mact="quiz" data-l="${id}" data-k="${k}"${done?' disabled':''}><span>${'ABC'[ord.indexOf(k)]}</span>${X.a[k]}</button>`}).join('');
+  return`<div class="lp"><button type="button" class="lp-back" data-mact="lback">‹ Business Book</button>
+  <div class="lp-hd"><span class="lp-no">${L.i+1}</span><div><small>LESSON ${L.i+1} OF ${LES.length}</small><h2>${L.t}</h2></div></div>
+  <div class="lp-talk"><span class="lp-f">${F(done?'proud':'n')}</span><p>${L.b}</p></div>
+  ${you?`<div class="lp-c you"><small>IN YOUR EMPIRE</small><p>${you}</p></div>`:''}
+  <div class="lp-c real"><small>IN THE REAL WORLD</small><p>${X.real}</p></div>
+  <div class="lp-c quiz"><small>${done?'QUIZ PASSED':'QUICK QUIZ · 5 CRYSTALS'}</small><p class="lq-q">${X.q}</p><div class="lq">${opts}</div>
+  ${quizWrong!=null&&!done?`<div class="lq-why bad"><span class="lp-f s">${F('worried')}</span><span>Not quite. Have another go, boss.</span></div>`:''}
+  ${done?`<div class="lq-why good"><span class="lp-f s">${F('happy')}</span><span>${X.why}</span></div>`:''}</div></div>`}
+ // ---- fresh wisdom after the first lessons: 48 Tycoon's Rules, recurring situations, milestone reactions ----
+ const RULES=[
+  ['full','capacity',"A full till earns nothing. Empty it."],['full','capacity',"Idle stock is idle money."],['full','capacity',"Grow the shelf, not just the shop."],['full','capacity',"Check on your earners before they check out."],
+  ['collect','cashflow',"Cash in hand beats cash in theory."],['collect','cashflow',"Count it, then spend it."],['collect','cashflow',"Profit is an opinion. Cash is a fact."],
+  ['cash','reinvest',"Money sitting still is money going nowhere."],['cash','reinvest',"Every coin should have a job."],['cash','opportunity',"The best time to reinvest was yesterday. The next best is now."],['cash','opportunity',"Spending well beats saving forever."],
+  ['bought','diversify',"Never trust one business with your whole fortune."],['bought','diversify',"Ten small earners beat one big gamble."],['bought','scale',"Every new shop makes the next one easier."],['bought','scale',"Build wide, then build tall."],
+  ['upgraded','compounding',"Small upgrades, big futures."],['upgraded','compounding',"Growth on top of growth is the closest thing to magic."],['upgraded','roi',"Upgrade what pays you back fastest first."],['upgraded','compounding',"Patience is just compounding with a smile."],
+  ['threat','reputation',"A good name takes years to build and minutes to lose."],['threat','reputation',"A good cause is the best insurance money can buy."],['threat','reputation',"The police notice money. They notice kindness too."],['threat','reputation',"Keep your name clean and your threat low."],
+  ['deal','risk',"If it sounds too good to be true, check the threat."],['deal','risk',"Never bet what you can't afford to lose."],['deal','risk',"The bigger the payout, the bigger the catch."],['deal','opportunity',"Saying no is a strategy too."],
+  ['jail','legal',"Shortcuts are the longest way round."],['jail','legal',"Every rule you bend bends back."],['jail','legal',"Time inside is time not earning."],
+  ['back','passive',"The best businesses miss you, but they don't need you."],['back','rest',"Rest is part of the plan."],['back','passive',"Money should work harder than you do."],['back','rest',"Sleep well, earn well."],
+  ['gold','investing',"Gold doesn't shout. It waits."],['gold','investing',"Spend gold where it doubles forever."],['gold','assets',"Assets pay you. Things cost you."],
+  ['worth','networth',"Net worth is the scoreboard. The game is what you build."],['worth','networth',"Every fortune starts as a small one."],['worth','legacy',"Celebrate, then get back to work."],
+  ['mgr','delegation',"Hire people who make you money while you sleep."],['mgr','salary',"A good manager pays for themselves."],['mgr','delegation',"You can't grow if you do every job yourself."],
+  ['any','luck',"Luck is a bonus, not a plan."],['any','philanthropy',"Give a little, gain a lot of trust."],['any','expansion',"New markets, new rules. Learn them fast."],['any','legacy',"The richest boss is the one who keeps learning."],['any','cashflow',"Fortune favours the boss who collects on time."]];
+ const OPEN={
+  full:[["{biz} is full again, boss.",'worried'],["{biz} has stopped earning. It's full to the brim.",'worried'],["Psst. {biz} is overflowing.",'wink']],
+  collect:[["{amt} in one go! Nice.",'happy'],["That's {amt} in your pocket.",'happy'],["Ka-ching, {amt}!",'surprised']],
+  cash:[["You're sitting on {cash}, boss.",'thinking'],["{cash} in the bank and nothing to do.",'thinking'],["That {cash} is getting bored.",'wink']],
+  bought:[["{biz}! Welcome to the family.",'happy'],["Another one: {biz}.",'proud'],["{biz} is open. That's business number {n}.",'happy']],
+  upgraded:[["{biz} just hit level {lv}.",'happy'],["Level {lv} for {biz}. Lovely.",'proud'],["{biz} is earning more already.",'happy']],
+  threat:[["Threat's at {th}%, boss.",'worried'],["{th}% threat. The police are taking notes.",'worried'],["Careful, your threat's climbing: {th}%.",'thinking']],
+  deal:[["{who} is on the phone again.",'thinking'],["Another offer from {who}.",'thinking'],["{who} wants a word.",'wink']],
+  jail:[["Caught again? Oh, boss.",'worried'],["Behind bars. Not your best look.",'worried'],["Well, this is awkward.",'worried']],
+  back:[["Welcome back! You made {gain} while you were gone.",'happy'],["There you are! {gain} came in while you were away.",'happy'],["Good to see you. Your empire made {gain}.",'proud']],
+  gold:[["You've got {gold} gold. That's enough to gild something.",'surprised'],["{gold} gold in the vault, boss.",'thinking'],["Your gold is piling up: {gold}.",'surprised']],
+  worth:[["You're worth {nw} now!",'surprised'],["{nw} net worth. Who'd have thought it?",'proud'],["Look at that: {nw}.",'happy']],
+  mgr:[["{n} businesses are full and nobody's minding them.",'thinking'],["No manager on duty, and {n} businesses have stopped earning.",'worried']],
+  any:[["A thought for you, boss.",'n'],["Something I learned the hard way.",'thinking'],["Here's one for the book.",'wink']]};
+ const MILE={
+  rank:[["#{rank} on the rich list! {who} won't like that.",'surprised'],["You passed {who}. Number {rank} and climbing!",'happy'],["Top {rank}, boss. They're whispering your name.",'proud']],
+  goals:[["{n} goals done! Pop into the Vault and grab your crystals.",'happy'],["{n} more trophies for the Vault. Go and claim them.",'proud']],
+  tier:[["New businesses just unlocked: {tier}. Bigger shops, bigger money.",'surprised'],["{tier} is open to you now. Have a look in the shop.",'happy']]};
+ const COOL={full:30,collect:25,cash:40,bought:12,upgraded:15,threat:30,deal:45,jail:0,back:90,gold:60,worth:0,mgr:60,any:45};
+ const pick=(L,key)=>{const m=M(),r=m.rot||(m.rot={}),n=L.length;const i=((r[key]||0)+Math.floor(Math.random()*Math.max(1,n-1))+1)%n;r[key]=i;return L[i]};
+ function ruleFor(sit){const m=M(),got=m.rules||(m.rules={});const L=RULES.map((r,i)=>({r,i})).filter(x=>x.r[0]===sit),fresh=L.filter(x=>!got[x.i]);const x=(fresh.length?fresh:L)[Math.floor(Math.random()*(fresh.length||L.length))];return x}
+ const tutOnNow=()=>{const m=M();return m.tut!=null&&m.tut!=='done'};
+ function gap(){const m=M();return Date.now()-(m.lastSay||0)}
+ function situation(sit,ctx,force){const m=M();if(!force){if(m.mode!=='all'||tutOnNow()||box||!canShow())return false;const cd=m.cool||(m.cool={});if(gap()<4*6e4)return false;if(COOL[sit]&&Date.now()-(cd[sit]||0)<COOL[sit]*6e4)return false;cd[sit]=Date.now()}
+  const [o,e]=pick(OPEN[sit],'o'+sit),x=ruleFor(sit),isNew=!(m.rules&&m.rules[x.i]);(m.rules||(m.rules={}))[x.i]=Date.now();m.lastSay=Date.now();save();
+  show({id:'rule',ctx,pages:[o,`Tycoon's Rule #${x.i+1}: ${x.r[2]}`],e,ruleTag:`${isNew?'NEW ':''}TYCOON'S RULE #${x.i+1}`});return true}
+ function milestone(kind,ctx){const m=M();if(m.mode==='off'||tutOnNow())return;if(box||!canShow()||gap()<90e3){(m.mq||(m.mq=[])).push([kind,ctx]);m.mq=m.mq.slice(-2);return}
+  const [o,e]=pick(MILE[kind],'m'+kind);m.lastSay=Date.now();save();show({id:'mile',ctx,pages:[o],e,ruleTag:'MILESTONE'})}
+ function sense(){const m=M(),t=Date.now();if(m.mode==='off'||tutOnNow())return;
+  if(m.mq&&m.mq.length&&gap()>=90e3&&canShow()){const [k,c]=m.mq.shift();return milestone(k,c)}
+  if(!canShow())return;
+  // net worth steps from $10M upward, every power of ten
+  const w=nw(),step=w>=1e7?Math.floor(Math.log10(w)):0;if(step>(m.nwStep||6)){const was=m.nwStep;m.nwStep=step;save();if(was&&gap()>=90e3)return situation('worth',{nw:$m(Math.pow(10,step))},true)}
+  if(m.mode!=='all'||gap()<4*6e4)return;
+  if(s.deal&&s.deal.at!==m.lastDeal){m.lastDeal=s.deal.at;if(situation('deal',{who:s.deal.who}))return}
+  if(s.jail&&s.jail.until!==m.lastJail){m.lastJail=s.jail.until;if(situation('jail',{}))return}
+  const fulls=s.owned.filter(o=>B[o.bid].rate>0&&!o.busy&&o.stored>=st(o).hold*.999);
+  if(fulls.length>=3&&!mgrOn()&&situation('mgr',{n:fulls.length}))return;
+  if(fulls.length&&situation('full',{biz:B[fulls[0].bid].name}))return;
+  const th=Math.round(threat());if(th>=40&&th>=(m.lastTh||0)+10){m.lastTh=th;if(situation('threat',{th}))return}if(th<30)m.lastTh=0;
+  const gb=goldOn&&goldOn()&&s.owned.map(o=>B[o.bid]).filter(canGild).sort((a,b)=>gildCost(a)-gildCost(b))[0];if(gb&&(s.gold||0)>=gildCost(gb)&&situation('gold',{gold:Math.floor(s.gold).toLocaleString('en-US')}))return;
+  const nb=nextBiz();if(nb&&s.cash>=nb.price*3&&situation('cash',{cash:$m(s.cash)}))return;
+  if(t-(m.lastSay||0)>25*6e4&&m.col>=4&&situation('any',{}))return}
+ function bookRules(){const m=M(),got=m.rules||{},n=Object.keys(got).length;
+  return`<div class="mbk-s">TYCOON'S RULES · ${n} OF ${RULES.length} COLLECTED</div>${RULES.map((r,i)=>got[i]?`<div class="mbk-r"><span class="rn">#${i+1}</span><b>${r[2]}</b></div>`:'').join('')}${n<RULES.length?`<div class="mbk-r lock"><span class="rn">?</span><span>${RULES.length-n} more to collect. Mr Tycoon shares them as you play.</span></div>`:''}`}
  // the Business Book
  let openL=null;
  function bookBody(){const m=M(),got=LES.filter(l=>m.learned[l[0]]).sort((a,b)=>m.learned[a[0]]-m.learned[b[0]]),left=LES.filter(l=>!m.learned[l[0]]),n=got.length;
-  const row=l=>{const L=LI[l[0]],op=openL===L.id,nu=!m.read[L.id];return`<button type="button" class="mbk-l${op?' open':''}" data-mact="lesson" data-l="${L.id}"><span class="no">${L.i+1}</span><span class="tx"><b>${L.t}</b><small>${op?'':'Learned '+new Date(m.learned[L.id]).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</small>${op?`<span class="bd">${L.b}</span>`:''}</span>${nu?`<span class="new">+5 ${GEM}</span>`:`<span class="chev">${op?'−':'+'}</span>`}</button>`};
-  return`<div class="mbk"><div class="mbk-hd"><span class="mbk-f">${F('n')}</span><span class="mbk-p"><b>${n} of ${LES.length} lessons learned</b><span class="bar"><i style="width:${Math.round(n/LES.length*100)}%"></i></span><small>${unread()?`${unread()} to read · each one pays 5 crystals`:'Every lesson you read pays 5 crystals'}</small></span></div>
-  ${n?`<div class="mbk-s">LEARNED</div>${got.map(row).join('')}`:''}${left.length?`<div class="mbk-s">STILL TO LEARN</div>${left.map(l=>`<div class="mbk-l lock"><span class="no">${LI[l[0]].i+1}</span><span class="tx"><b>???</b><small>Unlocks when you: ${l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small></span></div>`).join('')}`:''}</div>`}
- function openBook(){openL=null;hidePeek();if(box)close(true);sheet('Business Book',bookBody(),'book')}
- function rebook(){const sb=document.getElementById('sb');if(sb&&ovKind==='book'){const y=sb.scrollTop;sb.innerHTML=bookBody();sb.scrollTop=y}}
+  if(openL)return lessonPage(openL);
+  const row=l=>{const L=LI[l[0]],nu=!m.read[L.id];return`<button type="button" class="mbk-l" data-mact="lesson" data-l="${L.id}"><span class="no">${L.i+1}</span><span class="tx"><b>${L.t}</b><small>${nu?'New lesson · quiz pays 5 crystals':'Quiz passed ✓'}</small></span>${nu?`<span class="new">+5 ${GEM}</span>`:`<span class="chev">›</span>`}</button>`};
+  return`<div class="mbk"><div class="mbk-hd"><span class="mbk-f">${F('n')}</span><span class="mbk-p"><b>${n} of ${LES.length} lessons learned</b><span class="bar"><i style="width:${Math.round(n/LES.length*100)}%"></i></span><small>${unread()?`${unread()} new · pass a lesson's quiz for 5 crystals`:'Pass a lesson\'s quiz for 5 crystals'}</small></span></div>
+  ${n?`<div class="mbk-s">LEARNED</div>${got.map(row).join('')}`:''}${bookRules()}${left.length?`<div class="mbk-s">STILL TO LEARN</div>${left.map(l=>`<div class="mbk-l lock"><span class="no">${LI[l[0]].i+1}</span><span class="tx"><b>???</b><small>Unlocks when you: ${l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small></span></div>`).join('')}`:''}</div>`}
+ function openBook(id){openL=id||null;quizPick=quizWrong=null;hidePeek();if(box)close(true);sheet('Business Book',bookBody(),'book')}
+ let bookY=0;function rebook(top){const sb=document.getElementById('sb');if(sb&&ovKind==='book'){const y=sb.scrollTop;sb.innerHTML=bookBody();sb.scrollTop=top==='top'?0:top==='list'?bookY:y}}
 
  // settings row (separate from phone notifications)
  const MODES=[['off','Off'],['key','Key'],['all','All']];
@@ -3360,16 +3497,28 @@ const Mentor=(()=>{
 
  document.addEventListener('click',e=>{const el=e.target.closest('[data-mact]');if(!el)return;const a=el.dataset.mact;
   if(a==='book')openBook();
-  else if(a==='lesson'){const id=el.dataset.l,m=M();openL=openL===id?null:id;if(!m.read[id]){m.read[id]=1;s.gems+=5;gemLog(5,'Business Book');toast(`+5 crystals for reading "${LI[id].t}"`,'good');save();upd();dot()}rebook()}
+  else if(a==='lesson'){const sb=document.getElementById('sb');bookY=sb?sb.scrollTop:0;openL=el.dataset.l;quizPick=quizWrong=null;rebook('top')}
+  else if(a==='lback'){openL=null;quizPick=quizWrong=null;rebook('list')}
+  else if(a==='quiz'){const id=el.dataset.l,k=+el.dataset.k,m=M();if(m.read[id])return;
+   if(k===0){quizPick=0;quizWrong=null;m.read[id]=1;s.gems+=5;gemLog(5,'Business Book');save();vib&&vib([20,30,40]);rebook();upd();dot();
+    const r=el.getBoundingClientRect();try{tapFloat(r.left+r.width/2,r.top,'+5 💎','#9FE3FF')}catch(e){}toast(`Correct! +5 crystals for "${LI[id].t}"`,'good')}
+   else{quizWrong=k;vib&&vib(30);rebook();const b=document.querySelector('.lq-o.bad');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}}}
   else if(a==='mmode'){M().mode=el.dataset.v;save();document.querySelectorAll('[data-mact=mmode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===el.dataset.v));const t=document.getElementById('mtSetT');if(t)t.textContent=modeTxt(el.dataset.v);if(el.dataset.v!=='all')hidePeek()}
   else if(a==='tutskip'){M().tut='done';unpoint();document.getElementById('app')?.classList.remove('tut');save();toast('Tutorial skipped')}});
 
  // hooks into the game
  const _upd=upd;upd=function(){_upd.apply(this,arguments);try{check()}catch(e){}};
- const _col=collect;collect=function(){_col.apply(this,arguments);M().col++};
- const _wel=welcome;welcome=function(r,arr){_wel.apply(this,arguments);try{moment('passive',{gain:$m(r.gained)});if(r.dt>=8*36e5)moment('rest',{})}catch(e){}};
+ const _col=collect;collect=function(){const e0=s.earned;_col.apply(this,arguments);M().col++;const got=s.earned-e0,inc=income();if(inc>0&&got>=inc*20)setTimeout(()=>situation('collect',{amt:$m(got)}),900)};
+ const _wel=welcome;welcome=function(r,arr){_wel.apply(this,arguments);try{const m=M();const had=m.seen.passive;moment('passive',{gain:$m(r.gained)});if(r.dt>=8*36e5)moment('rest',{});if(had)setTimeout(()=>{if(canShow())situation('back',{gain:$m(r.gained)})},2500)}catch(e){}};
  const _dno=dealNo;dealNo=function(){const d=s.deal;_dno.apply(this,arguments);if(d)moment('opportunity',{who:d.who})};
- const _toast=toast;toast=function(m,c){_toast.apply(this,arguments);if(typeof m==='string'&&/^(You need .* more|Not enough cash)/.test(m))moment('liquidity',{})};
+ const _toast=toast;toast=function(m,c){_toast.apply(this,arguments);if(typeof m!=='string')return;try{let r;
+  if(/^(You need .* more|Not enough cash)/.test(m))moment('liquidity',{});
+  else if((r=m.match(/^You passed (.+)\. Now #(\d+) on the rich list/))&&(+r[2]<=10||+r[2]%10===0))milestone('rank',{who:r[1],rank:r[2]});
+  else if(r=m.match(/^(\d+) goals? complete/))milestone('goals',{n:r[1]});
+  else if(r=m.match(/^New businesses unlocked: (.+)/))milestone('tier',{tier:r[1]});
+  else if(r=m.match(/^(.+) is now level (\d+)/))setTimeout(()=>situation('upgraded',{biz:r[1],lv:r[2]}),1500);
+  else if(r=m.match(/^(.+) is open for business/))setTimeout(()=>situation('bought',{biz:r[1],n:s.owned.length}),1500);
+ }catch(e){}};
  const _au=askUpgrade;askUpgrade=function(){const o=cur(),m=M();
   if(o&&!o.busy&&!m.seen.roi&&m.mode!=='off'&&!box&&(m.tut==null||m.tut==='done')){const b=B[o.bid],x=st(o);
    if(b.rate>0&&!gemPay(b)&&!x.maxed){const g=x.nRate-x.rate,up=g>0?x.up/g:Infinity,nb=nextBiz();
@@ -3420,9 +3569,10 @@ const Mentor=(()=>{
   {say:["See this? That's your threat.","Some businesses attract the police. If your threat gets high, you can get caught. Good causes bring it down."],e:'worried',point:'#thrT'},
   {go:'gift',text:'Grab your free gift',at:'.tools [data-act=free]',done:()=>!!document.getElementById('claimBtn'),skip:()=>s.freeAt>now()},
   {text:'Tap Claim',at:'#claimBtn',done:()=>s.freeAt>now(),back:()=>!document.getElementById('claimBtn')&&s.freeAt<=now()?'gift':null},
-  {say:["Everything I teach you goes in your Business Book.","Read a lesson to earn 5 crystals. Tap the book to have a look."],e:'proud',point:'#bookTool'},
+  {say:["Everything I teach you goes in your Business Book.","Pass a lesson's quick quiz to earn 5 crystals. Tap the book to have a look."],e:'proud',point:'#bookTool'},
   {go:'book',text:'Open your Business Book',at:'#bookTool',done:()=>ovKind==='book'},
-  {text:'Read a lesson, then close the book',at:()=>document.querySelector('.mbk-l .new')?.closest('.mbk-l')||document.querySelector('.sheet-h [data-act=close]'),done:()=>ovKind!=='book'},
+  {text:'Open a lesson and pass its quiz',at:()=>{if(document.querySelector('.lp'))return document.querySelector('.lq-o:not([disabled])')?document.querySelector('.lq-q'):document.querySelector('.lp-back');return document.querySelector('.mbk-l .new')?.closest('.mbk-l')||document.querySelector('.sheet-h [data-act=close]')},done:()=>ovKind!=='book'||Object.keys(M().read).length>0&&!document.querySelector('.lp')&&!!document.querySelector('.mbk')&&(M().tutRead=1)},
+  {text:'Close the book',at:'.sheet-h [data-act=close]',done:()=>ovKind!=='book'},
   {say:["That's the basics, boss! Buy more businesses, keep your threat low and collect often.","I'll pop up at the big moments. Now go build that empire."],e:'happy'}];
  let tutOn=-1;
  function tutGo(i){const m=M();m.tut=i;tutOn=-1;unpoint();save()}
