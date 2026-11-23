@@ -1,4 +1,84 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Trillionaire"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+</style><style>/* ===== mentor: Mr Tycoon ===== */
+.mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
+.mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
+.mt.tip .mt-dim{background:#14141455}
+.mt.in .mt-dim{opacity:1}
+.mt-wrap{position:absolute;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateY(120%);transition:transform .34s cubic-bezier(.2,.9,.25,1.15)}
+.mt.in .mt-wrap{transform:none}
+.mt.out .mt-wrap{transform:translateY(130%);transition:transform .24s ease-in}.mt.out .mt-dim{opacity:0}
+.mt-face{position:absolute;left:-4px;bottom:100%;width:116px;height:144px;margin-bottom:-14px;animation:mtbob 2.4s ease-in-out infinite;transform-origin:50% 100%}
+.mt-face img{width:100%;height:100%;display:block;object-fit:contain;filter:drop-shadow(0 4px 0 #0003)}
+.mt-face.talking img,.mh-img.talking{animation:mttalk .32s ease-in-out infinite}
+@keyframes mttalk{50%{transform:translateY(-2px) scale(1.015,.985)}}
+@keyframes mtbob{50%{transform:translateY(-3px)}}
+.mt-name{position:absolute;left:112px;top:-19px;background:#2E7D32;color:#fff;font-size:13px;font-weight:900;letter-spacing:1.4px;padding:6px 10px;border:3px solid #1E1E1E;z-index:1}
+.mt-box{background:#fff;border:4px solid #1E1E1E;box-shadow:0 6px 0 #1E1E1E;padding:24px 18px 12px;color:#1E1E1E;min-height:96px;box-sizing:border-box}
+.mt-tag{display:inline-block;margin-bottom:9px;background:#FFF4D6;color:#8A5A00;font-size:10.5px;font-weight:900;letter-spacing:1.2px;padding:5px 8px}
+.mt-txt{margin:0;font-size:16px;font-weight:800;line-height:1.42;min-height:46px}
+.mt-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;min-height:18px}
+.mt-step{font-size:11px;font-weight:900;color:#7A827F;letter-spacing:1px}
+.mt-arr{font-size:15px;animation:mtarr .8s steps(2) infinite}
+@keyframes mtarr{50%{transform:translateY(3px)}}
+.mt-btns{display:flex;gap:10px;margin-top:6px}
+.mt-btns button{flex:1;border:3px solid #D5DAD7;background:#fff;color:#1E1E1E;box-shadow:0 4px 0 #B7BDBA;font:900 14px Montserrat,sans-serif;letter-spacing:.6px;padding:12px 8px;text-transform:uppercase}
+.mt-btns button.p{background:#3FA34D;border-color:#3FA34D;color:#fff;box-shadow:0 4px 0 #1E5E23}
+.mt-btns button:active{transform:translateY(3px);box-shadow:0 1px 0 #1E5E23}
+#mpeek{position:absolute;left:max(10px,env(safe-area-inset-left,0px));z-index:36;display:flex;align-items:flex-end;gap:8px;background:none;border:0;padding:0;font-family:Montserrat,sans-serif;text-align:left;transform:translateX(-120%);transition:transform .35s cubic-bezier(.2,.9,.25,1.15)}
+#mpeek.in{transform:none}
+#mpeek .mp-face{width:74px;height:92px;flex:none;animation:mtbob 2.4s ease-in-out infinite}
+#mpeek .mp-face img{width:100%;height:100%;display:block;object-fit:contain;filter:drop-shadow(0 3px 0 #0004)}
+#mpeek .mp-b{margin-bottom:8px;background:#fff;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:8px 11px;color:#1E1E1E;font-size:12.5px;font-weight:900;line-height:1.3;max-width:190px}
+#mpeek .mp-b i{display:block;font-style:normal;color:#2E7D32}
+#bookTool .dot{background:var(--gold,#F5B946);color:#3A2604}
+.mbk{padding:14px max(14px,env(safe-area-inset-left,0px)) 24px;display:flex;flex-direction:column;gap:9px;font-family:Montserrat,sans-serif}
+.mbk-hd{display:flex;gap:12px;align-items:center;background:#fff;border:3px solid #1E1E1E;padding:10px 12px;margin-bottom:6px}
+.mbk-f{width:56px;height:68px;flex:none}.mbk-f img{width:100%;height:100%;display:block;object-fit:contain}
+.mbk-p{flex:1;display:flex;flex-direction:column;gap:6px;color:#1E1E1E}.mbk-p b{font-size:14px;font-weight:900}.mbk-p small{font-size:11.5px;font-weight:800;color:#4A5250}
+.mbk-p .bar{height:10px;background:#E4E7E5;display:block}.mbk-p .bar i{display:block;height:10px;background:#F5B946}
+.mbk-s{font-size:11px;font-weight:900;letter-spacing:1.6px;color:#4A5250;margin-top:6px}
+.mbk-l{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:11px 12px;font-family:inherit;color:#1E1E1E}
+.mbk-l .no{width:36px;height:36px;flex:none;background:#3FA34D;color:#fff;display:grid;place-items:center;font-weight:900;font-size:15px}
+.mbk-l .tx{flex:1;display:flex;flex-direction:column;gap:3px;padding-top:2px}.mbk-l .tx b{font-size:15px;font-weight:900}.mbk-l .tx small{font-size:12px;font-weight:700;color:#4A5250}
+.mbk-l .bd{font-size:14px;font-weight:700;line-height:1.45;color:#1E1E1E;margin-top:4px}
+.mbk-l .new{flex:none;align-self:center;background:#F5B946;color:#3A2604;font-size:12px;font-weight:900;padding:5px 8px;display:inline-flex;gap:4px;align-items:center}
+.mbk-l .new svg{width:13px;height:13px}
+.mbk-l .chev{flex:none;align-self:center;font-size:20px;font-weight:900;color:#4A5250;width:20px;text-align:center}
+.mbk-l.lock{background:#E4E7E5;border:3px dashed #9AA39D;box-shadow:none}.mbk-l.lock .no{background:#C9CFCB;color:#5E6662}.mbk-l.lock b{color:#4A5250}
+.dark .mbk-hd,.dark .mbk-l:not(.lock){background:#1E2728;color:#EEF1EE;border-color:#3A4647;box-shadow:0 4px 0 #0B0F10}.dark .mbk-p,.dark .mbk-l .bd{color:#EEF1EE}.dark .mbk-p small,.dark .mbk-l .tx small,.dark .mbk-s{color:#A9B2AD}.dark .mbk-l.lock{background:#161D1E;border-color:#3A4647}
+/* pointing hand + coach strip */
+.mhand{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:0;height:0;transition:opacity .2s}
+.mhand .mh-i{position:absolute;left:-19px;top:2px;width:48px;height:56px;animation:mhtap 1s ease-in-out infinite;filter:drop-shadow(0 3px 0 #0006)}
+.mhand svg{width:100%;height:100%;display:block}
+@keyframes mhtap{0%,100%{transform:translateY(12px)}50%{transform:translateY(0)}}
+.mcoach{position:fixed;z-index:9998;display:flex;align-items:center;gap:10px;background:#fff;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:6px 8px 6px 6px;font-family:Montserrat,sans-serif;box-sizing:border-box;animation:mcin .3s ease-out}
+@keyframes mcin{from{transform:translateY(-14px);opacity:0}}
+.mcoach .mc-f{width:40px;height:48px;flex:none;margin:-6px 0}.mcoach .mc-f img{width:100%;height:100%;display:block;object-fit:contain}
+.mcoach .mc-t{flex:1;font-size:15px;font-weight:900;color:#1E1E1E;line-height:1.25}
+.mcoach .mc-s{background:none;border:0;font:800 12px Montserrat,sans-serif;color:#7A827F;padding:8px 6px;text-decoration:underline}
+.tut #getmore{display:none!important}
+
+/* full-screen introduction */
+.mhero{position:absolute;inset:0;z-index:60;overflow:hidden;background:radial-gradient(120% 80% at 50% 38%,#5FC155 0%,#3E9B37 45%,#1E5E23 100%);font-family:Montserrat,sans-serif;opacity:0;transition:opacity .35s;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.mhero.in{opacity:1}
+.mh-rays{position:absolute;left:50%;top:44%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(from 0deg,#ffffff1f 0deg 9deg,#ffffff00 9deg 22.5deg);animation:mhspin 28s linear infinite;-webkit-mask:radial-gradient(circle,#000 8%,transparent 42%);mask:radial-gradient(circle,#000 8%,transparent 42%)}
+@keyframes mhspin{to{transform:rotate(360deg)}}
+.mh-name{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 7%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;transform:translateY(-30px);opacity:0;transition:transform .5s .55s cubic-bezier(.2,.9,.25,1.3),opacity .4s .55s}
+.mhero.in .mh-name{transform:none;opacity:1}
+.mh-name small{font-size:12px;font-weight:900;letter-spacing:3px;color:#DDF5D9}
+.mh-name b{font-family:'Lilita One','Arial Rounded MT Bold',sans-serif;font-weight:400;font-size:clamp(40px,12vw,56px);line-height:1;color:#FFD84A;-webkit-text-stroke:3px #2A1A05;paint-order:stroke fill;text-shadow:0 5px 0 #2A1A05;letter-spacing:1px}
+.mh-stage{position:absolute;left:0;right:0;bottom:calc(150px + env(safe-area-inset-bottom,0px));top:22%;display:flex;align-items:flex-end;justify-content:center}
+.mh-img{height:100%;width:auto;max-width:94%;max-height:100%;object-fit:contain;object-position:50% 100%;transform:translateY(110%) scale(.9);transition:transform .7s .1s cubic-bezier(.2,.9,.25,1.2);filter:drop-shadow(0 10px 0 #0003)}
+.mhero.in .mh-img{transform:none}
+.mh-box{position:absolute;left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));background:#fff;border:4px solid #1E1E1E;box-shadow:0 6px 0 #1E1E1E;padding:18px 18px 12px;color:#1E1E1E;transform:translateY(160%);transition:transform .45s .8s cubic-bezier(.2,.9,.25,1.15)}
+.mhero.in .mh-box{transform:none}
+.mh-txt{margin:0;font-size:18px;font-weight:800;line-height:1.4;min-height:52px}
+.mh-skip{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 12px);background:#0003;border:0;color:#fff;font:800 12px Montserrat,sans-serif;padding:8px 12px;letter-spacing:.5px}
+.mhero.out{opacity:0;transition:opacity .45s .15s}
+.mhero.out .mh-img{transform:translate(-34%,40%) scale(.28);transition:transform .55s cubic-bezier(.5,0,.75,0)}
+.mhero.out .mh-box{transform:translateY(160%);transition:transform .3s ease-in}
+.mhero.out .mh-name{opacity:0;transition:opacity .2s}
+@media (prefers-reduced-motion:reduce){.mh-rays{animation:none}}
 </style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1396,7 +1476,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112404,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112405,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3132,6 +3212,231 @@ function count(){let n=0;for(const[id]of TROPHIES)if(s.ach[id]===1)n++;
 function openPlaque(){if(busy)return;S.wing=0;wantAward=true;if(host&&host.style.display!=='none'&&S.screen==='gallery'){render();autoAward();return}open()}
 return{open,openPlaque,count,isOpen:()=>!!host&&host.style.display!=='none'};
 })();
+
+/* ================= mentor: Mr Tycoon ================= */
+// A retired tycoon who pops up at key moments (Pokémon-style text box), drops small idle tips,
+// and files every lesson in the Business Book. Separate from phone notifications.
+const Mentor=(()=>{
+ const MDIR='mentor/v1/',FACES={n:'n',talk:'n',happy:'happy',worried:'worried',thinking:'thinking',surprised:'surprised',wink:'wink',proud:'proud'};
+ const F=e=>`<img src="${MDIR}${FACES[e]||'n'}.webp" alt="" draggable="false">`;
+ // warm the cache so faces swap instantly
+ Object.values(FACES).forEach(f=>{const i=new Image();i.src=MDIR+f+'.webp'});
+
+ // 24 lessons: id, title, how you unlock it, the lesson, and what Mr Tycoon says in the moment
+ const LES=[
+  ['revenue','Revenue','Buy your first business',"Revenue is the money a business brings in. Each of your businesses has an earning rate: the cash it makes every minute.",'happy',["Your first business, boss! Well done.","It earns money every minute. That's called revenue. Watch the stack grow, then tap it to collect."]],
+  ['cashflow','Cash flow','Collect your first stack',"Money earned isn't money you can spend until you collect it. Cash flow is cash actually moving into your pocket.",'n',["Ka-ching! Money only counts once it's in your pocket.","Cash coming in that you can actually spend is called cash flow."]],
+  ['capacity','Capacity','Let a business fill up',"Every business can only hold so much. When it's full, it stops earning. Real businesses hit limits too: more space, staff or stock lets them grow.",'worried',["Uh-oh, {biz} is full. A full business stops earning.","Collect often, or upgrade it to hold more. Real businesses hit limits like this too."]],
+  ['passive','Passive income','Come back after time away',"Passive income is money that arrives while you're busy with something else. Your businesses keep earning while you're away.",'happy',["Welcome back, boss! While you were away, your businesses made {gain}.","Money that arrives while you're doing something else is passive income. The best kind."]],
+  ['reinvest','Reinvesting','Own 3 businesses',"Using your profits to buy more things that earn is reinvesting. It's how a lemonade stand becomes an empire.",'proud',["Three businesses already! You used your profits to buy more earners.","That's reinvesting: how a lemonade stand becomes an empire."]],
+  ['roi','Return on investment','Weigh an upgrade against saving',"Return on investment compares what you spend with what comes back. The faster your money comes back, the better the deal.",'thinking',["Hold on, boss. This upgrade pays for itself in about {upPay}.","{next} would pay for itself in {nextPay}. Comparing how fast money comes back is called return on investment."]],
+  ['opportunity','Opportunity cost','Turn down a shady deal',"Every choice costs you the thing you didn't pick. That's opportunity cost.",'n',["You said no to {who}. Smart, or a missed chance?","Whatever you don't pick is the opportunity cost of what you did pick."]],
+  ['compounding','Compounding','Upgrade businesses 10 times',"Each upgrade multiplies what a business earns, and bigger earnings pay for bigger upgrades. Growth on top of growth is compounding.",'happy',["Ten upgrades! Each one multiplies what a business earns.","Bigger earnings buy bigger upgrades. Growth on top of growth is called compounding."]],
+  ['diversify','Diversification','Own 5 earning businesses',"Owning different kinds of business spreads your risk. If one has a bad day, the others keep earning.",'n',["Five businesses, all different. That spreads your risk.","If one has a bad day, the others keep earning. That's diversification."]],
+  ['reputation','Reputation','Let your threat pass 50%',"Risky businesses attract attention. Good causes bring threat down, just like real companies protecting their reputation.",'worried',["Whoa, {th}% threat! Risky businesses get the police's attention.","Good causes bring threat down, just like real companies protecting their reputation."]],
+  ['risk','Risk and reward','Get offered a shady deal',"Bigger rewards usually come with bigger risks. A smart boss checks both before saying yes.",'thinking',["Your phone's buzzing. That'll be a shady deal.","Big rewards come with big risks. Check the deal's threat before you say yes."]],
+  ['legal','Legal risk','Get caught by the police',"Bending the rules costs time, money and freedom. Real companies pay lawyers to stay out of trouble.",'worried',["Caught! That's the cost of bending the rules.","Time, money and freedom. Real companies pay lawyers to stay out of trouble."]],
+  ['delegation','Delegation','Put a manager on duty',"You can't run everything yourself. Delegating means trusting others with the work so you can focus on growing.",'proud',["A manager on duty! Now your businesses run without you.","Trusting others with the work is called delegation. It's how one person runs a hundred businesses."]],
+  ['salary','Salaries','Finish a manager shift',"A manager takes a cut. Paying people is a cost, but if they earn you more than they cost, it's worth it.",'n',["Your manager's shift is over, and they took their cut.","Paying people costs money. If they earn you more than they cost, it's worth it."]],
+  ['scale','Economies of scale','Own 10 businesses',"The bigger you get, the easier growth gets. Big companies buy in bulk and spread their costs over more sales.",'surprised',["Ten businesses! Look at the size of this empire.","The bigger you get, the easier growth gets. That's economies of scale."]],
+  ['investing','Investing','Gild your first business',"Spending now to earn more later is investing. Gilding costs gold today and doubles a business's earnings forever.",'proud',["Your first gilded business! It cost gold today, and it earns double forever.","Spending now to earn more later is called investing."]],
+  ['assets','Assets','Earn your first gold',"An asset is something you own that holds its value. People have stored their wealth in gold for thousands of years.",'surprised',["Gold! One of your businesses struck gold.","Gold is an asset: something you own that holds its value. People have stored wealth in it for thousands of years."]],
+  ['networth','Net worth','Reach $1M net worth',"Net worth is the value of everything you own. Cash is only the part you can spend right now.",'happy',["You're worth over a million, boss!","Net worth is everything you own. Cash is only the part you can spend right now."]],
+  ['liquidity','Liquidity','Come up short of cash',"Liquidity is how quickly you can turn what you own into cash. Even a rich boss can be short of cash.",'worried',["Short of cash? Even rich bosses run dry sometimes.","How quickly you can turn what you own into cash is called liquidity."]],
+  ['expansion','Expansion','Open a new world',"Moving into new markets brings new customers and new chances, and new risks too.",'surprised',["A whole new world is open! New businesses, new customers.","Moving into new markets is called expansion. New chances, and new risks."]],
+  ['luck','Luck and strategy','Play the daily chance',"Luck gives you a boost now and then, but strategy is what wins over time.",'wink',["Feeling lucky? The daily chance is a nice bonus.","Luck gives you a boost now and then. Strategy is what wins over time."]],
+  ['philanthropy','Philanthropy','Fund your first good cause',"Giving back helps others and builds trust in your name. Many of the world's richest people pledge to give most of their wealth away.",'proud',["Your first good cause. The city noticed.","Giving back is called philanthropy. It helps others, and it builds trust in your name."]],
+  ['rest','Rest','Come back after 8 hours away',"Great businesses run without their boss. Taking a break is part of the plan: your empire keeps earning while you rest.",'happy',["Back after a long break? Good. Your empire kept going.","Great businesses run without their boss. Rest is part of the plan."]],
+  ['legacy','Legacy','Reach $1 trillion',"Money comes and goes. What you built, and how you built it, is your legacy.",'proud',["A trillionaire. I always knew you had it in you.","Money comes and goes. What you built, and how you built it, is your legacy."]]];
+ const LI={};LES.forEach((l,i)=>LI[l[0]]={i,id:l[0],t:l[1],h:l[2],b:l[3],e:l[4],say:l[5]});
+ const SPECIAL={
+  intro:{e:'happy',say:["Hello, boss! I'm Mr Tycoon.","I turned one lemonade stand into a trillion-dollar empire. Stick with me and I'll show you how it's done.","I'll pop up at the big moments, and everything I teach you goes in your Business Book."]},
+  catchup:{e:'proud',say:["Well, well. I've been watching your empire, boss. I'm Mr Tycoon.","You've learned a lot already. I've put {n} lessons in your Business Book, and each one you read pays 5 crystals.","From now on I'll pop up at the big moments. You can change how often in Settings."]}};
+ const PEEK=["Psst, boss. Got a minute?","Boss! Quick tip?","A word of advice, boss?","Got a sec? I've been crunching your numbers.","Boss, I spotted something."];
+
+ const M=()=>{const m=s.mentor||(s.mentor={});m.mode=m.mode||'all';m.seen=m.seen||{};m.learned=m.learned||{};m.read=m.read||{};m.col=m.col||0;m.lastTip=m.lastTip||0;m.recent=m.recent||[];return m};
+ const fill=(t,c)=>t.replace(/\{(\w+)\}/g,(_,k)=>c&&c[k]!=null?c[k]:'');
+ const learn=id=>{const m=M();if(m.learned[id])return false;m.learned[id]=Date.now();return true};
+ let q=[],box=null,peekEl=null,tmr=null,lastChk=0,freeAt=Date.now();
+ const unread=()=>{const m=M();return Object.keys(m.learned).filter(k=>!m.read[k]&&LI[k]).length};
+ function dot(){const d=document.getElementById('bookDot');if(!d)return;const n=unread();d.hidden=!n;d.textContent=n>9?'9+':n}
+
+ // a key moment: learn it, file it, and queue the text box (once, ever)
+ function moment(id,ctx){const m=M();if(m.seen[id])return;m.seen[id]=1;learn(id);dot();save();if(m.mode!=='off')q.push({id,ctx:ctx||{}})}
+ const app=()=>document.getElementById('app')||document.body;
+ const busy=()=>!!ovKind||heroOn||!!document.querySelector('#gildfx,.vaultcover,#splash');
+ const canShow=()=>!box&&!busy()&&Date.now()-freeAt>1500;
+
+ function show(o){if(box)close(true);hidePeek();const L=LI[o.id]||SPECIAL[o.id]||{},tip=o.tip;
+  const pages=(tip?[tip.t]:(o.pages||L.say||[])).map(p=>fill(p,o.ctx)),e=(tip?tip.e:o.e||L.e)||'n',isL=!!LI[o.id]&&!tip;
+  const el=document.createElement('div');el.id='mentor';el.className='mt'+(tip?' tip':'');
+  el.innerHTML=`<div class="mt-dim"></div><div class="mt-wrap"><div class="mt-face">${F(e)}</div><div class="mt-name">MR TYCOON</div><div class="mt-box" role="dialog" aria-label="Mr Tycoon says">${isL?`<div class="mt-tag">NEW LESSON · ${LI[o.id].t.toUpperCase()}</div>`:''}<p class="mt-txt" aria-live="polite"></p><div class="mt-foot"><span class="mt-step"></span><span class="mt-arr">▼</span></div><div class="mt-btns" hidden></div></div></div>`;
+  app().appendChild(el);box={el,pages,i:0,e,o,btns:o.btns||null,typing:false};if(o.point)point(o.point,null)
+  el.addEventListener('click',ev=>{if(ev.target.closest('.mt-btns button'))return;if(box&&box.btns&&box.i===box.pages.length-1&&!box.typing)return;next()});
+  requestAnimationFrame(()=>el.classList.add('in'));page();vib&&vib(10)}
+ function page(){const b=box,txt=b.el.querySelector('.mt-txt'),full=b.pages[b.i],last=b.i===b.pages.length-1,fc=b.el.querySelector('.mt-face');
+  b.el.querySelector('.mt-step').textContent=b.pages.length>1?`${b.i+1} / ${b.pages.length}`:'';
+  b.el.querySelector('.mt-arr').style.visibility=last&&b.btns?'hidden':'';
+  const bt=b.el.querySelector('.mt-btns');bt.hidden=true;bt.innerHTML='';txt.textContent='';b.typing=true;let n=0;clearInterval(tmr);fc.innerHTML=F(b.e);fc.classList.add('talking');
+  const done=()=>{clearInterval(tmr);b.typing=false;txt.textContent=full;fc.classList.remove('talking');
+   if(last&&b.btns){bt.hidden=false;b.btns.forEach(x=>{const k=document.createElement('button');k.type='button';k.className=x.p?'p':'';k.textContent=x.l;k.onclick=()=>{close();x.a&&setTimeout(x.a,60)};bt.appendChild(k)})}};
+  b.done=done;
+  tmr=setInterval(()=>{n+=2;txt.textContent=full.slice(0,n);if(n>=full.length)done()},24)}
+ // full-screen introduction: he steps out properly before shrinking into the corner box
+ let heroOn=false;
+ function hero(o){hidePeek();if(box)close(true);heroOn=true;const pages=o.pages.map(p=>fill(p,o.ctx));let i=0,typing=false,n=0,ht=0;
+  const el=document.createElement('div');el.id='mhero';el.className='mhero';const img=o.e==='proud'?'proud':o.e==='n'?'n':'happy';
+  el.innerHTML=`<div class="mh-rays"></div><div class="mh-name"><small>MEET YOUR MENTOR</small><b>MR TYCOON</b></div><div class="mh-stage"><img class="mh-img" src="${MDIR}hero-body.webp" alt="Mr Tycoon" draggable="false"></div><div class="mh-box" role="dialog" aria-label="Mr Tycoon says"><p class="mh-txt" aria-live="polite"></p><div class="mt-foot"><span class="mt-step"></span><span class="mt-arr">▼</span></div></div><button type="button" class="mh-skip">Skip</button>`;
+  app().appendChild(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('in')));const txt=el.querySelector('.mh-txt'),stp=el.querySelector('.mt-step');
+  const one=()=>{const full=pages[i];stp.textContent=pages.length>1?`${i+1} / ${pages.length}`:'';typing=true;n=0;clearInterval(ht);el.querySelector('.mh-img').classList.add('talking');
+   ht=setInterval(()=>{n+=2;txt.textContent=full.slice(0,n);if(n>=full.length){clearInterval(ht);typing=false;el.querySelector('.mh-img').classList.remove('talking')}},24)};
+  let gone=false;const end=()=>{if(gone)return;gone=true;clearInterval(ht);el.classList.add('out');setTimeout(()=>{el.remove();heroOn=false;freeAt=Date.now()-1000;o.onEnd&&o.onEnd()},650)};
+  el.addEventListener('click',e=>{if(!el.classList.contains('ready'))return;if(e.target.closest('.mh-skip'))return end();if(typing){clearInterval(ht);typing=false;txt.textContent=pages[i];el.querySelector('.mh-img').classList.remove('talking');return}if(++i<pages.length)one();else end()});
+  setTimeout(()=>{el.classList.add('ready');one()},1100);vib&&vib([20,40,20])}
+ function next(){const b=box;if(!b)return;if(b.typing)return b.done();if(b.i<b.pages.length-1){b.i++;page()}else close()}
+ function close(now){clearInterval(tmr);const b=box;box=null;if(!b)return;const m=M();if(b.o.tip||b.o.id)m.lastTip=Date.now();save();if(b.o.point)unpoint();
+  if(now)return b.el.remove();if(b.o.onEnd)setTimeout(b.o.onEnd,280);b.el.classList.remove('in');b.el.classList.add('out');setTimeout(()=>b.el.remove(),260)}
+
+ // the small "Psst, boss" peek: only on the main screen, never blocks, gone after 25s
+ function showPeek(force){if(peekEl||box||(!force&&ovKind))return;const m=M(),el=document.createElement('button');el.type='button';el.id='mpeek';
+  el.setAttribute('aria-label','Mr Tycoon has a tip');const t=PEEK[Math.floor(Math.random()*PEEK.length)];
+  el.innerHTML=`<span class="mp-face">${F('wink')}</span><span class="mp-b">${t} <i>Tap for a tip</i></span>`;
+  const p=document.getElementById('panel');el.style.bottom=((p?p.getBoundingClientRect().height:200)+10)+'px';
+  el.onclick=()=>{hidePeek();tipNow()};app().appendChild(el);peekEl=el;requestAnimationFrame(()=>el.classList.add('in'));
+  m.col=0;m.lastTip=Date.now();save();setTimeout(()=>{if(peekEl===el)hidePeek()},25000)}
+ function hidePeek(){if(!peekEl)return;const el=peekEl;peekEl=null;el.classList.remove('in');setTimeout(()=>el.remove(),250)}
+
+ // idle tips use your real numbers, so they stay fresh
+ function tips(){const out=[],w=s.world|0,inc=income();
+  const full=s.owned.find(o=>B[o.bid].rate>0&&!o.busy&&o.stored>=st(o).hold*.85);
+  if(full){const x=st(full);out.push({k:'full'+full.bid,e:'worried',t:`${B[full.bid].name} is ${Math.min(100,Math.round(full.stored/x.hold*100))}% full. Collect it before it stops earning, boss.`})}
+  const nb=nextBiz();if(nb)out.push({k:'nb'+nb.id,e:'thinking',t:`${nb.name} costs ${$m(nb.price)} and earns ${$m(nb.rate)} a minute. It would pay for itself in ${dur(nb.price/nb.rate*60)}.`});
+  if(inc>0)out.push({k:'inc',e:'happy',t:`You're making ${$m(inc)} a minute. That's ${$m(inc*60)} an hour while you sit back.`});
+  const th=threat();if(th>30)out.push({k:'th',e:'worried',t:`Your threat is ${Math.round(th)}%. A good cause would bring it down before the police come knocking.`});
+  if(!mgrOn()&&s.owned.length>=3)out.push({k:'mgr',e:'n',t:"Heading off soon? A manager keeps full businesses earning while you're away."});
+  out.push({k:'rest',e:'happy',t:"Take a break, boss. Your businesses keep earning while you're away, up to what they can hold."});
+  out.push({k:'gold',e:'surprised',t:"All the gold ever mined would fit in a cube about 22 metres wide. That's why it's worth so much."});
+  out.push({k:'buffett',e:'n',t:"Warren Buffett bought his first shares when he was 11. He says his only regret is not starting sooner."});
+  out.push({k:'comp',e:'thinking',t:"Small upgrades add up. Growth on top of growth is how empires get big."});
+  return out}
+ function tipNow(){const m=M(),L=tips(),fresh=L.filter(x=>!m.recent.includes(x.k)),t=(fresh.length?fresh:L)[Math.floor(Math.random()*(fresh.length||L.length))];
+  m.recent=[t.k,...m.recent].slice(0,6);show({tip:t})}
+ function nextBiz(){const w=s.world|0;return B.filter(b=>(b.w|0)===w&&b.rate>0&&!b.secret&&!gemPay(b)&&!own(b.id)&&(typeof available!=='function'||available(b))).sort((a,c)=>a.price-c.price)[0]}
+
+ // conditions checked as you play
+ const T={revenue:()=>s.owned.length>=1,cashflow:()=>(s.collects||0)>=1,
+  capacity:()=>{const o=s.owned.find(o=>B[o.bid].rate>0&&!o.busy&&o.stored>=st(o).hold*.999);return o&&{biz:B[o.bid].name}},
+  reinvest:()=>s.owned.length>=3,compounding:()=>s.owned.reduce((a,o)=>a+Math.max(0,(o.level||1)-1),0)>=10,
+  diversify:()=>s.owned.filter(o=>B[o.bid].rate>0).length>=5,reputation:()=>threat()>50&&{th:Math.round(threat())},
+  risk:()=>!!s.deal,legal:()=>!!s.jail,delegation:()=>mgrOn(),salary:()=>M().mgrWas&&!mgrOn(),scale:()=>s.owned.length>=10,
+  investing:()=>!!(s.gild&&Object.keys(s.gild).length),assets:()=>(s.goldTot||0)>0||(s.gold||0)>0,networth:()=>nw()>=1e6,
+  expansion:()=>typeof worldOpen==='function'&&worldOpen(1),luck:()=>!!(s.dc&&s.dc.streak>0),
+  philanthropy:()=>s.owned.some(o=>!(B[o.bid].rate>0)),legacy:()=>!!s.tril};
+ function init(){const m=M();if(m.init)return;m.init=1;
+  if(s.owned.length>=4){let n=0;for(const k in T){try{if(T[k]()){m.seen[k]=1;if(learn(k))n++}}catch(e){}}if(s.earned>0){m.seen.passive=1;if(learn('passive'))n++}
+   if(m.mode!=='off')q.push({id:'catchup',ctx:{n}})}
+  else{m.tut=0}save();dot()}
+ function check(){const t=Date.now();if(t-lastChk<400)return;lastChk=t;if(typeof s==='undefined'||!s||!clockReady)return;const m=M();if(!m.init)init();
+  if(m.tut!=null&&m.tut!=='done'){tutTick();return}
+  if(busy()){freeAt=Date.now();if(box&&!box.el.classList.contains('out')){const o=box.o;close(true);q.unshift(o)}hidePeek();return}
+  if(mgrOn())m.mgrWas=1;
+  if(!box)for(const k in T){if(m.seen[k])continue;let r=false;try{r=T[k]()}catch(e){}if(r){moment(k,typeof r==='object'?r:{});if(k==='salary')m.mgrWas=0;break}}
+  if(canShow()&&q.length){show(q.shift());return}
+  if(m.mode==='all'&&!box&&!peekEl&&!ovKind&&!q.length&&m.col>=6&&t-m.lastTip>8*6e4)showPeek()}
+
+ // the Business Book
+ let openL=null;
+ function bookBody(){const m=M(),got=LES.filter(l=>m.learned[l[0]]).sort((a,b)=>m.learned[a[0]]-m.learned[b[0]]),left=LES.filter(l=>!m.learned[l[0]]),n=got.length;
+  const row=l=>{const L=LI[l[0]],op=openL===L.id,nu=!m.read[L.id];return`<button type="button" class="mbk-l${op?' open':''}" data-mact="lesson" data-l="${L.id}"><span class="no">${L.i+1}</span><span class="tx"><b>${L.t}</b><small>${op?'':'Learned '+new Date(m.learned[L.id]).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</small>${op?`<span class="bd">${L.b}</span>`:''}</span>${nu?`<span class="new">+5 ${GEM}</span>`:`<span class="chev">${op?'−':'+'}</span>`}</button>`};
+  return`<div class="mbk"><div class="mbk-hd"><span class="mbk-f">${F('n')}</span><span class="mbk-p"><b>${n} of ${LES.length} lessons learned</b><span class="bar"><i style="width:${Math.round(n/LES.length*100)}%"></i></span><small>${unread()?`${unread()} to read · each one pays 5 crystals`:'Every lesson you read pays 5 crystals'}</small></span></div>
+  ${n?`<div class="mbk-s">LEARNED</div>${got.map(row).join('')}`:''}${left.length?`<div class="mbk-s">STILL TO LEARN</div>${left.map(l=>`<div class="mbk-l lock"><span class="no">${LI[l[0]].i+1}</span><span class="tx"><b>???</b><small>Unlocks when you: ${l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small></span></div>`).join('')}`:''}</div>`}
+ function openBook(){openL=null;hidePeek();if(box)close(true);sheet('Business Book',bookBody(),'book')}
+ function rebook(){const sb=document.getElementById('sb');if(sb&&ovKind==='book'){const y=sb.scrollTop;sb.innerHTML=bookBody();sb.scrollTop=y}}
+
+ // settings row (separate from phone notifications)
+ const MODES=[['off','Off'],['key','Key'],['all','All']];
+ const modeTxt=m=>m==='off'?'Off. Lessons still go in your Business Book':m==='key'?'Key moments only: big wins, high threat, gold, new worlds':'Key moments plus small idle tips while you collect';
+ const setRow=()=>`<div class="switch" id="mtSet"><span>Mentor tips<small id="mtSetT">${modeTxt(M().mode)}</small></span><span class="seg">${MODES.map(([k,l])=>`<button type="button" data-mact="mmode" data-v="${k}" aria-pressed="${M().mode===k}">${l}</button>`).join('')}</span></div>`;
+
+ document.addEventListener('click',e=>{const el=e.target.closest('[data-mact]');if(!el)return;const a=el.dataset.mact;
+  if(a==='book')openBook();
+  else if(a==='lesson'){const id=el.dataset.l,m=M();openL=openL===id?null:id;if(!m.read[id]){m.read[id]=1;s.gems+=5;gemLog(5,'Business Book');toast(`+5 crystals for reading "${LI[id].t}"`,'good');save();upd();dot()}rebook()}
+  else if(a==='mmode'){M().mode=el.dataset.v;save();document.querySelectorAll('[data-mact=mmode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===el.dataset.v));const t=document.getElementById('mtSetT');if(t)t.textContent=modeTxt(el.dataset.v);if(el.dataset.v!=='all')hidePeek()}
+  else if(a==='tutskip'){M().tut='done';unpoint();document.getElementById('app')?.classList.remove('tut');save();toast('Tutorial skipped')}});
+
+ // hooks into the game
+ const _upd=upd;upd=function(){_upd.apply(this,arguments);try{check()}catch(e){}};
+ const _col=collect;collect=function(){_col.apply(this,arguments);M().col++};
+ const _wel=welcome;welcome=function(r,arr){_wel.apply(this,arguments);try{moment('passive',{gain:$m(r.gained)});if(r.dt>=8*36e5)moment('rest',{})}catch(e){}};
+ const _dno=dealNo;dealNo=function(){const d=s.deal;_dno.apply(this,arguments);if(d)moment('opportunity',{who:d.who})};
+ const _toast=toast;toast=function(m,c){_toast.apply(this,arguments);if(typeof m==='string'&&/^(You need .* more|Not enough cash)/.test(m))moment('liquidity',{})};
+ const _au=askUpgrade;askUpgrade=function(){const o=cur(),m=M();
+  if(o&&!o.busy&&!m.seen.roi&&m.mode!=='off'&&!box&&(m.tut==null||m.tut==='done')){const b=B[o.bid],x=st(o);
+   if(b.rate>0&&!gemPay(b)&&!x.maxed){const g=x.nRate-x.rate,up=g>0?x.up/g:Infinity,nb=nextBiz();
+    if(nb&&isFinite(up)){const np=nb.price/nb.rate;if(up>2*np){m.seen.roi=1;learn('roi');dot();save();
+     show({id:'roi',ctx:{upPay:dur(up*60),nextPay:dur(np*60),next:nb.name},btns:[{l:'Upgrade',a:()=>_au()},{l:'Save up',p:1}]});return}}}}
+  _au.apply(this,arguments)};
+ const _dlg=dialog;dialog=function(title){if(typeof title==='string'&&/^Welcome, /.test(title)&&s.mentor&&s.mentor.tut===0)return;return _dlg.apply(this,arguments)};
+ const _bm=bossMain;bossMain=function(){return _bm.apply(this,arguments).replace('<div class="srow" data-act="howto"',setRow()+'<div class="srow" data-act="howto"')};
+ // reputation's button opens the shop; the book button lives on the right-hand rail
+ LI.reputation.btns=[{l:'Got it'},{l:'Show causes',p:1,a:()=>openShop()}];
+ const _show=show;show=function(o){if(!o.btns&&o.id&&LI[o.id]&&LI[o.id].btns)o.btns=LI[o.id].btns;if((o.id==='catchup'||o.id==='intro')&&!o.mini){const S=SPECIAL[o.id];return hero({pages:S.say,e:S.e,ctx:o.ctx,onEnd:()=>pointBook()})}_show(o)};
+ function mountRail(){const tl=document.querySelector('.tools');if(!tl||document.getElementById('bookTool'))return;const b=document.createElement('button');b.className='tool';b.id='bookTool';b.dataset.mact='book';b.setAttribute('aria-label','Business Book');
+  b.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3M9 7h6M9 10.5h4"/></svg><span class="dot y" id="bookDot" hidden>0</span>';tl.appendChild(b);dot()}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountRail);else mountRail();
+
+ // ---- the pointing hand ----
+ const HAND=["....KK......","...KWWK.....","...KWWK.....","...KWWK.....","...KWWKKK...","...KWWKWWKK.",".KKKWWKWWKWK","KWWKWWWWWWWK","KWWWWWWWWWWK",".KWWWWWWWWWK",".KWWWWWWWWK.","..KWWWWWWWK.","...KWWWWWK..","...KKKKKKK.."];
+ const HANDSVG=(()=>{let p='';HAND.forEach((r,y)=>{for(let x=0;x<12;x++){const c=r[x]==='K'?'#1E1E1E':r[x]==='W'?'#FFFFFF':null;if(c)p+=`<rect x="${x}" y="${y}" width="1.04" height="1.04" fill="${c}"/>`}});return`<svg viewBox="0 0 12 14" shape-rendering="crispEdges" aria-hidden="true">${p}</svg>`})();
+ let hand=null,coach=null,raf=0;
+ function point(sel,text){unpoint(true);hand=document.createElement('div');hand.className='mhand';hand.innerHTML=`<div class="mh-i">${HANDSVG}</div>`;document.body.appendChild(hand);hand.sel=sel;
+  if(text){coach=document.createElement('div');coach.className='mcoach';coach.innerHTML=`<span class="mc-f">${F('n')}</span><span class="mc-t">${text}</span>${M().tut!=null&&M().tut!=='done'?'<button type="button" class="mc-s" data-mact="tutskip">Skip</button>':''}`;document.body.appendChild(coach)}
+  const loop=()=>{raf=requestAnimationFrame(loop);place()};loop()}
+ function place(){if(!hand)return;const el=typeof hand.sel==='function'?hand.sel():document.querySelector(hand.sel),A=app().getBoundingClientRect();
+  if(coach){coach.style.left=(A.left+12)+'px';coach.style.width=(A.width-24)+'px';coach.style.top=(A.top+Math.max(10,parseFloat(getComputedStyle(document.documentElement).paddingTop)||0)+6)+'px'}
+  if(hand.soft&&busy()){hand.style.opacity=0;if(coach)coach.style.visibility='hidden';return}if(coach)coach.style.visibility='';
+  if(!el||!el.getClientRects().length){hand.style.opacity=0;return}hand.style.opacity=1;const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  let x=cx,y=r.top+r.height*.7,rot=0;if(cx>A.right-90){x=r.left+r.width*.25;y=cy;rot=90}else if(cy>A.top+A.height*.68){y=r.top+r.height*.3;rot=180}
+  hand.style.transform=`translate(${x}px,${y}px) rotate(${rot}deg)`}
+ function unpoint(keep){cancelAnimationFrame(raf);hand&&hand.remove();hand=null;coach&&coach.remove();coach=null}
+ let pbT=0;function pointBook(){point('#bookTool','Your Business Book lives here');hand.soft=1;clearTimeout(pbT);pbT=setTimeout(()=>{if(hand&&hand.sel==='#bookTool')unpoint()},8000)}
+
+ // ---- step-by-step onboarding for a brand-new player ----
+ const lem=()=>own(0)||own(B.find(b=>b.code==='lem')?.id),bizEl=()=>document.querySelector('#sb [data-act=ask][data-bid="'+(B.find(b=>b.code==='lem')?.id??0)+'"]')||document.querySelector('#sb [data-act=ask]');
+ const TUT=[
+  {hero:1,say:["Welcome, {name}! I'm Mr Tycoon.","I turned one lemonade stand into a trillion-dollar empire.","Now I'm retired, and I'm going to teach you everything I know."],e:'happy'},
+  {say:["Every empire starts with one business. Let's buy yours."],e:'n'},
+  {go:'shop',text:'Tap the shop',at:'.tools [data-act=shop]',done:()=>ovKind==='shop'||!!lem()},
+  {text:'Pick the Lemonade Stand',at:bizEl,done:()=>ovKind==='askbuy'||!!lem(),back:()=>!ovKind?'shop':null},
+  {text:'Tap Buy',at:'#ovl [data-act=buy]',done:()=>!!lem(),back:()=>ovKind!=='askbuy'?'shop':null},
+  {say:["Your first business! It takes a couple of minutes to build.","Tap the building site to build it faster."],e:'happy',skip:()=>!lem()?.busy},
+  {text:'Tap the site to build faster',at:'#art',done:()=>!lem()?.busy},
+  {say:["It's open! Your Lemonade Stand makes money every minute. That's called revenue.","Cash piles up in the stack. When you're ready, collect it."],e:'surprised',learn:'revenue'},
+  {go:'collect',text:'Tap Collect',at:'#panel .collect',done:()=>(s.collects||0)>M().tc0,enter:()=>{M().tc0=s.collects||0}},
+  {say:["Ka-ching! Money only counts once it's in your pocket. That's cash flow.","Your stand can only hold so much, so come back and collect often."],e:'happy',learn:'cashflow'},
+  {go:'up',text:'Tap the green arrow to upgrade',at:'#upBtn',done:()=>!!document.querySelector('#ovl [data-act=doupgrade]')||lem()?.busy==='up',skip:()=>{const o=lem();return !o||o.busy||s.cash<st(o).up}},
+  {text:'Tap Yes',at:'#ovl [data-act=doupgrade]',done:()=>lem()?.busy==='up'||(lem()?.level||1)>=2,back:()=>!document.querySelector('#ovl [data-act=doupgrade]')?'up':null},
+  {say:["Upgrades make a business earn more and hold more. They take a little while to finish."],e:'n',skip:()=>(lem()?.level||1)<2&&lem()?.busy!=='up'},
+  {say:["See this? That's your threat.","Some businesses attract the police. If your threat gets high, you can get caught. Good causes bring it down."],e:'worried',point:'#thrT'},
+  {go:'gift',text:'Grab your free gift',at:'.tools [data-act=free]',done:()=>!!document.getElementById('claimBtn'),skip:()=>s.freeAt>now()},
+  {text:'Tap Claim',at:'#claimBtn',done:()=>s.freeAt>now(),back:()=>!document.getElementById('claimBtn')&&s.freeAt<=now()?'gift':null},
+  {say:["Everything I teach you goes in your Business Book.","Read a lesson to earn 5 crystals. Tap the book to have a look."],e:'proud',point:'#bookTool'},
+  {go:'book',text:'Open your Business Book',at:'#bookTool',done:()=>ovKind==='book'},
+  {text:'Read a lesson, then close the book',at:()=>document.querySelector('.mbk-l .new')?.closest('.mbk-l')||document.querySelector('.sheet-h [data-act=close]'),done:()=>ovKind!=='book'},
+  {say:["That's the basics, boss! Buy more businesses, keep your threat low and collect often.","I'll pop up at the big moments. Now go build that empire."],e:'happy'}];
+ let tutOn=-1;
+ function tutGo(i){const m=M();m.tut=i;tutOn=-1;unpoint();save()}
+ function tutTick(){const m=M();if(!s.name){return}let i=m.tut|0;if(i>=TUT.length){m.tut='done';unpoint();document.getElementById('app')?.classList.remove('tut');save();return}
+  document.getElementById('app')?.classList.add('tut');const st_=TUT[i];
+  if(st_.skip&&tutOn!==i&&st_.skip()){return tutGo(i+1)}
+  if(st_.say){if(box||tutOn===i)return;if(busy()){freeAt=Date.now();return}if(Date.now()-freeAt<900)return;tutOn=i;if(st_.learn){learn(st_.learn);m.seen[st_.learn]=1;dot()}
+   if(st_.hero){heroOn=true;setTimeout(()=>hero({pages:st_.say,e:st_.e,ctx:{name:esc(s.name||'boss')},onEnd:()=>tutGo(i+1)}),0);return}
+   _show({id:st_.learn||'tut',ctx:{name:esc(s.name||'boss')},onEnd:()=>tutGo(i+1),point:st_.point,tut:1,pages:st_.say,e:st_.e});return}
+  if(tutOn!==i){tutOn=i;st_.enter&&st_.enter();point(st_.at,st_.text)}
+  if(st_.done()){return tutGo(i+1)}
+  if(st_.back){const g=st_.back();if(g){const j=TUT.findIndex(x=>x.go===g);if(j>=0&&j<i)return tutGo(j)}}}
+
+ return{check,moment,openBook,show,tipNow,showPeek,_tgt:()=>hand&&(typeof hand.sel==="function"?hand.sel():document.querySelector(hand.sel)),_step:()=>M().tut}})();
 
 /* intro */
 // falling money like real paper: each bill drops at its own pace, drifts side to side and tilts into the drift, and flutters or tumbles as it goes
