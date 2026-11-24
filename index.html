@@ -1517,7 +1517,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112411,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112412,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1592,14 +1592,15 @@ const UPG=1.17,UP0=.25,UPC=1.19,UPMAX=43200,MAXL=50;
 // Gold builds up for up to 8 hours, and Collect picks it up with the cash.
 // Spend gold to gild any business that earns cash: it turns gold and earns 2x forever.
 // Costs rise with each tier: 25 gold for Downtown tier 1 up to about 4,800 for the top of the last world.
-const GOLDM={bb01:1,bb05:1.5,bb08:2,bb10:3,bb11:4,bb19:6,bb20:8},GOLD_CAP_H=8;
+// gold per hour at level 1 (+5% per level). Slowed 4x in build 185 so gilding is a long-term goal
+const GOLDM={bb01:.25,bb05:.375,bb08:.5,bb10:.75,bb11:1,bb19:1.5,bb20:2},GOLD_CAP_H=8;
 const isGild=b=>!!(b&&(s.gild||{})[b.code]);
 const goldRate=o=>{const b=B[o.bid],m=b&&GOLDM[b.code];return m?m*(1+.05*(o.level-1)):0};
 function goldPend(o){const r=goldRate(o);if(!r||o.busy)return 0;if(!(o.gAt>0)||o.gAt>now())o.gAt=now();return Math.min(r*GOLD_CAP_H,r*Math.max(0,now()-o.gAt)/3600000)}
 function goldTake(o){const p=goldPend(o),n=Math.floor(p);if(n<1)return 0;const r=goldRate(o);o.gAt=p>=r*GOLD_CAP_H?now():o.gAt+n/r*3600000;s.gold=(s.gold||0)+n;s.goldTot=(s.goldTot||0)+n;return n}
 const goldOn=()=>(s.wopen|0)>=1||(s.gold||0)>0||Object.keys(s.gild||{}).length>0;
 function gildStep(b){if(!b.w)return b.tier;if(b.w===4)return 20+wTierOf(b);return 8+(b.w-1)*4+wTierOf(b)}
-function gildCost(b){const v=25*Math.pow(1.27,gildStep(b)-1);return v<20?Math.round(v):Math.round(v/5)*5}
+function gildCost(b){const v=100*Math.pow(1.3,gildStep(b)-1);return Math.round(v/5)*5}
 const goldCardRate=b=>{const o=own(b.id);return +(o?goldRate(o):GOLDM[b.code]).toFixed(2)};
 const canGild=b=>b&&b.rate>0&&!isGild(b);
 // gold version of a picture: drawn ones are recoloured in gold tones (grass stays green); painted ones get a gold tint
