@@ -5,6 +5,9 @@
 @keyframes dcglow{50%{box-shadow:0 0 0 3px #EC4FA677,0 0 28px 8px #FF5DB8DD;transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){.tools #dailyTool{animation:none}}
 .bstreak{margin:0 0 6px}.bstreak .dc-streak{border:2px solid #141A1B;box-shadow:0 3px 0 #141A1B}
+.vall{display:block;width:calc(100% - 24px);margin:4px 12px 10px;background:#fff;border:2px solid #D9A23A;color:#8A5A00;font:900 13px Montserrat,sans-serif;letter-spacing:.6px;padding:12px;text-transform:uppercase}
+.dark .vall{background:#2E2614;color:#F5C451}
+.vrate{font-size:13px;font-weight:900;color:#2E7D32;margin-top:2px}.vrate span{color:#C98F1E}.dark .vrate{color:#7EDB6F}
 </style><style>/* ===== mentor: Mr Tycoon ===== */
 .mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
 .mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
@@ -1558,7 +1561,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112414,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112416,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1724,17 +1727,18 @@ function vaultBody(){const t=now(),gold=Math.floor(s.gold||0),mk=Object.keys(GOL
  h+=`<div class="vsec"><b>Golden Empire</b><span class="num">${gilded}/${earners.length} gilded</span></div><div class="vprog"><i style="width:${pct.toFixed(1)}%"></i></div><div class="vworlds">`;
  for(let w=0;w<WN.length;w++){const bs=earners.filter(b=>(b.w|0)===w);if(!bs.length||(w&&!worldOpen(w)&&!bs.some(isGild)))continue;h+=`<span>${esc(WN[w])} <b class="num">${bs.filter(isGild).length}/${bs.length}</b></span>`}
  h+=`</div>`;
- // what you can gild next: your businesses that aren't gold yet, cheapest first
- const next=s.owned.map(o=>B[o.bid]).filter(b=>b&&canGild(b)).sort((a,c)=>gildCost(a)-gildCost(c)).slice(0,6);
- h+=`<div class="vsec"><b>Gild next</b><span>Tap one to go and gild it</span></div>`;
- h+=next.length?next.map(b=>{const c=gildCost(b),ok=gold>=c;return`<div class="wrow vrow" data-act="pfgo" data-bid="${b.id}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${b.w?WN[b.w]:'Downtown'} · Tier ${wTierOf(b)}</div><div class="vneed">${ok?'Ready to gild':`Need ${(c-gold).toLocaleString('en-US')} more`}</div></div><div class="act"><span class="vcost num ${ok?'':'off'}"><i class="gbar"></i>${c.toLocaleString('en-US')}</span><span class="vgo">View ›</span></div></div>`}).join(''):`<p class="vnone">Everything you own is gold. Buy more businesses to gild.</p>`;
+ // what you can gild next: every business you own that isn't gold yet, cheapest first (6 shown, the rest behind Show all)
+ const all=s.owned.map(o=>B[o.bid]).filter(b=>b&&canGild(b)).sort((a,c)=>gildCost(a)-gildCost(c)||(own(c.id)?st(own(c.id)).rate:c.rate)-(own(a.id)?st(own(a.id)).rate:a.rate)),next=vaultAll?all:all.slice(0,6);
+ h+=`<div class="vsec"><b>Gild next</b><span>${all.length?`${all.length} not gold yet · tap one to gild it`:'Tap one to go and gild it'}</span></div>`;
+ h+=next.length?next.map(b=>{const c=gildCost(b),ok=gold>=c;return`<div class="wrow vrow" data-act="pfgo" data-bid="${b.id}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">${b.w?WN[b.w]:'Downtown'} · Tier ${wTierOf(b)}</div><div class="vrate num">${(()=>{const o=own(b.id),r=o?st(o).rate:b.rate;return`${$m(r)}/min <span>→ ${$m(r*2)}/min</span>`})()}</div><div class="vneed">${ok?'Ready to gild':`Need ${(c-gold).toLocaleString('en-US')} more`}</div></div><div class="act"><span class="vcost num ${ok?'':'off'}"><i class="gbar"></i>${c.toLocaleString('en-US')}</span><span class="vgo">View ›</span></div></div>`}).join('')+(all.length>6?`<button type="button" class="vall" data-act="vaultall">${vaultAll?'Show fewer':`Show all ${all.length}`}</button>`:''):`<p class="vnone">Everything you own is gold. Buy more businesses to gild.</p>`;
  // gold makers
  h+=`<div class="vsec"><b>Gold makers</b><span>Bullion Bay</span></div>`;
  h+=mk.map(b=>{const o=own(b.id);if(!o)return`<div class="wrow vrow lock"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">Makes ${GOLDM[b.code]} gold an hour</div><div class="vneed">Not owned yet · ${$m(b.price)}</div></div><div class="act"></div></div>`;
   const p=goldPend(o),r=goldRate(o);return`<div class="wrow vrow" data-act="pfgo" data-bid="${b.id}"><div class="pic">${picArt(b)}</div><div><h5>${esc(b.name)}</h5><div class="wsub">Level ${o.level} · ${(+r.toFixed(2))} gold an hour</div><div class="wbar"><i style="width:${(p/(r*GOLD_CAP_H)*100).toFixed(1)}%;background:linear-gradient(90deg,#F5C451,#D98E16)"></i></div><div class="eta">${o.busy?'Busy':p>=r*GOLD_CAP_H?'Full':Math.floor(p)+' ready'}<span>holds ${GOLD_CAP_H}h</span></div></div><div class="act"><span class="lv">LV ${o.level}</span></div></div>`}).join('');
  h+=`<p class="vhow">Gold makers dig up gold as they earn and hold up to ${GOLD_CAP_H} hours of it. Upgrading them makes more. Gild a business and it turns gold and earns 2× forever.</p>`;
  return h}
-function openVault(){sheet('Gold Vault',vaultBody(),'vault')}
+let vaultAll=false;
+function openVault(){vaultAll=false;sheet('Gold Vault',vaultBody(),'vault')}
 function vaultRefresh(){const sb=$('sb');if(sb&&ovKind==='vault'){const y=sb.scrollTop;sb.innerHTML=vaultBody();sb.scrollTop=y}}
 function vaultCollect(){let n=0;for(const c of Object.keys(GOLDM)){const b=BY[c],o=b&&own(b.id);if(o)n+=goldTake(o)}if(!n)return toast('No gold to collect yet');save();hud();toast(`Collected ${n} gold`,'good');const gt=$('goldT');if(gt){gt.classList.add('bump');setTimeout(()=>gt.classList.remove('bump'),400)}vaultRefresh()}
 // the gilding moment: full screen, the business fills with gold from the ground up, then GILDED
@@ -3757,6 +3761,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'buy':buy(bid);break;
   case'goto':plotSel=null;s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();upd();break;
   case'upgrade':askUpgrade();break;case'gild':gildDlg();break;case'gildok':doGild(bid);break;case'goldinfo':openVault();break;case'vaultcollect':vaultCollect();break;case'vaultgild':{const b=B[bid];if(!b)break;const i=s.owned.findIndex(o=>o.bid===bid);if(i<0)break;plotSel=null;if((b.w|0)!==(s.world|0)&&worldOpen(b.w|0)){s.wlast=s.wlast||{};s.wlast[b.w|0]=bid;travel(b.w|0)}s.cur=s.owned.findIndex(o=>o.bid===bid);closeOv();stageSig='';upd();setTimeout(gildDlg,60);break}case'doupgrade':upgrade();break;
+  case'vaultall':{vaultAll=!vaultAll;vaultRefresh();break}
   case'sell':askSell();break;case'dosell':sell();break;
   case'prev':slideStep(-1);break;case'next':slideStep(1);break;case'vbiz':showGroup(false);break;case'vgood':showGroup(true);break;
   case'threat':threatDlg();break;
