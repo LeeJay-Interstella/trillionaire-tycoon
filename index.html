@@ -123,6 +123,78 @@
 .mbk-r .rn{flex:none;min-width:34px;font-weight:900;font-size:13px;color:#8A5A00}.mbk-r b{font-size:14px;font-weight:800;line-height:1.35}
 .mbk-r.lock{background:#E4E7E5;border:3px dashed #9AA39D;color:#4A5250;font-size:12.5px;font-weight:700}.mbk-r.lock .rn{color:#5E6662}
 .dark .mbk-r{background:#2E2614;color:#EEF1EE}.dark .mbk-r.lock{background:#161D1E;color:#A9B2AD}
+
+/* lesson path */
+.lpath{display:flex;flex-direction:column;align-items:center;gap:30px;padding:30px 0 26px}.lnode:has(.cur){margin-top:14px}
+.lnode{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;width:150px}
+.lnode small{font:800 12px Montserrat,sans-serif;text-align:center;color:#1E1E1E;line-height:1.25}
+.lnode .node{width:76px;height:70px;border-radius:50%;border:0;display:grid;place-items:center;font:900 26px Montserrat,sans-serif;color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .1s}
+.lnode .node svg{width:34px;height:34px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.lnode .node.new{background:#58CC5A;box-shadow:0 7px 0 #3A9A3C}
+.lnode .node.done{background:#F5B946;box-shadow:0 7px 0 #C98F1E}
+.lnode .node.lock{background:#D5DAD7;box-shadow:0 7px 0 #AEB5B1;cursor:default}.lnode .node.lock svg{stroke:#8E9893}
+.lnode .node:not(.lock):active{transform:translateY(5px);box-shadow:0 2px 0 #0003}
+.lnode .node.cur{animation:lnpulse 1.6s ease-in-out infinite}
+@keyframes lnpulse{50%{transform:scale(1.07)}}
+.lstart{position:absolute;top:-30px;background:#fff;border:3px solid #D5DAD7;color:#3A9A3C;font:900 13px Montserrat,sans-serif;letter-spacing:1px;padding:4px 10px;border-radius:10px;animation:lsbob 1.2s ease-in-out infinite;z-index:1}
+.lstart:after{content:"";position:absolute;left:50%;bottom:-9px;margin-left:-7px;border:7px solid transparent;border-top-color:#D5DAD7;border-bottom:0}
+@keyframes lsbob{50%{transform:translateY(-4px)}}
+.lgem{display:inline-flex;align-items:center;gap:3px;font:900 11px Montserrat,sans-serif;color:#8A5A00;background:#FFF4D6;padding:2px 7px;border-radius:8px}.lgem svg{width:11px;height:11px}
+.dark .lnode small{color:#C9D0CB}.dark .lnode .node.lock{background:#2B3637;box-shadow:0 7px 0 #1A2223}.dark .lnode .node.lock svg{stroke:#6E7873}.dark .lstart{background:#1E2728;border-color:#3A4647}
+/* full-screen lesson player */
+#lx{position:absolute;inset:0;z-index:66;background:#fff;color:#1E1E1E;display:flex;flex-direction:column;font-family:Montserrat,sans-serif;transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.9,.25,1)}
+#lx.in{transform:none}#lx.out{transform:translateY(100%);transition:transform .25s ease-in}
+.dark #lx{background:#131F24;color:#EEF1EE}
+.lx-top{display:flex;align-items:center;gap:14px;padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 8px}
+.lx-x{background:none;border:0;font-size:24px;font-weight:900;color:#AFB6B2;padding:6px;line-height:1}
+.lx-bar{flex:1;height:16px;border-radius:99px;background:#E5E8E6;overflow:hidden}.dark .lx-bar{background:#2B3637}
+.lx-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(#7BE07D,#58CC5A);box-shadow:inset 0 -4px 0 #0001,inset 0 4px 0 #fff4;transition:width .4s cubic-bezier(.2,.9,.25,1.2)}
+.lx-gem{display:inline-flex;align-items:center;gap:4px;font-weight:900;font-size:14px;color:#1CB0F6}.lx-gem svg{width:16px;height:16px}
+.lx-body{flex:1;overflow:auto;padding:12px 20px 20px;display:flex;flex-direction:column;gap:14px}
+.lx-body.slide{animation:lxin .3s ease-out}@keyframes lxin{from{opacity:0;transform:translateX(30px)}}
+.lx-k{font-size:12px;font-weight:900;letter-spacing:1.6px;color:#58A700}.dark .lx-k{color:#7EDB6F}
+.lx-t{margin:0;font-size:25px;font-weight:900;line-height:1.2}
+.lx-talk{display:flex;gap:12px;align-items:flex-end;margin-top:8px}
+.lx-face{width:110px;height:136px;flex:none}.lx-face img{width:100%;height:100%;object-fit:contain;display:block}
+.lx-face.talking img{animation:mttalk .32s ease-in-out infinite}
+.lx-talk p{position:relative;margin:0 0 24px;flex:1;border:2px solid #E5E8E6;border-radius:16px;padding:14px 16px;font-size:17px;font-weight:700;line-height:1.45;min-height:60px}
+.lx-talk p:before{content:"";position:absolute;left:-10px;bottom:18px;width:16px;height:16px;background:inherit;border-left:2px solid #E5E8E6;border-bottom:2px solid #E5E8E6;transform:rotate(45deg)}
+#lx .lx-talk p{background:#fff}.dark #lx .lx-talk p{background:#131F24;border-color:#37464F}.dark .lx-talk p:before{border-color:#37464F}
+.lx-talk.sm .lx-face{width:70px;height:86px}.lx-talk.sm p{font-size:15px;margin-bottom:14px}
+.lx-card{display:flex;gap:14px;align-items:flex-start;border:2px solid #E5E8E6;border-bottom-width:5px;border-radius:18px;padding:18px 16px;font-size:17px;font-weight:700;line-height:1.5}
+.lx-card p{margin:0}.lx-card b{font-weight:900;color:#58A700}.dark .lx-card{border-color:#37464F}.dark .lx-card b{color:#7EDB6F}
+.lx-card.you{background:#F1FBEA;border-color:#B8E6A0}.dark .lx-card.you{background:#16301A;border-color:#2E5E2E}
+.lx-card.real{background:#EEF7FD;border-color:#BFE3F8}.dark .lx-card.real{background:#132A3A;border-color:#24506E}
+.lx-ic{font-size:30px;line-height:1}
+.lx-opts{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.lx-o{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:2px solid #E5E8E6;border-bottom-width:5px;border-radius:16px;padding:14px;font:800 16px Montserrat,sans-serif;color:inherit;-webkit-tap-highlight-color:transparent}
+.lx-o span{width:30px;height:30px;flex:none;display:grid;place-items:center;border:2px solid #E5E8E6;border-radius:9px;font-size:13px;font-weight:900;color:#AFB6B2}
+.dark .lx-o,.dark .lx-o span{border-color:#37464F}
+.lx-o.sel{background:#DDF4FF;border-color:#84D8FF;color:#1899D6}.lx-o.sel span{border-color:#84D8FF;color:#1899D6}
+.dark .lx-o.sel{background:#1B3A4B}
+.lx-o.good{background:#D7FFB8;border-color:#79C944;color:#58A700}.lx-o.good span{border-color:#79C944;color:#58A700}
+.lx-o.bad{background:#FFDFE0;border-color:#FF9AA0;color:#EA2B2B;animation:lqshake .4s}.lx-o.bad span{border-color:#FF9AA0;color:#EA2B2B}
+.dark .lx-o.good{background:#1F3A16}.dark .lx-o.bad{background:#3A1A1C}
+.lx-o[disabled]{opacity:1}
+.lx-foot{position:relative;padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 18px);border-top:2px solid #E5E8E6}.dark .lx-foot{border-color:#37464F}
+.lx-fb{display:none;flex-direction:column;gap:4px;margin:-14px -16px 14px;padding:16px 18px}
+.lx-fb.on{display:flex;animation:lxfb .25s ease-out}@keyframes lxfb{from{transform:translateY(20px);opacity:0}}
+.lx-fb b{font-size:21px;font-weight:900}.lx-fb span{font-size:15px;font-weight:700;line-height:1.4}
+.lx-fb.good{background:#D7FFB8;color:#58A700}.lx-fb.bad{background:#FFDFE0;color:#EA2B2B}
+.dark .lx-fb.good{background:#1F3A16;color:#7EDB6F}.dark .lx-fb.bad{background:#3A1A1C;color:#FF8A8A}
+.lx-go{width:100%;border:0;border-radius:16px;padding:16px;font:900 17px Montserrat,sans-serif;letter-spacing:.8px;color:#fff;background:#58CC02;box-shadow:0 5px 0 #58A700;-webkit-tap-highlight-color:transparent}
+.lx-go:active{transform:translateY(4px);box-shadow:0 1px 0 #58A700}
+.lx-go[disabled]{background:#E5E8E6;color:#AFB6B2;box-shadow:0 5px 0 #CDD2CF}.dark .lx-go[disabled]{background:#37464F;color:#6E7873;box-shadow:0 5px 0 #26323A}
+.lx-go.bad{background:#FF4B4B;box-shadow:0 5px 0 #EA2B2B}
+.lx-go.claim{background:#F5B946;color:#3A2604;box-shadow:0 5px 0 #C98F1E}
+.lx-win{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;position:relative}
+.lx-burst{position:absolute;top:8%;left:50%;width:300px;height:300px;margin-left:-150px;background:repeating-conic-gradient(#F5B94622 0 10deg,transparent 10deg 22.5deg);border-radius:50%;animation:mhspin 18s linear infinite;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+.lx-face.big{width:170px;height:210px;position:relative;animation:lxpop .5s cubic-bezier(.2,.9,.25,1.4)}@keyframes lxpop{from{transform:scale(.4)}}
+.lx-win h2{margin:6px 0 0;font-size:30px;font-weight:900;color:#F5A400;position:relative}.lx-win p{margin:0;font-size:16px;font-weight:800;opacity:.75;position:relative}
+.lx-stats{display:flex;gap:12px;margin-top:16px;position:relative}
+.lx-stats div{min-width:120px;border:2px solid #F5B946;border-radius:16px;overflow:hidden;text-align:center}
+.lx-stats small{display:block;background:#F5B946;color:#fff;font-size:12px;font-weight:900;letter-spacing:1px;padding:5px}
+.lx-stats b{display:inline-flex;align-items:center;gap:5px;padding:12px;font-size:20px;font-weight:900;color:#F5A400}.lx-stats b svg{width:18px;height:18px}
 /* mock-up: vault raid */
 #raidfx{position:absolute;inset:0;z-index:70;display:grid;place-items:center;background:#160A0AF5;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;font-family:Montserrat,sans-serif;overflow:hidden}
 #raidfx.in{opacity:1}#raidfx.out{opacity:0}
@@ -1478,7 +1550,7 @@ const B=RAW.map((r,i)=>({id:i,code:r[0],tier:r[1],name:r[2],pt:r[3],price:r[4],r
  iP:r[11]/100,iE:r[12]/100,iC:r[13]/100,iT:r[14]/100,iTh:r[15],maxTh:r[16],req:r[17],vis:r[18],maxL:r[19],secret:r[3]===2}));
 const BY={};B.forEach(b=>BY[b.code]=b);
 // worlds: Downtown is tiers 1-8; three new worlds of new businesses; Stardust Empire is the old tiers 9-11. Each opens once at a net worth, for good
-const WU=[0,1e12,25e12,5e14,1e16],WN=['Downtown','Bullion Bay','Diamond Canyon','Black Gold Coast','Stardust Empire'],WS=['','BULLION BAY','DIAMOND CANYON','BLACK GOLD COAST','STARDUST'];
+const WU=[0,1e12,2.5e14,5e14,1e16],WN=['Downtown','Bullion Bay','Diamond Canyon','Black Gold Coast','Stardust Empire'],WS=['','BULLION BAY','DIAMOND CANYON','BLACK GOLD COAST','STARDUST'];
 const SDG={9:'Mythic',10:'Cosmic',11:'Infinite'},WDESC={"bb01":"Fresh catch sold at dawn on the quay","bb02":"Craft beer brewed on the pier","bb03":"Fine wine with a view of the yachts","bb04":"Members-only drinks by the marina","bb05":"Rare watches for collectors","bb06":"Bets on every race across the bay","bb07":"Clears plastic from the sea","bb08":"Hypercars for the waterfront set","bb09":"Eighteen holes along the cliffs","bb10":"Where pearl traders set the price","bb11":"Designer floors facing the sea","bb12":"Glass-walled homes above the berths","bb13":"Where the cruise ships dock","bb14":"Fine art sold to the highest bidder","bb15":"Funds sea rescue crews","bb16":"Berths for the world's biggest yachts","bb17":"High stakes on the boardwalk","bb18":"A private island hotel off the bay","bb19":"Banking for the ultra-rich","bb20":"A nation's fortune, managed from the bay","dc01":"Where every prospector starts","dc02":"Lumber from the canyon forests","dc03":"Slides carved into the red rock","dc04":"A rich silver seam in the canyon walls","dc05":"Cowboy films shot on location","dc06":"Ore melted down into copper bars","dc07":"Restores old mines to nature","dc08":"Ore trains through the gorge","dc09":"Saloon-style gambling for prospectors","dc10":"Shootouts and stagecoach rides","dc11":"Private patrols guarding the mines","dc12":"Turns rough stones into jewels","dc13":"Rugged trucks for rough roads","dc14":"Where every mine's freight meets","dc15":"Readies the world for the next outbreak","dc16":"Blasting supplies for every mine","dc17":"The metal behind every battery","dc18":"A whole city built into the cliff","dc19":"Hydro power from the river","dc20":"Diamonds moved off the books","gc01":"Carries crude from the wells to the shore","gc02":"Turns crude into fuel","gc03":"Medicines from the deep sea","gc04":"The internet's cables under the ocean","gc05":"Ships oil around the world","gc06":"Fresh water from the sea","gc07":"Pulls carbon out of the air","gc08":"The rarest metal on the coast","gc09":"Rigs pumping oil from the seabed","gc10":"Pours gold into bars","gc11":"Gas shipped as liquid, a fast-growing trade","gc12":"Armed boats guarding the rigs","gc13":"Newspapers and TV owned by oil money","gc14":"Turbines out at sea, the new energy boom","gc15":"Cleans up spills at sea","gc16":"Raises sunken treasure and wrecks","gc17":"Builds warships and supertankers","gc18":"Power for the whole coast","gc19":"Money that never touches land","gc20":"Where the oil money is banked","se01":"Keeps runaway AI in check","se02":"Clears junk from orbit","se03":"Watches for asteroids heading our way","se04":"Heals the planet you left behind"};
 B.forEach(b=>{const c=b.code;b.w=/^bb\d/.test(c)?1:/^dc\d/.test(c)?2:/^gc\d/.test(c)?3:/^se\d/.test(c)||b.tier>=9?4:0;b.desc=WDESC[c]||''});
 const wOf=b=>b.w,worldOpen=w=>w<=(s.wopen||0);
@@ -1561,7 +1633,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112416,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112418,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3357,7 +3429,7 @@ const Mentor=(()=>{
  // a key moment: learn it, file it, and queue the text box (once, ever)
  function moment(id,ctx){const m=M();if(m.seen[id])return;m.seen[id]=1;learn(id);dot();save();if(m.mode!=='off')q.push({id,ctx:ctx||{}})}
  const app=()=>document.getElementById('app')||document.body;
- const busy=()=>!!ovKind||heroOn||!!document.querySelector('#gildfx,.vaultcover,#splash');
+ const busy=()=>!!ovKind||heroOn||!!document.querySelector('#gildfx,.vaultcover,#splash,#lx,#lockfx,#raidfx');
  const canShow=()=>!box&&!busy()&&Date.now()-freeAt>1500;
 
  function show(o){if(box)close(true);if(o&&(o.id||o.tip))M().lastSay=Date.now();hidePeek();const L=LI[o.id]||SPECIAL[o.id]||{},tip=o.tip;
@@ -3538,14 +3610,45 @@ const Mentor=(()=>{
   if(t-(m.lastSay||0)>25*6e4&&m.col>=4&&situation('any',{}))return}
  function bookRules(){const m=M(),got=m.rules||{},n=Object.keys(got).length;
   return`<div class="mbk-s">TYCOON'S RULES · ${n} OF ${RULES.length} COLLECTED</div>${RULES.map((r,i)=>got[i]?`<div class="mbk-r"><span class="rn">#${i+1}</span><b>${r[2]}</b></div>`:'').join('')}${n<RULES.length?`<div class="mbk-r lock"><span class="rn">?</span><span>${RULES.length-n} more to collect. Mr Tycoon shares them as you play.</span></div>`:''}`}
+ // ---- Duolingo-style lessons: a winding path in the book, and a full-screen player for each lesson ----
+ function bookPath(){const m=M();let first=true;
+  return`<div class="lpath">${LES.map((l,i)=>{const L=LI[l[0]],got=!!m.learned[L.id],done=!!m.read[L.id],st_=!got?'lock':done?'done':'new',cur=st_==='new'&&first;if(cur)first=false;
+   const x=[0,34,52,34,0,-34,-52,-34][i%8];
+   return`<div class="lnode" style="transform:translateX(${x}px)">${cur?`<span class="lstart">START</span>`:''}<button type="button" class="node ${st_}${cur?' cur':''}" ${got?`data-mact="lesson" data-l="${L.id}"`:'disabled'} aria-label="Lesson ${i+1}: ${got?L.t:'locked'}">${st_==='done'?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':st_==='lock'?'<svg viewBox="0 0 24 24"><rect x="6" y="10.5" width="12" height="9" rx="1.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>':`<b>${i+1}</b>`}</button><small>${got?L.t:'Unlocks when you '+l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small>${st_==='new'?`<span class="lgem">+5 ${GEM}</span>`:''}</div>`}).join('')}</div>`}
+ let LX_=null;
+ function openLesson(id){const L=LI[id],X=LX[id],m=M();if(!L||!X)return;let you='';try{you=X.you()}catch(e){}
+  const ord=order(id,3),steps=['talk',...(you?['you']:[]),'real','quiz','done'];LX_={id,i:0,steps,pick:null,checked:false,ord,you,first:!m.read[id]};
+  const el=document.createElement('div');el.id='lx';el.innerHTML=`<div class="lx-top"><button type="button" class="lx-x" data-mact="lxclose" aria-label="Close lesson">✕</button><div class="lx-bar"><i></i></div><span class="lx-gem">${LX_.first?`+5 ${GEM}`:''}</span></div><div class="lx-body"></div><div class="lx-foot"><div class="lx-fb"></div><button type="button" class="lx-go" data-mact="lxgo">CONTINUE</button></div>`;
+  app().appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));lxRender()}
+ function lxRender(){const el=document.getElementById('lx');if(!el||!LX_)return;const S=LX_,L=LI[S.id],X=LX[S.id],step=S.steps[S.i],body=el.querySelector('.lx-body'),go=el.querySelector('.lx-go'),fb=el.querySelector('.lx-fb');
+  el.querySelector('.lx-bar i').style.width=(S.i/(S.steps.length-1)*100)+'%';fb.className='lx-fb';fb.innerHTML='';go.className='lx-go';go.disabled=false;go.textContent='CONTINUE';
+  let h='';
+  if(step==='talk')h=`<small class="lx-k">LESSON ${L.i+1} · NEW IDEA</small><h2 class="lx-t">${L.t}</h2><div class="lx-talk"><span class="lx-face">${F('n')}</span><p class="lx-say"></p></div>`;
+  else if(step==='you')h=`<small class="lx-k">IN YOUR EMPIRE</small><h2 class="lx-t">How it shows up for you</h2><div class="lx-card you"><span class="lx-ic">📈</span><p>${S.you}</p></div><div class="lx-talk sm"><span class="lx-face">${F('happy')}</span><p>See? You're already doing it, boss.</p></div>`;
+  else if(step==='real')h=`<small class="lx-k">IN THE REAL WORLD</small><h2 class="lx-t">It's not just a game</h2><div class="lx-card real"><span class="lx-ic">🌍</span><p>${X.real}</p></div><div class="lx-talk sm"><span class="lx-face">${F('wink')}</span><p>Same rules, bigger numbers.</p></div>`;
+  else if(step==='quiz'){h=`<small class="lx-k">QUICK QUIZ</small><h2 class="lx-t">${X.q}</h2><div class="lx-opts">${S.ord.map((k,j)=>`<button type="button" class="lx-o${S.pick===k?' sel':''}${S.checked&&k===0&&S.pick===0?' good':''}${S.checked&&S.pick===k&&k!==0?' bad':''}" data-mact="lxpick" data-k="${k}"${S.checked?' disabled':''}><span>${'ABC'[j]}</span>${X.a[k]}</button>`).join('')}</div>`;
+   if(!S.checked){go.textContent='CHECK';go.disabled=S.pick==null;go.classList.add('check')}}
+  else if(step==='done'){const n=Object.keys(M().read).length+(S.first&&!M().read[S.id]?1:0);h=`<div class="lx-win"><div class="lx-burst"></div><span class="lx-face big">${F('proud')}</span><h2>Lesson complete!</h2><p>${L.t}</p><div class="lx-stats"><div><small>REWARD</small><b class="num">${S.first?`+5 ${GEM}`:'Review'}</b></div><div><small>LESSONS</small><b class="num">${n}/${LES.length}</b></div></div></div>`;go.textContent=S.first?'CLAIM 5 CRYSTALS':'CONTINUE';go.classList.add('claim')}
+  body.innerHTML=h;body.classList.remove('slide');void body.offsetWidth;body.classList.add('slide');
+  if(step==='talk'){const p=body.querySelector('.lx-say'),full=L.b;let n=0;const fc=body.querySelector('.lx-face');fc.classList.add('talking');const iv=setInterval(()=>{n+=2;p.textContent=full.slice(0,n);if(n>=full.length||!document.getElementById('lx')){clearInterval(iv);p.textContent=full;fc.classList.remove('talking')}},22)}}
+ function lxGo(){const S=LX_,el=document.getElementById('lx');if(!S||!el)return;const step=S.steps[S.i],X=LX[S.id];
+  if(step==='quiz'&&!S.checked){if(S.pick==null)return;S.checked=true;const ok=S.pick===0,fb=el.querySelector('.lx-fb'),go=el.querySelector('.lx-go');
+   el.querySelectorAll('.lx-o').forEach(b=>{const k=+b.dataset.k;b.disabled=true;if(ok&&k===0)b.classList.add('good');if(k===S.pick&&!ok)b.classList.add('bad')});
+   if(ok){fb.className='lx-fb good on';fb.innerHTML=`<b>✓ Nailed it!</b><span>${X.why}</span>`;go.textContent='CONTINUE';go.className='lx-go good';vib&&vib([20,30,40])}
+   else{fb.className='lx-fb bad on';fb.innerHTML=`<b>✕ Not quite</b><span>Have another go, boss.</span>`;go.textContent='TRY AGAIN';go.className='lx-go bad';S.retry=true;vib&&vib(40)}
+   return}
+  if(step==='quiz'&&S.retry){S.retry=false;S.checked=false;S.pick=null;return lxRender()}
+  if(step==='done'){const m=M();if(S.first&&!m.read[S.id]){m.read[S.id]=1;s.gems+=5;gemLog(5,'Business Book');save();upd();dot();toast(`+5 crystals for "${LI[S.id].t}"`,'good')}lxClose();return}
+  S.i++;lxRender()}
+ function lxClose(){const el=document.getElementById('lx');LX_=null;if(el){el.classList.remove('in');el.classList.add('out');setTimeout(()=>el.remove(),260)}rebook()}
  // the Business Book
  let openL=null;
  function bookBody(){const m=M(),got=LES.filter(l=>m.learned[l[0]]).sort((a,b)=>m.learned[a[0]]-m.learned[b[0]]),left=LES.filter(l=>!m.learned[l[0]]),n=got.length;
   if(openL)return lessonPage(openL);
   const row=l=>{const L=LI[l[0]],nu=!m.read[L.id];return`<button type="button" class="mbk-l" data-mact="lesson" data-l="${L.id}"><span class="no">${L.i+1}</span><span class="tx"><b>${L.t}</b><small>${nu?'New lesson · quiz pays 5 crystals':'Quiz passed ✓'}</small></span>${nu?`<span class="new">+5 ${GEM}</span>`:`<span class="chev">›</span>`}</button>`};
   return`<div class="mbk"><div class="mbk-hd"><span class="mbk-f">${F('n')}</span><span class="mbk-p"><b>${n} of ${LES.length} lessons learned</b><span class="bar"><i style="width:${Math.round(n/LES.length*100)}%"></i></span><small>${unread()?`${unread()} new · pass a lesson's quiz for 5 crystals`:'Pass a lesson\'s quiz for 5 crystals'}</small></span></div>
-  ${n?`<div class="mbk-s">LEARNED</div>${got.map(row).join('')}`:''}${bookRules()}${left.length?`<div class="mbk-s">STILL TO LEARN</div>${left.map(l=>`<div class="mbk-l lock"><span class="no">${LI[l[0]].i+1}</span><span class="tx"><b>???</b><small>Unlocks when you: ${l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small></span></div>`).join('')}`:''}</div>`}
- function openBook(id){openL=id||null;quizPick=quizWrong=null;hidePeek();if(box)close(true);sheet('Business Book',bookBody(),'book')}
+  ${bookPath()}${bookRules()}</div>`}
+ function openBook(id){openL=null;quizPick=quizWrong=null;hidePeek();if(box)close(true);sheet('Business Book',bookBody(),'book');if(id)openLesson(id)}
  let bookY=0;function rebook(top){const sb=document.getElementById('sb');if(sb&&ovKind==='book'){const y=sb.scrollTop;sb.innerHTML=bookBody();sb.scrollTop=top==='top'?0:top==='list'?bookY:y}}
 
  // settings row (separate from phone notifications)
@@ -3555,7 +3658,10 @@ const Mentor=(()=>{
 
  document.addEventListener('click',e=>{const el=e.target.closest('[data-mact]');if(!el)return;const a=el.dataset.mact;
   if(a==='book')openBook();
-  else if(a==='lesson'){const sb=document.getElementById('sb');bookY=sb?sb.scrollTop:0;openL=el.dataset.l;quizPick=quizWrong=null;rebook('top')}
+  else if(a==='lesson'){openLesson(el.dataset.l)}
+  else if(a==='lxgo')lxGo();
+  else if(a==='lxclose')lxClose();
+  else if(a==='lxpick'){if(!LX_||LX_.checked)return;LX_.pick=+el.dataset.k;document.querySelectorAll('#lx .lx-o').forEach(b=>b.classList.toggle('sel',+b.dataset.k===LX_.pick));const g=document.querySelector('#lx .lx-go');if(g)g.disabled=false}
   else if(a==='lback'){openL=null;quizPick=quizWrong=null;rebook('list')}
   else if(a==='quiz'){const id=el.dataset.l,k=+el.dataset.k,m=M();if(m.read[id])return;
    if(k===0){quizPick=0;quizWrong=null;m.read[id]=1;s.gems+=5;gemLog(5,'Business Book');save();vib&&vib([20,30,40]);rebook();upd();dot();
@@ -3629,7 +3735,7 @@ const Mentor=(()=>{
   {text:'Tap Claim',at:'#claimBtn',done:()=>s.freeAt>now(),back:()=>!document.getElementById('claimBtn')&&s.freeAt<=now()?'gift':null},
   {say:["Everything I teach you goes in your Business Book.","Pass a lesson's quick quiz to earn 5 crystals. Tap the book to have a look."],e:'proud',point:'#bookTool'},
   {go:'book',text:'Open your Business Book',at:'#bookTool',done:()=>ovKind==='book'},
-  {text:'Open a lesson and pass its quiz',at:()=>{if(document.querySelector('.lp'))return document.querySelector('.lq-o:not([disabled])')?document.querySelector('.lq-q'):document.querySelector('.lp-back');return document.querySelector('.mbk-l .new')?.closest('.mbk-l')||document.querySelector('.sheet-h [data-act=close]')},done:()=>ovKind!=='book'||Object.keys(M().read).length>0&&!document.querySelector('.lp')&&!!document.querySelector('.mbk')&&(M().tutRead=1)},
+  {text:'Tap your first lesson',at:()=>document.querySelector('#lx .lx-o:not([disabled])')&&!document.querySelector('#lx .lx-go:not([disabled])')?document.querySelector('#lx .lx-opts'):document.querySelector('#lx .lx-go:not([disabled])')||document.querySelector('.lpath .node.cur')||document.querySelector('.lpath .node.new'),done:()=>Object.keys(M().read).length>0&&!document.getElementById('lx')},
   {text:'Close the book',at:'.sheet-h [data-act=close]',done:()=>ovKind!=='book'},
   {say:["That's the basics, boss! Buy more businesses, keep your threat low and collect often.","I'll pop up at the big moments. Now go build that empire."],e:'happy'}];
  let tutOn=-1;
