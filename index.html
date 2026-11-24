@@ -8,6 +8,21 @@
 .vall{display:block;width:calc(100% - 24px);margin:4px 12px 10px;background:#fff;border:2px solid #D9A23A;color:#8A5A00;font:900 13px Montserrat,sans-serif;letter-spacing:.6px;padding:12px;text-transform:uppercase}
 .dark .vall{background:#2E2614;color:#F5C451}
 .vrate{font-size:13px;font-weight:900;color:#2E7D32;margin-top:2px}.vrate span{color:#C98F1E}.dark .vrate{color:#7EDB6F}
+
+/* world map at night */
+.dark #mapscr{background:radial-gradient(120% 70% at 50% 45%,#2A3550 0%,#18203A 55%,#0D1224 100%)}
+.dark #mapscr:before{background:repeating-conic-gradient(from 0deg,rgba(160,190,255,.10) 0deg 9deg,rgba(160,190,255,0) 9deg 22.5deg)}
+.mstars,.mmoon{display:none}
+.dark .mstars{display:block;position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 28% 8%,#fff,transparent),radial-gradient(1.8px 1.8px at 46% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 64% 12%,#fff,transparent),radial-gradient(1.6px 1.6px at 83% 26%,#fff,transparent),radial-gradient(1.2px 1.2px at 92% 9%,#fff,transparent),radial-gradient(1.4px 1.4px at 8% 40%,#fff,transparent),radial-gradient(1.2px 1.2px at 94% 44%,#fff,transparent),radial-gradient(1.4px 1.4px at 20% 78%,#fff,transparent),radial-gradient(1.2px 1.2px at 78% 82%,#fff,transparent),radial-gradient(1.6px 1.6px at 55% 90%,#fff,transparent),radial-gradient(1.2px 1.2px at 36% 64%,#fff8,transparent),radial-gradient(1.2px 1.2px at 70% 60%,#fff8,transparent);animation:mtwinkle 3.5s ease-in-out infinite alternate}
+@keyframes mtwinkle{to{opacity:.55}}
+.dark .mmoon{display:block;position:absolute;right:13%;top:calc(env(safe-area-inset-top,0px) + 150px);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF8DC,#F3E3A8 60%,#D9C27A);box-shadow:0 0 30px 8px #FFF3C455;pointer-events:none}
+.dark .mslide:not(:has(.art)){filter:brightness(.66) saturate(1.15) hue-rotate(-14deg)}
+.dark .mslide.on:not(:has(.art)){filter:brightness(.78) saturate(1.15) hue-rotate(-14deg) drop-shadow(0 0 26px #FFD86A40)}
+.dio.art .mart{width:100%;height:100%;object-fit:contain}
+.dark .mback,.dark .marrow,.dark .mlock,.dark .mbar,.dark .mgo.locked{background:#1E2728;border-color:#0B0F10;box-shadow:0 4px 0 #0B0F10}
+.dark .mback svg,.dark .marrow svg,.dark .mlock svg{stroke:#EEF1EE}
+.dark .mbar span,.dark .mgo.locked{color:#EEF1EE}.dark .mbar.lock i{background:#3A4647}
+.dark .mdots i{background:#3A4660}.dark .mdots i.on{background:#EEF1EE}
 </style><style>/* ===== mentor: Mr Tycoon ===== */
 .mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
 .mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
@@ -1633,7 +1648,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112419,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112420,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2379,6 +2394,7 @@ const DKEY='trillionaire.dark',NIGHT_FROM=19,NIGHT_TO=7;let lookMode='auto';try{
 const isNight=()=>{const h=new Date().getHours();return h>=NIGHT_FROM||h<NIGHT_TO};
 let darkOn=lookMode==='dark'||(lookMode==='auto'&&isNight());
 function applyDark(){darkOn=lookMode==='dark'||(lookMode==='auto'&&isNight());const R=document.documentElement,was=R.classList.contains('dark');R.classList.toggle('dark',darkOn);
+ if(was!==darkOn)document.querySelectorAll('[data-night]').forEach(el=>{const u=darkOn?el.dataset.night:el.dataset.day;if(el.tagName==='IMG')el.src=u;else el.setAttribute('href',u)});
  if(was!==darkOn)document.querySelectorAll('image[href^="img/"],img[src^="img/"]').forEach(el=>{const a=el.tagName.toLowerCase()==='img'?'src':'href',u=el.getAttribute(a),m=u.match(/^img\/([a-z0-9]+)(-n)?\.webp$/);if(m&&BIMG_N[m[1]])el.setAttribute(a,bimgUrl(m[1]))})}
 applyDark();setInterval(()=>{if(lookMode==='auto')applyDark()},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lookMode==='auto')applyDark()});
 const BOSS_SVG='<svg viewBox="0 0 20 20" shape-rendering="crispEdges"><rect width="20" height="20" fill="#3DA62F"/><rect x="6" y="3" width="8" height="8" fill="#F2C99A"/><rect x="6" y="3" width="8" height="2" fill="#5A3B22"/><rect x="7" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="6" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="9" width="4" height="1" fill="#B85C3A"/><rect x="4" y="12" width="12" height="8" fill="#2C7526"/><rect x="9" y="12" width="2" height="6" fill="#F5B946"/></svg>';
@@ -4550,6 +4566,10 @@ function worldLand(w,locked){mDim=locked?.62:0;let h='';const L=170,base=26;
  return`<div class="land">${h}</div>`}
 const LOCKSVG='<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 let mapIdx=0;
+// day/night pictures: dn('img/x.webp','img/x-n.webp') draws the right one now and swaps it when day turns to night
+const dn=(day,night,cls='',alt='')=>`<img class="${cls}" src="${darkOn?night:day}" data-day="${day}" data-night="${night}" alt="${alt}" draggable="false">`;
+// painted world art for the map: add a world's id here once img/map/<id>.webp and img/map/<id>-n.webp are uploaded
+const MAP_ART={};
 function travel(w){if(!worldOpen(w))return;plotSel=null;const o=cur();s.wlast=s.wlast||{};if(o)s.wlast[s.world|0]=o.bid;s.world=w;s.wseen=Math.max(s.wseen|0,w);
  const want=s.wlast[w];let i=s.owned.findIndex(x=>x.bid===want);if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w&&!isGood(x));if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w);if(i>=0)s.cur=i;
  paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
@@ -4561,9 +4581,9 @@ function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter
  if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`,pct:own/bs.length};
  return{locked:1,label:`$${money(n)} / $${money(w.need)}`,pct:Math.min(1,n/w.need)}}
 function openMap(){mapIdx=s.world|0;let el=$('mapscr');if(!el){el=document.createElement('div');el.id='mapscr';$('app').appendChild(el)}
- el.innerHTML=`<button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+ el.innerHTML=`<div class="mstars" aria-hidden="true"></div><div class="mmoon" aria-hidden="true"></div><button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
  <div class="mhead"><h2 id="mName"></h2><div class="mbar" id="mBar"><i></i><span></span></div></div>
- <div class="mtrack" id="mTrack">${WORLDS.map((w,i)=>{const lk=!!worldState(w,i).locked;return`<div class="mslide${lk?' locked':''}" data-i="${i}"><div class="dio">${worldLand(w,lk)}</div>${lk?`<div class="mlock">${LOCKSVG}</div>`:''}</div>`}).join('')}</div>
+ <div class="mtrack" id="mTrack">${WORLDS.map((w,i)=>{const lk=!!worldState(w,i).locked;return`<div class="mslide${lk?' locked':''}" data-i="${i}"><div class="dio${MAP_ART[w.id]?' art':''}">${MAP_ART[w.id]?dn(`img/map/${w.id}.webp`,`img/map/${w.id}-n.webp`,'mart'):worldLand(w,lk)}</div>${lk?`<div class="mlock">${LOCKSVG}</div>`:''}</div>`}).join('')}</div>
  <button class="marrow l" data-act="mapprev" aria-label="Previous world"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="marrow r" data-act="mapnext" aria-label="Next world"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
  <div class="mfoot"><button class="mgo" id="mGo" data-act="mapgo"></button><div class="mdots" id="mDots">${WORLDS.map(()=>'<i></i>').join('')}</div></div>`;
  el.hidden=false;const tr=$('mTrack');
