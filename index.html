@@ -120,6 +120,47 @@
 .mbk-r .rn{flex:none;min-width:34px;font-weight:900;font-size:13px;color:#8A5A00}.mbk-r b{font-size:14px;font-weight:800;line-height:1.35}
 .mbk-r.lock{background:#E4E7E5;border:3px dashed #9AA39D;color:#4A5250;font-size:12.5px;font-weight:700}.mbk-r.lock .rn{color:#5E6662}
 .dark .mbk-r{background:#2E2614;color:#EEF1EE}.dark .mbk-r.lock{background:#161D1E;color:#A9B2AD}
+/* mock-up: vault raid */
+#raidfx{position:absolute;inset:0;z-index:70;display:grid;place-items:center;background:#160A0AF5;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;font-family:Montserrat,sans-serif;overflow:hidden}
+#raidfx.in{opacity:1}#raidfx.out{opacity:0}
+.rf-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#FF3B3B55,transparent 65%);animation:rfflash .5s steps(2) 6}
+@keyframes rfflash{50%{opacity:0}}
+.rf-sir{position:absolute;top:-60px;width:220px;height:220px;border-radius:50%;filter:blur(30px);animation:rfsir 1s ease-in-out infinite alternate}
+.rf-sir.l{left:-80px;background:#FF2E2E}.rf-sir.r{right:-80px;background:#2E6BFF;animation-delay:.5s}
+@keyframes rfsir{from{opacity:.2}to{opacity:.85}}
+.rf-in{position:relative;width:min(88%,360px);display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;gap:8px}
+.rf-tag{background:#E23B2E;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:6px 14px;font-weight:900;letter-spacing:2px;font-size:14px;animation:rfpop .4s cubic-bezier(.2,.9,.25,1.4)}
+@keyframes rfpop{from{transform:scale(.3)}}
+.rf-vault{position:relative;width:180px;height:144px;margin:18px 0 6px}
+.rf-art{width:100%;height:100%;animation:rfshake .5s ease-in-out .2s 3}.rf-art svg{width:100%;height:100%}
+@keyframes rfshake{20%{transform:translate(-6px,2px) rotate(-3deg)}40%{transform:translate(6px,-2px) rotate(3deg)}60%{transform:translate(-4px,1px) rotate(-2deg)}80%{transform:translate(4px,0) rotate(2deg)}}
+.rb{position:absolute;left:50%;top:55%;width:30px;height:14px;margin:-7px 0 0 -15px;background:linear-gradient(#FFE58A,#E0A322);clip-path:polygon(14% 0,86% 0,100% 100%,0 100%);opacity:0;animation:rbfly 1.1s cubic-bezier(.2,.7,.4,1) forwards}
+@keyframes rbfly{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(.7)}}
+.rf-in h2{margin:4px 0 0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:30px;line-height:1.05}
+.rf-in p{margin:0;font-size:14px;font-weight:700;opacity:.85;line-height:1.4}
+.rf-loss{display:flex;align-items:center;gap:8px;margin-top:6px;background:#2A1414;border:3px solid #E23B2E;padding:8px 14px}
+.rf-loss b{font-size:30px;font-weight:900;color:#FF8A73}.rf-loss span{font-size:13px;font-weight:800;color:#FFC9BF}.rf-loss .gbar{transform:scale(1.4)}
+.rf-in small{font-size:12px;font-weight:800;opacity:.7}
+.rf-ok{margin-top:10px;width:100%;background:#F5B946;color:#3A2604;border:0;box-shadow:0 5px 0 #A8741A;padding:15px;font:900 16px Montserrat,sans-serif;letter-spacing:1px;text-transform:uppercase}
+
+#lockfx{position:absolute;inset:0;z-index:70;display:grid;place-items:center;background:#160A0AF5;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;font-family:Montserrat,sans-serif;overflow:hidden;color:#fff}
+#lockfx.in{opacity:1}#lockfx.out{opacity:0}#lockfx.won .rf-sir,#lockfx.won .rf-flash{display:none}#lockfx.won{background:#0F2A14F5}
+.lk-in{position:relative;width:min(88%,360px);display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.lk-sub{margin:0;font-size:14px;font-weight:800;line-height:1.4;opacity:.9}
+.lk-door{position:relative;width:230px;height:230px;margin:6px 0}.lk-door svg{width:100%;height:100%;filter:drop-shadow(0 6px 0 #0008)}
+.lk-door.miss{animation:rfshake .35s}
+.lk-bolts{position:absolute;right:-26px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px}
+.lk-b{display:block;width:34px;height:16px;background:#3A2A14;border:3px solid #1E1E1E;transform:translateX(18px);transition:transform .25s cubic-bezier(.2,.9,.3,1.4),background .2s}
+.lk-b.on{transform:none;background:#F5B946}
+.lk-time{width:100%;height:12px;background:#3A1A1A;border:3px solid #1E1E1E}.lk-time i{display:block;height:100%;background:#FF6B57;width:100%}
+.lk-tap{width:100%;background:#5BE36B;color:#0B3313;border:0;box-shadow:0 6px 0 #1F8A2E;padding:18px;font:900 22px Montserrat,sans-serif;letter-spacing:3px}
+.lk-tap{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}.lk-tap:active{transform:none}.lk-tap.press{transform:translateY(4px);box-shadow:0 2px 0 #1F8A2E}
+.lk-hint{font-size:13px;font-weight:800;opacity:.8}
+.rf-tag.ok{background:#3FA34D}.lk-safe{width:150px;height:120px;margin:12px 0}.lk-safe svg{width:100%;height:100%}
+#lockfx h2{margin:4px 0 0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:28px;line-height:1.1}#lockfx p{margin:0;font-size:14px;font-weight:700;opacity:.85}
+
+.lk-how{display:flex;gap:10px;align-items:flex-end;background:#fff;color:#1E1E1E;border:3px solid #1E1E1E;box-shadow:0 4px 0 #1E1E1E;padding:10px 12px;text-align:left;margin-top:4px}
+.lk-how p{margin:0;font-size:13.5px;font-weight:800;line-height:1.4;opacity:1}.lk-f{width:48px;height:58px;flex:none}.lk-f img{width:100%;height:100%;object-fit:contain}
 </style></head><body><title>Trillionaire Tycoon</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1517,7 +1558,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112412,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112414,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1729,7 +1770,10 @@ const threatAt=c=>{const b=threatBase(),h=heatAt(c);return Math.max(0,(h>0?Math.
 function sentence(th,n){let row=BUSTED[0];for(const r of BUSTED)if(n>=r[0])row=r;const sev=th<20?'low':th<50?'mid':'high';return{sev,sec:sev==='low'?row[1]:sev==='mid'?row[2]:row[3],row}}
 function bustPlan(horizon=3*864e5){if(nw()<BUSTED[0][0])return null;const n=nw(),t=now();const jailEnd=s.jail?s.jail.until:0;let quiet=s.jail?s.jail.until+COOL:(s.coolUntil||0),cards=s.perks.jail||0;
  const sim=s.owned.map(o=>({b:B[o.bid],level:o.level,up:o.busy==='up'?o.end:0,bld:gcBuilding(o)?o.end:0}));
- for(let c=s.nextCheck;c<t+horizon;c+=30000){if(c<jailEnd||c<quiet)continue;
+ for(let c=s.nextCheck;c<t+horizon;c+=30000){
+  // a shady deal can get you caught too (cool-down or not, like the live check): plan it so the phone notification arrives on time
+  if(c>=jailEnd&&(s.deals||[]).some(d=>c>=d.start&&c<d.end)){const dd=dealBust(c);if(dd&&!(cards>0&&c<(s.mgrUntil||0))){const ms=Math.min(JAIL_MAX,Math.max(30000,2*(dd.end-c)));return{at:c,until:c+ms,sec:Math.round(ms/1000),loss:false,deal:dd.who}}}
+  if(c<jailEnd||c<quiet)continue;
   const th=Math.max(0,sim.reduce((a,o)=>a+(o.bld&&c<o.bld?0:thrAt(o.b,o.level+(o.up&&c>=o.up?1:0))),0)-(c<(s.cleanUntil||0)?20:0));
   if(!caught(th,c))continue;
   if(cards>0&&c<(s.mgrUntil||0)){cards--;quiet=c+COOL;continue}
@@ -3263,7 +3307,7 @@ return{open,openPlaque,count,isOpen:()=>!!host&&host.style.display!=='none'};
 // and files every lesson in the Business Book. Separate from phone notifications.
 const Mentor=(()=>{
  const MDIR='mentor/v1/',FACES={n:'n',talk:'n',happy:'happy',worried:'worried',thinking:'thinking',surprised:'surprised',wink:'wink',proud:'proud'};
- const F=e=>`<img src="${MDIR}${FACES[e]||'n'}.webp" alt="" draggable="false">`;
+ const F=e=>`<img src="${MDIR}${FACES[e]||'n'}.webp" alt="" draggable="false">`;window.MDIR_=MDIR;
  // warm the cache so faces swap instantly
  Object.values(FACES).forEach(f=>{const i=new Image();i.src=MDIR+f+'.webp'});
 
@@ -3596,7 +3640,52 @@ const Mentor=(()=>{
   if(st_.done()){return tutGo(i+1)}
   if(st_.back){const g=st_.back();if(g){const j=TUT.findIndex(x=>x.go===g);if(j>=0&&j<i)return tutGo(j)}}}
 
- return{check,moment,openBook,show,tipNow,showPeek,_tgt:()=>hand&&(typeof hand.sel==="function"?hand.sel():document.querySelector(hand.sel)),_step:()=>M().tut}})();
+ return{check,moment,openBook,show,tipNow,showPeek,point,unpoint,_tgt:()=>hand&&(typeof hand.sel==="function"?hand.sel():document.querySelector(hand.sel)),_step:()=>M().tut}})();
+
+/* ===== mock-up: gold vault raids during shady deals (prototype only) ===== */
+const Raid=(()=>{
+ const MIN_TH=50,MAX_P=.25,MAX_TAKE=150;
+ const chanceAt=th=>th<=MIN_TH?0:Math.min(MAX_P,(th-MIN_TH)/200);
+ const takeOf=g=>Math.max(1,Math.min(MAX_TAKE,Math.round(g*(.03+Math.random()*.03))));
+ const gold=()=>Math.floor(s.gold||0);
+ // the deal card gets a vault-raid row once you have gold
+ const _card=dealCard;dealCard=function(d,th,live){let h=_card.apply(this,arguments);if(!gold())return h;
+  const after=live?Math.round(threatRaw()-(cleanOn()?20:0)):Math.max(0,Math.round(threatRaw()-(cleanOn()?20:0)))+d.add,p=chanceAt(after);
+  const row=`<div><span>Vault raid</span><b style="color:${p?'#F5B946':'#8E9893'}">${p?`${Math.round(p*100)}% · up to 6% of gold`:`Safe under ${MIN_TH}% threat`}</b></div>`;
+  return h.replace('<div><span>If caught</span>',row+'<div><span>If caught</span>')};
+ // when you say yes, the dice are rolled once: a raid may happen at a random moment while the deal runs
+ const _yes=dealYes;dealYes=function(){const before=(s.deals||[]).length;_yes.apply(this,arguments);const d=(s.deals||[])[s.deals.length-1];if(!d||s.deals.length===before)return;
+  const th=Math.round(threatRaw()-(cleanOn()?20:0)),p=chanceAt(th);if(gold()&&Math.random()<p){d.raidAt=d.start+Math.random()*(d.end-d.start)*.9;save()}};
+ // a raid is its own thing (not jail): it waits until you're in the game, then you get one go at locking the vault
+ setInterval(()=>{if(typeof s==='undefined'||!s)return;const t=now();
+  // never both: getting arrested calls off any raid, and no raid starts while you're in jail
+  if(s.jail){let ch=false;for(const d of s.deals||[])if(d.raidAt&&!d.raided){d.raided=1;ch=true}if(s.raidPending){s.raidPending=null;ch=true}if(ch)save();return}for(const d of s.deals||[]){if(d.raidAt&&!d.raided&&t>=d.raidAt){d.raided=1;s.raidPending={at:t,who:d.who};save()}}
+  if(s.raidPending&&!ovKind&&!document.getElementById('raidfx')&&!document.getElementById('lockfx')&&!document.getElementById('mhero')&&!document.getElementById('mentor'))lockGame()},1000);
+ function lockGame(){const pend=s.raidPending;if(!pend)return;const el=document.createElement('div');el.id='lockfx';const LOCKS=3,TIME=20,first=!s.raidSeen;let got=0,ang=0,spd=first?80:110,zone=0,width=50,dead=false,t0=0,last=0,raf=0,practice=first;
+  const newZone=()=>{zone=(ang+120+Math.random()*180)%360};newZone();
+  el.innerHTML=`<div class="rf-flash"></div><div class="rf-sir l"></div><div class="rf-sir r"></div><div class="lk-in"><div class="rf-tag">🚨 THIEVES AT THE VAULT 🚨</div><p class="lk-sub">${esc(pend.who||'Someone')}'s deal tipped them off. Lock all 3 bolts before they get in!</p>
+   <div class="lk-door"><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96" fill="#5A4426"/><circle cx="100" cy="100" r="84" fill="#8A6A3A"/><circle cx="100" cy="100" r="70" fill="#C9A35A"/><path class="lk-zone" fill="none" stroke="#5BE36B" stroke-width="16"/><circle cx="100" cy="100" r="30" fill="#7A5A2A"/><g class="lk-needle"><rect x="96" y="22" width="8" height="58" rx="4" fill="#1E1E1E"/><circle cx="100" cy="100" r="12" fill="#1E1E1E"/></g></svg>
+   <div class="lk-bolts">${[0,1,2].map(i=>`<i class="lk-b" data-i="${i}"></i>`).join('')}</div></div>
+   <div class="lk-time"><i></i></div><button type="button" class="lk-tap">LOCK</button><small class="lk-hint">${first?'Practice first: the timer starts after your first bolt':'Tap LOCK when the needle is in the green'}</small>${first?`<div class="lk-how"><span class="lk-f">${typeof Mentor!=='undefined'?'<img src="'+(window.MDIR_||'mentor/')+'worried.webp" alt="">':''}</span><p><b>Quick, boss!</b> Watch the needle. When it's inside the <b style="color:#5BE36B">green</b>, tap <b>LOCK</b> to slide a bolt shut. Lock all 3 before the time runs out and they get nothing.</p></div>`:''}</div>`;
+  (document.getElementById('app')||document.body).appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));vib&&vib([80,60,80]);
+  const needle=el.querySelector('.lk-needle'),zp=el.querySelector('.lk-zone'),bar=el.querySelector('.lk-time i'),hint=el.querySelector('.lk-hint');
+  const arc=()=>{const a0=(zone-width/2-90)*Math.PI/180,a1=(zone+width/2-90)*Math.PI/180,r=70-8;zp.setAttribute('d',`M${100+r*Math.cos(a0)} ${100+r*Math.sin(a0)} A${r} ${r} 0 0 1 ${100+r*Math.cos(a1)} ${100+r*Math.sin(a1)}`)};arc();
+  const inZone=()=>{let d=Math.abs(((ang-zone)%360+540)%360-180);return d<=width/2+4};
+  const end=ok=>{if(dead)return;dead=true;cancelAnimationFrame(raf);s.raidPending=null;save();
+   if(ok){el.classList.add('won');el.querySelector('.lk-in').innerHTML=`<div class="rf-tag ok">🔒 VAULT LOCKED</div><div class="rf-art lk-safe">${VAULT_ART}</div><h2>The crooks ran off empty-handed!</h2><p>All ${Math.floor(s.gold||0).toLocaleString('en-US')} gold is still safe in the vault.</p><button type="button" class="rf-ok">Phew</button>`;vib&&vib(30);el.querySelector('.rf-ok').onclick=()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)}}
+   else{el.remove();play(takeOf(gold()))}};
+  const loop=ts=>{if(dead)return;if(!last)last=ts;if(practice){t0=ts}else if(!t0)t0=ts;const dt=(ts-last)/1000;last=ts;ang=(ang+spd*dt)%360;needle.setAttribute('transform',`rotate(${ang} 100 100)`);
+   const left=Math.max(0,1-(ts-t0)/(TIME*1000));bar.style.width=(left*100)+'%';if(left<=0)return end(false);raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop);
+  let lockUntil=0;if(first&&typeof Mentor!=='undefined'&&Mentor.point)setTimeout(()=>Mentor.point('#lockfx .lk-tap',null),350);
+  const tap=el.querySelector('.lk-tap');tap.addEventListener('pointerdown',e=>{e.preventDefault();tap.classList.add('press');setTimeout(()=>tap.classList.remove('press'),120);press()});
+  const press=()=>{if(dead||performance.now()<lockUntil)return;if(inZone()){if(practice){practice=false;s.raidSeen=1;save();if(typeof Mentor!=='undefined')Mentor.unpoint();const h=el.querySelector('.lk-how');if(h)h.remove()}el.querySelector(`.lk-b[data-i="${got}"]`).classList.add('on');got++;vib&&vib(20);if(got>=LOCKS)return end(true);spd*=1.3;width=Math.max(32,width-6);newZone();arc();hint.textContent=`${LOCKS-got} more to go!`}
+   else{el.querySelector('.lk-door').classList.remove('miss');void el.offsetWidth;el.querySelector('.lk-door').classList.add('miss');vib&&vib(60);if(!practice)t0-=1000;lockUntil=performance.now()+350;hint.textContent=practice?'Not quite. Wait until the needle is in the green':'Missed! −1 second. Wait for the green'}}}
+ function play(n){if(!n)return;s.gold=Math.max(0,(s.gold||0)-n);s.lastRaidG={n,at:now()};save();hud&&hud();vib&&vib([60,40,60,40,120]);
+  const el=document.createElement('div');el.id='raidfx';let bars='';for(let i=0;i<14;i++){const a=(-160+Math.random()*140)*Math.PI/180,r=180+Math.random()*160;bars+=`<i class="rb" style="--x:${Math.round(Math.cos(a)*r)}px;--y:${Math.round(Math.sin(a)*r)}px;--r:${Math.round(Math.random()*540-270)}deg;animation-delay:${(.5+i*.07).toFixed(2)}s"></i>`}
+  el.innerHTML=`<div class="rf-flash"></div><div class="rf-sir l"></div><div class="rf-sir r"></div><div class="rf-in"><div class="rf-tag">🚨 VAULT RAID 🚨</div><div class="rf-vault"><div class="rf-art">${VAULT_ART}</div>${bars}</div><h2>They got in!</h2><p>The bolts didn't hold. The crooks grabbed what they could and ran.</p><div class="rf-loss"><i class="gbar"></i><b class="num">−${n.toLocaleString('en-US')}</b><span>gold stolen</span></div><small>${gold().toLocaleString('en-US')} gold left in the vault</small><button type="button" class="rf-ok">Lock it up</button></div>`;
+  (document.getElementById('app')||document.body).appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));
+  el.querySelector('.rf-ok').onclick=()=>{el.classList.add('out');setTimeout(()=>el.remove(),350)}}
+ return{play,chanceAt,lockGame,test:()=>{s.raidPending={at:now(),who:'Big Tony'};if(!(s.gold>0))s.gold=640;save()}}})();
 
 /* intro */
 // falling money like real paper: each bill drops at its own pace, drifts side to side and tilts into the drift, and flutters or tumbles as it goes
