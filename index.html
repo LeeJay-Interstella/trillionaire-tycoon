@@ -1633,7 +1633,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112418,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112419,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -4558,7 +4558,7 @@ function worldOpenDlg(w){mDim=0;dialog(`${WN[w]} is open!`,`<div class="pic">${'
 function buyLand(wi,pi){const w=wi==null?s.world|0:wi;if(!w||!worldOpen(w))return;if(s.jail)return jailNag();const i=pi==null||isNaN(pi)?nextPlot(w):pi;if(i<0||plotOwned(w,i))return;const p=plotPrice(w,i);if(s.cash<p)return toast(`You need ${$m(p-s.cash)} more`,'bad');
  s.cash-=p;ev('land',{world:w,price:Math.round(p)});s.landVal=(s.landVal||0)+p;plotSet(w).push(i);s.land[w]=landIn(w);vib(20);toast(`Plot ${i+1} in ${WN[w]} is yours`,'good');save();const sb=$('sb');if(sb&&ovKind==='shop'){const y=sb.scrollTop;sb.innerHTML=shopBody();sb.scrollTop=y}else if(landFromShop){const y=shopY;openShop();const s2=$('sb');if(s2)s2.scrollTop=y}else closeOv();if((s.world|0)===w)plotSel=i;stageSig='';upd()}
 function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter(o=>B[o.bid].w===i).length;
- if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`+(i?` · ${landIn(i)}/${plotsIn(i)} plots`:''),pct:own/bs.length};
+ if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`,pct:own/bs.length};
  return{locked:1,label:`$${money(n)} / $${money(w.need)}`,pct:Math.min(1,n/w.need)}}
 function openMap(){mapIdx=s.world|0;let el=$('mapscr');if(!el){el=document.createElement('div');el.id='mapscr';$('app').appendChild(el)}
  el.innerHTML=`<button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
