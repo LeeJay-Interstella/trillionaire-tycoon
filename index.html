@@ -11,7 +11,6 @@
 
 /* world map at night */
 .dark #mapscr{background:radial-gradient(120% 70% at 50% 45%,#2A3550 0%,#18203A 55%,#0D1224 100%)}
-.dark #mapscr:before{background:repeating-conic-gradient(from 0deg,rgba(160,190,255,.10) 0deg 9deg,rgba(160,190,255,0) 9deg 22.5deg)}
 .mstars,.mmoon{display:none}
 .dark .mstars{display:block;position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 28% 8%,#fff,transparent),radial-gradient(1.8px 1.8px at 46% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 64% 12%,#fff,transparent),radial-gradient(1.6px 1.6px at 83% 26%,#fff,transparent),radial-gradient(1.2px 1.2px at 92% 9%,#fff,transparent),radial-gradient(1.4px 1.4px at 8% 40%,#fff,transparent),radial-gradient(1.2px 1.2px at 94% 44%,#fff,transparent),radial-gradient(1.4px 1.4px at 20% 78%,#fff,transparent),radial-gradient(1.2px 1.2px at 78% 82%,#fff,transparent),radial-gradient(1.6px 1.6px at 55% 90%,#fff,transparent),radial-gradient(1.2px 1.2px at 36% 64%,#fff8,transparent),radial-gradient(1.2px 1.2px at 70% 60%,#fff8,transparent);animation:mtwinkle 3.5s ease-in-out infinite alternate}
 @keyframes mtwinkle{to{opacity:.55}}
@@ -23,6 +22,7 @@
 .dark .mback svg,.dark .marrow svg,.dark .mlock svg{stroke:#EEF1EE}
 .dark .mbar span,.dark .mgo.locked{color:#EEF1EE}.dark .mbar.lock i{background:#3A4647}
 .dark .mdots i{background:#3A4660}.dark .mdots i.on{background:#EEF1EE}
+#mapscr:before{display:none!important}
 </style><style>/* ===== mentor: Mr Tycoon ===== */
 .mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
 .mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
@@ -210,6 +210,26 @@
 .lx-stats div{min-width:120px;border:2px solid #F5B946;border-radius:16px;overflow:hidden;text-align:center}
 .lx-stats small{display:block;background:#F5B946;color:#fff;font-size:12px;font-weight:900;letter-spacing:1px;padding:5px}
 .lx-stats b{display:inline-flex;align-items:center;gap:5px;padding:12px;font-size:20px;font-weight:900;color:#F5A400}.lx-stats b svg{width:18px;height:18px}
+
+/* lesson intro: full-body Mr Tycoon */
+.lx-body:has(.lx-intro){padding:0}
+.lx-intro{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;overflow:hidden;background:radial-gradient(90% 60% at 50% 70%,#E9F9DF 0%,#fff 70%);min-height:100%}
+.dark .lx-intro{background:radial-gradient(90% 60% at 50% 70%,#1F3A26 0%,#131F24 70%)}
+.lx-coins{position:absolute;inset:0;pointer-events:none}
+.lx-coins i{position:absolute;top:-30px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE89A,#F5B946 60%,#C98F1E);box-shadow:inset 0 -2px 0 #A8741A;animation:lxcoin 3s linear infinite;opacity:.9}
+@keyframes lxcoin{to{transform:translateY(820px) rotate(540deg)}}
+.lx-badge{position:relative;margin-top:18px;display:flex;flex-direction:column;align-items:center;background:#58CC02;color:#fff;border-radius:18px;padding:6px 18px 8px;box-shadow:0 5px 0 #58A700;animation:lxdrop .5s cubic-bezier(.2,.9,.25,1.4) both}
+.lx-badge small{font-size:11px;font-weight:900;letter-spacing:2px}.lx-badge b{font-size:30px;font-weight:900;line-height:1}
+.lx-big{position:relative;margin:12px 16px 0;font-size:32px;font-weight:900;text-align:center;line-height:1.1;animation:lxdrop .5s .12s cubic-bezier(.2,.9,.25,1.4) both}
+@keyframes lxdrop{from{transform:translateY(-40px) scale(.8);opacity:0}}
+.lx-bub{position:relative;z-index:2;margin:16px 22px 0 auto;max-width:62%;background:#fff;border:2px solid #E5E8E6;border-radius:18px;padding:12px 14px;font-size:16px;font-weight:800;line-height:1.35;box-shadow:0 4px 0 #E5E8E6;animation:lxpopb .4s .7s cubic-bezier(.2,.9,.25,1.5) both}
+.lx-bub:after{content:"";position:absolute;left:26px;bottom:-11px;width:16px;height:16px;background:#fff;border-right:2px solid #E5E8E6;border-bottom:2px solid #E5E8E6;transform:rotate(45deg)}
+.dark .lx-bub,.dark .lx-bub:after{background:#1E2B30;border-color:#37464F}.dark .lx-bub{box-shadow:0 4px 0 #0B1216}
+@keyframes lxpopb{from{transform:scale(.3);opacity:0}}
+.lx-body-img{position:relative;z-index:1;margin-top:auto;height:min(52vh,430px);width:auto;max-width:90%;object-fit:contain;object-position:50% 100%;transform-origin:50% 100%;animation:lxrise .7s .25s cubic-bezier(.2,.9,.25,1.25) both,lxsway 3s 1.1s ease-in-out infinite;filter:drop-shadow(0 8px 0 #0002)}
+@keyframes lxrise{from{transform:translateY(110%)}}
+@keyframes lxsway{50%{transform:rotate(-2deg) translateY(-4px)}}
+.lx-floor{position:absolute;bottom:-30px;left:50%;width:260px;height:70px;margin-left:-130px;border-radius:50%;background:#58CC0233}
 /* mock-up: vault raid */
 #raidfx{position:absolute;inset:0;z-index:70;display:grid;place-items:center;background:#160A0AF5;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;transition:opacity .25s;font-family:Montserrat,sans-serif;overflow:hidden}
 #raidfx.in{opacity:1}#raidfx.out{opacity:0}
@@ -1648,7 +1668,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112420,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112422,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3633,13 +3653,17 @@ const Mentor=(()=>{
    return`<div class="lnode" style="transform:translateX(${x}px)">${cur?`<span class="lstart">START</span>`:''}<button type="button" class="node ${st_}${cur?' cur':''}" ${got?`data-mact="lesson" data-l="${L.id}"`:'disabled'} aria-label="Lesson ${i+1}: ${got?L.t:'locked'}">${st_==='done'?'<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>':st_==='lock'?'<svg viewBox="0 0 24 24"><rect x="6" y="10.5" width="12" height="9" rx="1.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>':`<b>${i+1}</b>`}</button><small>${got?L.t:'Unlocks when you '+l[2].charAt(0).toLowerCase()+l[2].slice(1)}</small>${st_==='new'?`<span class="lgem">+5 ${GEM}</span>`:''}</div>`}).join('')}</div>`}
  let LX_=null;
  function openLesson(id){const L=LI[id],X=LX[id],m=M();if(!L||!X)return;let you='';try{you=X.you()}catch(e){}
-  const ord=order(id,3),steps=['talk',...(you?['you']:[]),'real','quiz','done'];LX_={id,i:0,steps,pick:null,checked:false,ord,you,first:!m.read[id]};
+  const ord=order(id,3),steps=['intro','talk',...(you?['you']:[]),'real','quiz','done'];LX_={id,i:0,steps,pick:null,checked:false,ord,you,first:!m.read[id]};
   const el=document.createElement('div');el.id='lx';el.innerHTML=`<div class="lx-top"><button type="button" class="lx-x" data-mact="lxclose" aria-label="Close lesson">✕</button><div class="lx-bar"><i></i></div><span class="lx-gem">${LX_.first?`+5 ${GEM}`:''}</span></div><div class="lx-body"></div><div class="lx-foot"><div class="lx-fb"></div><button type="button" class="lx-go" data-mact="lxgo">CONTINUE</button></div>`;
   app().appendChild(el);requestAnimationFrame(()=>el.classList.add('in'));lxRender()}
  function lxRender(){const el=document.getElementById('lx');if(!el||!LX_)return;const S=LX_,L=LI[S.id],X=LX[S.id],step=S.steps[S.i],body=el.querySelector('.lx-body'),go=el.querySelector('.lx-go'),fb=el.querySelector('.lx-fb');
   el.querySelector('.lx-bar i').style.width=(S.i/(S.steps.length-1)*100)+'%';fb.className='lx-fb';fb.innerHTML='';go.className='lx-go';go.disabled=false;go.textContent='CONTINUE';
   let h='';
-  if(step==='talk')h=`<small class="lx-k">LESSON ${L.i+1} · NEW IDEA</small><h2 class="lx-t">${L.t}</h2><div class="lx-talk"><span class="lx-face">${F('n')}</span><p class="lx-say"></p></div>`;
+  if(step==='intro'){const lines=['Class is in session, boss!','Pull up a chair, boss.','Pop quiz incoming. Kidding. Mostly.','Time to get smarter and richer.','My favourite lesson, this one.'];
+   h=`<div class="lx-intro"><div class="lx-coins">${Array.from({length:12},(_,i)=>`<i style="left:${(i*37)%100}%;animation-delay:${(i*.27).toFixed(2)}s;animation-duration:${(2.6+(i%4)*.5).toFixed(1)}s"></i>`).join('')}</div>
+    <div class="lx-badge"><small>LESSON</small><b>${L.i+1}</b></div><h2 class="lx-big">${L.t}</h2><div class="lx-bub">${lines[(L.i*7)%lines.length]}</div>
+    <img class="lx-body-img" src="${MDIR}hero-body.webp" alt="Mr Tycoon" draggable="false"><div class="lx-floor"></div></div>`;go.textContent="LET'S GO!";go.classList.add('claim')}
+  else if(step==='talk')h=`<small class="lx-k">LESSON ${L.i+1} · NEW IDEA</small><h2 class="lx-t">${L.t}</h2><div class="lx-talk"><span class="lx-face">${F('n')}</span><p class="lx-say"></p></div>`;
   else if(step==='you')h=`<small class="lx-k">IN YOUR EMPIRE</small><h2 class="lx-t">How it shows up for you</h2><div class="lx-card you"><span class="lx-ic">📈</span><p>${S.you}</p></div><div class="lx-talk sm"><span class="lx-face">${F('happy')}</span><p>See? You're already doing it, boss.</p></div>`;
   else if(step==='real')h=`<small class="lx-k">IN THE REAL WORLD</small><h2 class="lx-t">It's not just a game</h2><div class="lx-card real"><span class="lx-ic">🌍</span><p>${X.real}</p></div><div class="lx-talk sm"><span class="lx-face">${F('wink')}</span><p>Same rules, bigger numbers.</p></div>`;
   else if(step==='quiz'){h=`<small class="lx-k">QUICK QUIZ</small><h2 class="lx-t">${X.q}</h2><div class="lx-opts">${S.ord.map((k,j)=>`<button type="button" class="lx-o${S.pick===k?' sel':''}${S.checked&&k===0&&S.pick===0?' good':''}${S.checked&&S.pick===k&&k!==0?' bad':''}" data-mact="lxpick" data-k="${k}"${S.checked?' disabled':''}><span>${'ABC'[j]}</span>${X.a[k]}</button>`).join('')}</div>`;
