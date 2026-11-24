@@ -1,4 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#3E9B37"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Trillionaire"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><script src="config.js"></script><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;height:100%}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+#dailyTool[hidden]{display:none!important}
+.tools #dailyTool{background:#EC4FA6;border-color:#FFD1EA;box-shadow:0 0 0 2px #EC4FA655,0 0 18px 4px #FF5DB8AA;animation:dcglow 1.6s ease-in-out infinite}
+#dailyTool .dot{display:none}
+@keyframes dcglow{50%{box-shadow:0 0 0 3px #EC4FA677,0 0 28px 8px #FF5DB8DD;transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.tools #dailyTool{animation:none}}
+.bstreak{margin:0 0 6px}.bstreak .dc-streak{border:2px solid #141A1B;box-shadow:0 3px 0 #141A1B}
 </style><style>/* ===== mentor: Mr Tycoon ===== */
 .mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
 .mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
@@ -1511,7 +1517,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112410,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112411,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1893,7 +1899,7 @@ function hud(){pmUI();dealUI();{const gt=$('goldT'),on=goldOn();if(gt){if(gt.hid
   if(on){const r=Math.ceil((s.boostUntil-t_)/1000);b.textContent=(s.boostX||2)+'X '+(r>=3600?dur(r):Math.floor(r/60)+':'+String(r%60).padStart(2,'0'))}else if(rec)b.textContent=dur(Math.ceil((s.boostReady-t_)/1000))}
  const cr=s.chestAt<=now();$('chestT').textContent=cr?'OPEN!':dur((s.chestAt-now())/1000);
  {const vn=Vault.count(),nv=$('nwv');if(nv){const t=vn?vn+' TO CLAIM':'';if(nv.textContent!==t)nv.textContent=t;nv.hidden=!vn;nv.classList.toggle('on',!!vn)}}
- $('dailyDot').hidden=!dcReady()||(CLOCK_GUARD&&!clockChecked);{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
+ $('dailyDot').hidden=!dcReady()||(CLOCK_GUARD&&!clockChecked);{const g=s.dc.got,p=g&&g.cards&&g.cards[g.pick],due=dcReady()||!!(p&&p.k==='mgr'&&g.spin===false),t=$('dailyTool');if(t.hidden===due)t.hidden=!due}{const n=perkCount(),d=$('perksDot');d.hidden=!n;d.textContent=n>9?'9+':n;$('perksTool').classList.toggle('glow',mgrOn()||cleanOn())}}
 
 /* ================= actions ================= */
 function jailNag(){toast("You can't buy or upgrade while on community service. Done in "+jdur((s.jail.until-now())/1000)+'.','bad')}
@@ -2280,6 +2286,7 @@ function bossBody(){return bossView==='acct'?acctView():bossView==='data'?dataVi
 function bossMain(){const pic=s.avatar?`<img src="${s.avatar}" alt="">`:BOSS_SVG,signed=cloudOn()&&cloudUser,nst=notifState(),ntx={unsupported:'Open from your Home Screen icon to use these',blocked:'Blocked in iPhone Settings',signin:'Sign in to turn these on',ask:'Off',on:'On'}[nst];
  return`<div class="bprof"><label class="bav" aria-label="Change profile picture">${pic}<input type="file" class="avf" accept="image/*" onchange="window.__avPick&&window.__avPick(this)"><span class="cam"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span></label><div class="who"><b>${esc(s.name||'Boss')}${s.tril?`<i class="tclub btag g" data-act="plaque" role="button" aria-label="Your Trillionaire badge">${s.tril.n?'T#'+s.tril.n:'T'}</i>`:''}</b><small>Net worth ${$m(nw())}</small><span class="lk"><label class="avl">${s.avatar?'Change photo':'Add photo'}<input type="file" class="avf" accept="image/*" onchange="window.__avPick&&window.__avPick(this)"></label>${s.avatar?'<button type="button" data-act="avdel">Remove</button>':''}</span></div></div>
  <div class="statgrid num"><div class="rl" data-act="ranks"><small>Rich list</small><b>#${myRank()}</b></div><div><small>Total earned</small><b>${$m(s.earned)}</b></div><div><small>Businesses</small><b>${s.owned.length} / ${B.length}</b></div><div><small>Arrests</small><b>${s.arrests}</b></div><div><small>Taps</small><b>${s.taps.toLocaleString()}</b></div><div><small>Playing for</small><b>${dur((now()-s.start)/1000)}</b></div></div>
+ <div class="bsec">Daily streak<span>${dcReady()?'Today\'s card is waiting':'Come back tomorrow'}</span></div><div class="bstreak">${streakHTML()}</div>
  <div class="bsec">My empire<span>${$m(income())}/min</span></div><div id="cAllW">${colAllBtn()}</div><div id="pfw">${pfBody()}</div>
  <div class="bsec">Account &amp; settings</div>
  <div class="sgrp">
@@ -2368,12 +2375,12 @@ function prizeCard(p,win,st){const f=prizeInfo(p);
  return`<div class="dc-win"><span class="dc-rar ${p.streak?'s':f.r}">${p.streak?'STREAK REWARD':f.r==='r'?'RARE':'COMMON'}</span>${PICON[p.k]}<b>${esc(f.n)}</b><p>${esc(f.d)}</p>${p.k==='mgr'?`<span class="dur">${p.v}-hour shift</span>`:p.k==='cash'||p.k==='gems'?`<span class="dur num">${p.k==='cash'?'+'+$m(p.v):'+'+p.v+' crystals'}</span>`:''}</div>`}
 const wbar=()=>{const n=perkCount();return`<button type="button" class="dc-wbar" data-act="perks">${PICON.cash}<div><b>Your perks</b><span>${n?n+' waiting in your wallet':'Nothing saved yet'}</span></div><span class="go">OPEN</span></button>`};
 function dailyBody(){
- if(dcReady()&&CLOCK_GUARD&&!clockChecked)return streakHTML()+`<div class="dc-h" style="padding:28px 20px"><b>Checking the time…</b><span>Your daily card needs the internet to confirm today's date. Connect, then open this again.</span></div>${wbar()}`;
+ if(dcReady()&&CLOCK_GUARD&&!clockChecked)return`<div class="dc-h" style="padding:28px 20px"><b>Checking the time…</b><span>Your daily card needs the internet to confirm today's date. Connect, then open this again.</span></div>${wbar()}`;
  if(dcReady()){const n=dcToday(),pos=(n-1)%7+1;
-  return streakHTML()+`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your 8-hour manager, plus a bonus`:'One card per day. Better odds the longer your streak.'}</span></div>
+  return`<div class="dc-h"><b>Pick a card</b><span>${pos===7?`Day 7: today's card is your 8-hour manager, plus a bonus`:'One card per day. Better odds the longer your streak.'}</span></div>
   <div class="dc-cards">${[0,1,2].map(i=>`<div class="dc-card" role="button" tabindex="0" aria-label="Card ${i+1}" data-act="dcpick" data-v="${i}"><div class="pat"></div><div class="q">?</div></div>`).join('')}</div>
   <div class="dc-hint">Could be cash, crystals, a jail-free card… or a manager</div>${wbar()}`}
- const g=s.dc.got;if(!g||!g.cards)return streakHTML()+`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
+ const g=s.dc.got;if(!g||!g.cards)return`<div class="dc-h"><b>See you tomorrow</b><span>Next daily chance in <span id="dcnext" class="num">${nextIn()}</span></span></div>${wbar()}`;
  const p=g.cards[g.pick],o=g.cards.filter((_,j)=>j!==g.pick),f=prizeInfo(p);
  const unspun=p.k==='mgr'&&g.spin===false;
  if(unspun&&p.streak)return`<div class="dc-h" style="padding-top:22px"><b>Streak reward!</b><span>An 8-hour manager, plus a bonus perk to spin for</span></div>
