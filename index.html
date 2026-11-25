@@ -14,7 +14,7 @@
 .mstars,.mmoon{display:none}
 .dark .mstars{display:block;position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.6px 1.6px at 12% 18%,#fff,transparent),radial-gradient(1.2px 1.2px at 28% 8%,#fff,transparent),radial-gradient(1.8px 1.8px at 46% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 64% 12%,#fff,transparent),radial-gradient(1.6px 1.6px at 83% 26%,#fff,transparent),radial-gradient(1.2px 1.2px at 92% 9%,#fff,transparent),radial-gradient(1.4px 1.4px at 8% 40%,#fff,transparent),radial-gradient(1.2px 1.2px at 94% 44%,#fff,transparent),radial-gradient(1.4px 1.4px at 20% 78%,#fff,transparent),radial-gradient(1.2px 1.2px at 78% 82%,#fff,transparent),radial-gradient(1.6px 1.6px at 55% 90%,#fff,transparent),radial-gradient(1.2px 1.2px at 36% 64%,#fff8,transparent),radial-gradient(1.2px 1.2px at 70% 60%,#fff8,transparent);animation:mtwinkle 3.5s ease-in-out infinite alternate}
 @keyframes mtwinkle{to{opacity:.55}}
-.dark .mmoon{display:block;position:absolute;right:13%;top:calc(env(safe-area-inset-top,0px) + 150px);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF8DC,#F3E3A8 60%,#D9C27A);box-shadow:0 0 30px 8px #FFF3C455;pointer-events:none}
+/* moon removed */.mmoon{display:none;position:absolute;right:13%;top:calc(env(safe-area-inset-top,0px) + 150px);width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFF8DC,#F3E3A8 60%,#D9C27A);box-shadow:0 0 30px 8px #FFF3C455;pointer-events:none}
 .dark .mslide:not(:has(.art)){filter:brightness(.66) saturate(1.15) hue-rotate(-14deg)}
 .dark .mslide.on:not(:has(.art)){filter:brightness(.78) saturate(1.15) hue-rotate(-14deg) drop-shadow(0 0 26px #FFD86A40)}
 .dio.art .mart{width:100%;height:100%;object-fit:contain}
@@ -1105,7 +1105,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
   #dealBtn{top:auto}
 }
 #mapscr{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;overflow:hidden;
-  background:radial-gradient(120% 70% at 50% 45%,#FBF9F4 0%,#ECE8DF 55%,#DCD7CC 100%);color:var(--ink)}
+  background:radial-gradient(120% 70% at 50% 45%,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 55%,rgba(60,40,30,.07) 100%),var(--mtint,#ECE8DF);transition:background-color .6s ease;color:var(--ink)}
 #mapscr[hidden]{display:none}
 #mapscr:before{content:'';position:absolute;left:50%;top:46%;width:900px;height:900px;margin:-450px 0 0 -450px;pointer-events:none;
   background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.55) 0deg 9deg,rgba(255,255,255,0) 9deg 22.5deg);
@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112430,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112431,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -4605,6 +4605,8 @@ let mapIdx=0;
 const dn=(day,night,cls='',alt='')=>`<img class="${cls}" src="${darkOn?night:day}" data-day="${day}" data-night="${night}" alt="${alt}" draggable="false">`;
 // painted world art for the map: add a world's id here once img/map/<id>.webp and img/map/<id>-n.webp are uploaded
 const MAP_ART={downtown:1,bullion:1,canyon:1};
+// daytime map background: a soft pastel taken from each island's art (Downtown's purple buildings, Bullion Bay's water, Diamond Canyon's rock)
+const MAP_TINT={downtown:'#E3D6EB',bullion:'#D0F1F1',canyon:'#F1D7D0'};
 function travel(w){if(!worldOpen(w))return;plotSel=null;const o=cur();s.wlast=s.wlast||{};if(o)s.wlast[s.world|0]=o.bid;s.world=w;s.wseen=Math.max(s.wseen|0,w);
  const want=s.wlast[w];let i=s.owned.findIndex(x=>x.bid===want);if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w&&!isGood(x));if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w);if(i>=0)s.cur=i;
  paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
@@ -4616,7 +4618,7 @@ function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter
  if(worldOpen(i))return{here:i===(s.world|0),open:1,label:`${own}/${bs.length} businesses`,pct:own/bs.length};
  return{locked:1,label:`$${money(n)} / $${money(w.need)}`,pct:Math.min(1,n/w.need)}}
 function openMap(){mapIdx=s.world|0;let el=$('mapscr');if(!el){el=document.createElement('div');el.id='mapscr';$('app').appendChild(el)}
- el.innerHTML=`<div class="mstars" aria-hidden="true"></div><div class="mmoon" aria-hidden="true"></div><button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+ el.innerHTML=`<div class="mstars" aria-hidden="true"></div><button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
  <div class="mhead"><h2 id="mName"></h2><div class="mbar" id="mBar"><i></i><span></span></div></div>
  <div class="mtrack" id="mTrack"><div class="mrail" id="mRail">${WORLDS.map((w,i)=>{const lk=!!worldState(w,i).locked;return`<div class="mslide${lk?' locked':''}" data-i="${i}"><div class="dio${MAP_ART[w.id]?' art':''}">${MAP_ART[w.id]?dn(`img/map/${w.id}.webp`,`img/map/${w.id}-n.webp`,'mart'):worldLand(w,lk)}</div>${lk?`<div class="mlock">${LOCKSVG}</div>`:''}</div>`}).join('')}</div></div>
  <button class="marrow l" data-act="mapprev" aria-label="Previous world"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="marrow r" data-act="mapnext" aria-label="Next world"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
@@ -4641,7 +4643,7 @@ function mapDrag(tr){let id=null,x0=0,y0=0,t0=0,base=0,dir=0,lx=0,lt=0,v=0;
  const end=e=>{if(e.pointerId!==id)return;id=null;if(dir<1)return;tr.classList.remove('drag');const d=mapX-base;let i=mapIdx;
   if(d<-mapW*.22||(v<-.45&&d<-12))i++;else if(d>mapW*.22||(v>.45&&d>12))i--;mapGoTo(i)};
  tr.addEventListener('pointerup',end);tr.addEventListener('pointercancel',end)}
-function mapShow(){const w=WORLDS[mapIdx],st=worldState(w,mapIdx);{const t=$('mName');t.textContent=w.name;t.style.fontSize=w.name.length>15?'28px':w.name.length>11?'33px':''}
+function mapShow(){const w=WORLDS[mapIdx],st=worldState(w,mapIdx);{const ms=$('mapscr');if(ms)ms.style.setProperty('--mtint',MAP_TINT[w.id]||'#ECE8DF')}{const t=$('mName');t.textContent=w.name;t.style.fontSize=w.name.length>15?'28px':w.name.length>11?'33px':''}
  const bar=$('mBar');bar.classList.toggle('lock',!st.here);bar.querySelector('i').style.width=(st.pct*100).toFixed(1)+'%';bar.querySelector('span').textContent=st.label;
  [...$('mRail').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));[...$('mDots').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));
  const g=$('mGo');g.className='mgo'+(st.here?' here':st.open?'':' locked');g.innerHTML=st.here?'YOU\'RE HERE<small>Tap to play</small>':st.open?'TRAVEL<small>Go to '+w.name+'</small>':`${LOCKSVG.replace('<svg','<svg style="width:20px;height:20px;stroke:#14191A;fill:none;stroke-width:2.6"')} LOCKED<small>${w.need===1e12?'Become a Trillionaire':'Reach $'+money(w.need)+' net worth'}</small>`}
