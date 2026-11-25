@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112433,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112434,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2231,7 +2231,7 @@ function wishTick(){const L=wishList(),ready=L.filter(b=>available(b)&&canPay(b,
  wishBadge(ready.length);
  if(ovKind==='shop'&&shopF==='wish'){const sb=$('sb');if(sb)L.forEach(b=>{const w=sb.querySelector(`.wsw[data-wb="${b.id}"]`),r=w&&w.querySelector('.wrow');if(!r)return;const nr=document.createElement('div');nr.innerHTML=wishRow(b);const n=nr.firstChild.querySelector('.wrow');r.classList.toggle('ready',n.classList.contains('ready'));r.querySelector('.wbar i').style.width=n.querySelector('.wbar i').style.width;r.querySelector('.eta').innerHTML=n.querySelector('.eta').innerHTML})}}
 function wishBadge(n){const t=document.querySelector('.tool[data-act="shop"]');if(!t)return;if(n==null)n=wishList().filter(b=>available(b)&&canPay(b,buyPrice(b))).length;let d=t.querySelector('.dot.wish');if(n>0){if(!d){d=document.createElement('span');d.className='dot wish';t.appendChild(d)}d.innerHTML=HEART}else if(d)d.remove()}
-function wishPing(b){document.querySelector('.wtoast')?.remove();const d=document.createElement('div');d.className='wtoast';d.innerHTML=`<div class="h">${HEART}</div><div><small>Wishlist</small>${esc(b.name)} is ready to buy</div><button type="button" data-act="wishbuy" data-bid="${b.id}">BUY</button>`;const tb=$('toasts');tb.prepend(d);vib(15);setTimeout(()=>d.remove(),6000)}
+function wishPing(b){document.querySelector('.wtoast')?.remove();const d=document.createElement('div');d.className='wtoast';d.dataset.act='wishsee';d.dataset.bid=b.id;d.innerHTML=`<div class="h">${HEART}</div><div><small>Wishlist</small>${esc(b.name)} is ready to buy</div><button type="button" data-act="wishbuy" data-bid="${b.id}">BUY</button>`;const tb=$('toasts');tb.prepend(d);vib(15);setTimeout(()=>d.remove(),6000)}
 // swipe: wishlist rows slide right to show Remove; the ready banner flicks up to dismiss
 let wsw=null,wNoClick=0;const WDEL=88;
 function wClose(ex){document.querySelectorAll('#sb .wsw>.open').forEach(r=>{if(r!==ex){r.classList.remove('open');r.style.transform=''}})}
@@ -3932,6 +3932,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'bizinfo':bizInfo(bid);break;
   case'infoclose':if(ovKind==='askbuy')backToShop();else closeOv();break;
   case'infobuy':{const st=ovl.querySelector('.dim.stack');if(st&&$('sb')){st.remove();ovKind='shop'}askBuy(bid);break}
+  case'wishsee':{document.querySelector('.wtoast')?.remove();if(typeof closeMap==='function')closeMap();if(ovKind!=='shop'){if(ovKind)closeOv();openShop()}wishGo(bid);break}
   case'wishbuy':{document.querySelector('.wtoast')?.remove();if(ovKind)closeOv();openShop();askBuy(bid);break}
   case'lbf':lbF=el.dataset.v;$('sb').innerHTML=ranksBody(lbF);if(lbF==='friends')loadFriends();break;
   case'invite':inviteDlg(false);break;
