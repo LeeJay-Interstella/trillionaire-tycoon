@@ -23,6 +23,7 @@
 .dark .mbar span,.dark .mgo.locked{color:#EEF1EE}.dark .mbar.lock i{background:#3A4647}
 .dark .mdots i{background:#3A4660}.dark .mdots i.on{background:#EEF1EE}
 #mapscr:before{display:none!important}
+.mslide.locked .mart{filter:brightness(.55) saturate(.5) blur(2.4px)}.mtrack{gap:44px}.dio.art{transform:scale(var(--dz,1.3)) translateY(-4%)}
 </style><style>/* ===== mentor: Mr Tycoon ===== */
 .mt{position:absolute;inset:0;z-index:38;font-family:Montserrat,'Arial Black',sans-serif;-webkit-tap-highlight-color:transparent}
 .mt-dim{position:absolute;inset:0;background:#14141480;opacity:0;transition:opacity .25s}
@@ -1668,7 +1669,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112422,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112425,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -4593,7 +4594,7 @@ let mapIdx=0;
 // day/night pictures: dn('img/x.webp','img/x-n.webp') draws the right one now and swaps it when day turns to night
 const dn=(day,night,cls='',alt='')=>`<img class="${cls}" src="${darkOn?night:day}" data-day="${day}" data-night="${night}" alt="${alt}" draggable="false">`;
 // painted world art for the map: add a world's id here once img/map/<id>.webp and img/map/<id>-n.webp are uploaded
-const MAP_ART={};
+const MAP_ART={bullion:1,canyon:1};
 function travel(w){if(!worldOpen(w))return;plotSel=null;const o=cur();s.wlast=s.wlast||{};if(o)s.wlast[s.world|0]=o.bid;s.world=w;s.wseen=Math.max(s.wseen|0,w);
  const want=s.wlast[w];let i=s.owned.findIndex(x=>x.bid===want);if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w&&!isGood(x));if(i<0)i=s.owned.findIndex(x=>B[x.bid].w===w);if(i>=0)s.cur=i;
  paintCity(w);stageSig='';closeMap();closeOv();vib(15);save();upd();if(w)toast(`Welcome to ${WN[w]}`,'good')}
