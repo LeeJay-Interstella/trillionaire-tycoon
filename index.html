@@ -1119,9 +1119,11 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .mbar i{position:absolute;inset:0 auto 0 0;background:var(--green);transition:width .4s}
 .mbar span{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:14px;color:#14191A}
 .mbar.lock i{background:#B9B4A8}
-.mtrack{position:relative;z-index:1;flex:1;width:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;padding:0 15%}
-.mtrack::-webkit-scrollbar{display:none}
-.mslide{flex:0 0 70%;scroll-snap-align:center;display:grid;place-items:center;position:relative;transition:transform .35s,opacity .35s;transform:scale(.72);opacity:.55}
+.mtrack{position:relative;z-index:1;flex:1;width:100%;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.mtrack.drag{cursor:grabbing}
+.mrail{display:flex;height:100%;will-change:transform;transition:transform .55s cubic-bezier(.2,.85,.25,1)}
+.mtrack.drag .mrail{transition:none}
+.mslide{flex:0 0 70%;display:grid;place-items:center;position:relative;transition:transform .35s,opacity .35s;transform:scale(.72);opacity:.55}
 .mslide.on{transform:none;opacity:1}
 .dio{width:240px;height:240px;transform:scale(var(--dz,1.3));perspective:900px;display:grid;place-items:center;pointer-events:none}
 .land{position:relative;width:170px;height:170px;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(var(--a,40deg));animation:turn 28s linear infinite;animation-play-state:paused}
@@ -1145,7 +1147,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .marrow.l{left:18px}.marrow.r{right:18px}
 @media (hover:hover) and (pointer:fine){.marrow{display:grid}}
 @media (prefers-reduced-motion:reduce){.land{animation:none}#mapscr:before{animation:none}}
-@media (min-width:700px){.dio{--dz:1.6}.mslide{flex-basis:46%}.mtrack{padding:0 27%}}
+@media (min-width:700px){.dio{--dz:1.6}.mslide{flex-basis:46%}}
 
 .vtog{left:calc(max(8px,env(safe-area-inset-left,0px)) + var(--tsz,44px) + 10px);top:8px}
 /* top-left of the stage, the same in every world: the map, with the business/causes switch or the page count beside it;
@@ -1669,7 +1671,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112427,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112428,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -4608,19 +4610,32 @@ function worldState(w,i){const n=nw(),bs=B.filter(b=>b.w===i),own=s.owned.filter
 function openMap(){mapIdx=s.world|0;let el=$('mapscr');if(!el){el=document.createElement('div');el.id='mapscr';$('app').appendChild(el)}
  el.innerHTML=`<div class="mstars" aria-hidden="true"></div><div class="mmoon" aria-hidden="true"></div><button class="mback" data-act="mapclose" aria-label="Back to the game"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
  <div class="mhead"><h2 id="mName"></h2><div class="mbar" id="mBar"><i></i><span></span></div></div>
- <div class="mtrack" id="mTrack">${WORLDS.map((w,i)=>{const lk=!!worldState(w,i).locked;return`<div class="mslide${lk?' locked':''}" data-i="${i}"><div class="dio${MAP_ART[w.id]?' art':''}">${MAP_ART[w.id]?dn(`img/map/${w.id}.webp`,`img/map/${w.id}-n.webp`,'mart'):worldLand(w,lk)}</div>${lk?`<div class="mlock">${LOCKSVG}</div>`:''}</div>`}).join('')}</div>
+ <div class="mtrack" id="mTrack"><div class="mrail" id="mRail">${WORLDS.map((w,i)=>{const lk=!!worldState(w,i).locked;return`<div class="mslide${lk?' locked':''}" data-i="${i}"><div class="dio${MAP_ART[w.id]?' art':''}">${MAP_ART[w.id]?dn(`img/map/${w.id}.webp`,`img/map/${w.id}-n.webp`,'mart'):worldLand(w,lk)}</div>${lk?`<div class="mlock">${LOCKSVG}</div>`:''}</div>`}).join('')}</div></div>
  <button class="marrow l" data-act="mapprev" aria-label="Previous world"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><button class="marrow r" data-act="mapnext" aria-label="Next world"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
  <div class="mfoot"><button class="mgo" id="mGo" data-act="mapgo"></button><div class="mdots" id="mDots">${WORLDS.map(()=>'<i></i>').join('')}</div></div>`;
  el.hidden=false;const tr=$('mTrack');
- let raf=0;tr.addEventListener('scroll',()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const sl=[...tr.children],mid=tr.scrollLeft+tr.clientWidth/2;let best=0,bd=1e9;sl.forEach((d,i)=>{const c=d.offsetLeft+d.offsetWidth/2,dd=Math.abs(c-mid);if(dd<bd){bd=dd;best=i}});if(best!==mapIdx){mapIdx=best;mapShow()}})},{passive:true});
+ mapDrag(tr);
  requestAnimationFrame(()=>{mapLayout();mapGoTo(mapIdx,true);mapShow()})}
-// size every world and the space either side from the track's own width, so the first and last world can scroll to the centre on any screen
-function mapLayout(){const tr=$('mTrack');if(!tr)return;const W=tr.clientWidth,w=Math.round(W*(W>=700?.52:.86));[...tr.children].forEach(c=>c.style.flex=`0 0 ${w}px`);tr.style.padding=`0 ${Math.max(0,(W-w)/2)}px`}
+// the map moves one world per swipe and always lands each world exactly in the centre; dragging is heavier than the finger, and stiffer still past the first and last world
+let mapW=0,mapX=0;
+function mapLayout(){const tr=$('mTrack'),rl=$('mRail');if(!tr||!rl)return;const W=tr.clientWidth;mapW=Math.round(W*(W>=700?.52:.86));[...rl.children].forEach(c=>c.style.flex=`0 0 ${mapW}px`)}
+function mapPos(i){const tr=$('mTrack');return tr.clientWidth/2-mapW*i-mapW/2}
+function mapSet(x){mapX=x;const rl=$('mRail');if(rl)rl.style.transform=`translate3d(${x}px,0,0)`}
 addEventListener('resize',()=>{const ms=$('mapscr');if(ms&&!ms.hidden){mapLayout();mapGoTo(mapIdx,true)}});
-function mapGoTo(i,instant){const tr=$('mTrack');if(!tr)return;i=Math.max(0,Math.min(WORLDS.length-1,i));const d=tr.children[i];tr.scrollTo({left:d.offsetLeft+d.offsetWidth/2-tr.clientWidth/2,behavior:instant?'auto':'smooth'})}
+function mapGoTo(i,instant){const tr=$('mTrack');if(!tr)return;i=Math.max(0,Math.min(WORLDS.length-1,i));tr.classList.toggle('drag',!!instant);mapSet(mapPos(i));if(instant)requestAnimationFrame(()=>tr.classList.remove('drag'));if(i!==mapIdx){mapIdx=i;mapShow()}}
+function mapDrag(tr){let id=null,x0=0,y0=0,t0=0,base=0,dir=0,lx=0,lt=0,v=0;
+ tr.addEventListener('pointerdown',e=>{if(id!==null||e.button>0)return;id=e.pointerId;x0=lx=e.clientX;y0=e.clientY;t0=lt=performance.now();base=mapPos(mapIdx);dir=0;v=0});
+ tr.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dx=e.clientX-x0,dy=e.clientY-y0;
+  if(!dir){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;dir=Math.abs(dx)>Math.abs(dy)?1:-1;if(dir<0){id=null;return}tr.classList.add('drag');try{tr.setPointerCapture(id)}catch(_){}}
+  const now=performance.now();if(now>lt){v=v*.4+.6*(e.clientX-lx)/(now-lt)}lx=e.clientX;lt=now;
+  let d=dx*.62;const edge=(mapIdx===0&&d>0)||(mapIdx===WORLDS.length-1&&d<0);if(edge)d=d*.35/(1+Math.abs(d)/220);
+  d=Math.max(-mapW*.9,Math.min(mapW*.9,d));mapSet(base+d)});
+ const end=e=>{if(e.pointerId!==id)return;id=null;if(dir<1)return;tr.classList.remove('drag');const d=mapX-base;let i=mapIdx;
+  if(d<-mapW*.22||(v<-.45&&d<-12))i++;else if(d>mapW*.22||(v>.45&&d>12))i--;mapGoTo(i)};
+ tr.addEventListener('pointerup',end);tr.addEventListener('pointercancel',end)}
 function mapShow(){const w=WORLDS[mapIdx],st=worldState(w,mapIdx);{const t=$('mName');t.textContent=w.name;t.style.fontSize=w.name.length>15?'28px':w.name.length>11?'33px':''}
  const bar=$('mBar');bar.classList.toggle('lock',!st.here);bar.querySelector('i').style.width=(st.pct*100).toFixed(1)+'%';bar.querySelector('span').textContent=st.label;
- [...$('mTrack').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));[...$('mDots').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));
+ [...$('mRail').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));[...$('mDots').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));
  const g=$('mGo');g.className='mgo'+(st.here?' here':st.open?'':' locked');g.innerHTML=st.here?'YOU\'RE HERE<small>Tap to play</small>':st.open?'TRAVEL<small>Go to '+w.name+'</small>':`${LOCKSVG.replace('<svg','<svg style="width:20px;height:20px;stroke:#14191A;fill:none;stroke-width:2.6"')} LOCKED<small>${w.need===1e12?'Become a Trillionaire':'Reach $'+money(w.need)+' net worth'}</small>`}
 function closeMap(){const el=$('mapscr');if(el){el.hidden=true;el.innerHTML=''}}
 
