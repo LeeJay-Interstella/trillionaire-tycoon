@@ -1105,7 +1105,7 @@ input.nm:focus{outline:none;border-color:var(--green)}
   #dealBtn{top:auto}
 }
 #mapscr{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;overflow:hidden;
-  background:radial-gradient(120% 70% at 50% 45%,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 55%,rgba(60,40,30,.07) 100%),var(--mtint,#ECE8DF);transition:background-color .6s ease;color:var(--ink)}
+  background:radial-gradient(120% 70% at 50% 45%,rgba(255,255,255,.6) 0%,rgba(255,255,255,0) 55%),var(--mtint,#ECE8DF);transition:background-color .6s ease;color:var(--ink)}
 #mapscr[hidden]{display:none}
 #mapscr:before{content:'';position:absolute;left:50%;top:46%;width:900px;height:900px;margin:-450px 0 0 -450px;pointer-events:none;
   background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.55) 0deg 9deg,rgba(255,255,255,0) 9deg 22.5deg);
@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112431,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112432,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -4643,11 +4643,15 @@ function mapDrag(tr){let id=null,x0=0,y0=0,t0=0,base=0,dir=0,lx=0,lt=0,v=0;
  const end=e=>{if(e.pointerId!==id)return;id=null;if(dir<1)return;tr.classList.remove('drag');const d=mapX-base;let i=mapIdx;
   if(d<-mapW*.22||(v<-.45&&d<-12))i++;else if(d>mapW*.22||(v>.45&&d>12))i--;mapGoTo(i)};
  tr.addEventListener('pointerup',end);tr.addEventListener('pointercancel',end)}
-function mapShow(){const w=WORLDS[mapIdx],st=worldState(w,mapIdx);{const ms=$('mapscr');if(ms)ms.style.setProperty('--mtint',MAP_TINT[w.id]||'#ECE8DF')}{const t=$('mName');t.textContent=w.name;t.style.fontSize=w.name.length>15?'28px':w.name.length>11?'33px':''}
+function mapShow(){const w=WORLDS[mapIdx],st=worldState(w,mapIdx);{const ms=$('mapscr'),t=MAP_TINT[w.id]||'#ECE8DF';if(ms)ms.style.setProperty('--mtint',t);mapEdges(darkOn?'#141B33':t)}{const t=$('mName');t.textContent=w.name;t.style.fontSize=w.name.length>15?'28px':w.name.length>11?'33px':''}
  const bar=$('mBar');bar.classList.toggle('lock',!st.here);bar.querySelector('i').style.width=(st.pct*100).toFixed(1)+'%';bar.querySelector('span').textContent=st.label;
  [...$('mRail').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));[...$('mDots').children].forEach((d,i)=>d.classList.toggle('on',i===mapIdx));
  const g=$('mGo');g.className='mgo'+(st.here?' here':st.open?'':' locked');g.innerHTML=st.here?'YOU\'RE HERE<small>Tap to play</small>':st.open?'TRAVEL<small>Go to '+w.name+'</small>':`${LOCKSVG.replace('<svg','<svg style="width:20px;height:20px;stroke:#14191A;fill:none;stroke-width:2.6"')} LOCKED<small>${w.need===1e12?'Become a Trillionaire':'Reach $'+money(w.need)+' net worth'}</small>`}
-function closeMap(){const el=$('mapscr');if(el){el.hidden=true;el.innerHTML=''}}
+// while the map is open, the status bar strip and the strip behind the home bar take the map's colour, so the background reads edge to edge
+function mapEdges(c){const tc=document.querySelector('meta[name=theme-color]'),R=document.documentElement,Bd=document.body;
+ if(c){if(tc&&tc.dataset.map==null)tc.dataset.map=tc.content;if(R.dataset.mapbg==null){R.dataset.mapbg=R.style.background||'';Bd.dataset.mapbg=Bd.style.background||''}if(tc)tc.content=c;R.style.background=c;Bd.style.background=c;return}
+ if(tc&&tc.dataset.map!=null){tc.content=tc.dataset.map;delete tc.dataset.map}if(R.dataset.mapbg!=null){R.style.background=R.dataset.mapbg;Bd.style.background=Bd.dataset.mapbg;delete R.dataset.mapbg;delete Bd.dataset.mapbg}}
+function closeMap(){const el=$('mapscr');if(el){el.hidden=true;el.innerHTML=''}mapEdges(null)}
 
 })();
 </script>
