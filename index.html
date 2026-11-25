@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112435,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112437,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2169,7 +2169,8 @@ function digTap(ev,o){const d=o.dig,b=B[o.bid],x=ev.clientX||innerWidth/2,y=ev.c
   const t=f>=20?'You hit a rare seam! ':f>=8?'Rich ground! ':'';
   setTimeout(()=>dialog('Foundations dug',`<p>${t}You dug up <b class="num">${GEM} ${f} crystal${f===1?'':'s'}</b> on the ${esc(b.name)} site.</p><p class="s">The ground is clear now. Building carries on as normal, and taps speed it up.</p>`,`<button class="yes" data-act="close">Nice!</button>`),300);return}
  if(d.n%4===0)save();digShow(o)}
-function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;if(o.dig)return digTap(ev,o);const c=tapCut(o);o.end-=c;s.taps++;vib(5);
+function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)return;if(o.dig)return digTap(ev,o);const c=tapCut(o)*tapMul();o.end-=c; // Double taps doubles the time each tap takes off
+ s.taps++;vib(5);
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(!hasSite(b))return needLand(b);
  if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
@@ -2615,7 +2616,7 @@ function walletBody(){let a='',w='';const t=now();
   w+=`<div class="dc-perk">${MGR}<div><b>Manager</b><small>Shift length not revealed yet. Spin in Daily chance to find out.</small></div><button class="dc-use g" data-act="daily">SPIN</button></div>`}}
  Object.keys(hs).map(Number).sort((x,y)=>y-x).forEach(h=>w+=`<div class="dc-perk">${MGR}<div><b>${mgrName(h)}<span class="n">×${hs[h]}</span></b><small>${h}-hour shift · Lv ${s.mgr.level} · ${Math.round(commission()*100)}% commission${s.mgr.train&&!mgrOn()?' · training resumes on shift':''}</small></div><button class="dc-use g" data-act="perkuse" data-v="mgr:${h}">${mgrOn()?'ADD SHIFT':'START SHIFT'}</button></div>`);
  if(s.perks.jail)w+=`<div class="dc-perk">${PICON.jail}<div><b>Get out of jail free<span class="n">×${s.perks.jail}</span></b><small>Use it on the busted screen to walk free instantly. If you're raided while a manager is on shift, it's used for you.</small></div><span class="dc-use off">READY</span></div>`;
- if(s.perks.tap2)w+=`<div class="dc-perk">${PICON.tap2}<div><b>Double taps · 30 min<span class="n">×${s.perks.tap2}</span></b><small>Every tap on a building earns twice as much.</small></div><button class="dc-use" data-act="perkuse" data-v="tap2">USE</button></div>`;
+ if(s.perks.tap2)w+=`<div class="dc-perk">${PICON.tap2}<div><b>Double taps · 30 min<span class="n">×${s.perks.tap2}</span></b><small>Taps earn twice as much, and taps on a building that's being built or upgraded take off twice as much time.</small></div><button class="dc-use" data-act="perkuse" data-v="tap2">USE</button></div>`;
  if(s.perks.boost)w+=`<div class="dc-perk">${PICON.boost}<div><b>2× boost · 30 min<span class="n">×${s.perks.boost}</span></b><small>Double all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost">USE</button></div>`;
  if(s.perks.boost4)w+=`<div class="dc-perk">${PICON.boost}<div><b>4× boost · 30 min<span class="n">×${s.perks.boost4}</span></b><small>Four times all income for 30 minutes.</small></div><button class="dc-use" data-act="perkuse" data-v="boost4">USE</button></div>`;
  if(s.perks.crew)w+=`<div class="dc-perk">${PICON.crew}<div><b>Builder's crew<span class="n">×${s.perks.crew}</span></b><small>Your next 3 builds or upgrades finish twice as fast.</small></div><button class="dc-use" data-act="perkuse" data-v="crew">USE</button></div>`;
@@ -2630,7 +2631,7 @@ function usePerk(v){const t=now();
   else{if(s.shift)endShift();s.mgrUntil=t+h*36e5;s.mgrTotal=h*36e5;s.shift={start:t,end:s.mgrUntil,hours:h,jails:[],biz:{},salFrom:t};toast(`${mgrName(h)} on duty for ${h} hours`,'good')}}
  else if(v==='boost'){if(!s.perks.boost)return;if(boostOn()&&s.boostX===4)return toast('Your 4× boost is still running. Use this one after it ends','bad');s.perks.boost--;s.boostX=2;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('2× income for 30 minutes!','good')}
  else if(v==='boost4'){if(!s.perks.boost4)return;s.perks.boost4--;s.boostX=4;s.boostUntil=Math.max(t,s.boostUntil)+BOOST_MIN*6e4;toast('4× income for 30 minutes!','good')}
- else if(v==='tap2'){if(!s.perks.tap2)return;s.perks.tap2--;s.tapUntil=Math.max(t,s.tapUntil||0)+TAP2_MIN*6e4;toast('Double taps for 30 minutes! Tap your buildings','good')}
+ else if(v==='tap2'){if(!s.perks.tap2)return;s.perks.tap2--;s.tapUntil=Math.max(t,s.tapUntil||0)+TAP2_MIN*6e4;toast('Double taps for 30 minutes! Taps pay double and speed up building twice as much','good')}
  else if(v==='crew'){if(!s.perks.crew)return;s.perks.crew--;s.crew=(s.crew||0)+CREW_N;toast("Builder's crew hired: your next 3 jobs are twice as fast",'good')}
  else if(v==='manual'){if(!s.perks.manual)return;if(s.mgr.level>=MGR_MAX)return toast('Your manager is already fully trained');s.perks.manual--;if(s.mgr.train)finishTrain();else{s.mgr.level++;toast(`Your manager is now Level ${s.mgr.level}: ${Math.round(commission()*100)}% commission`,'good')}}
  else if(v==='clean'){if(!s.perks.clean)return;s.perks.clean--;s.cleanUntil=Math.max(t,s.cleanUntil||0)+CLEAN_H*36e5;toast('Clean record: −20% threat for 12 hours','good')}
@@ -4490,7 +4491,7 @@ const start=()=>{};window.claude?.hot?.ready?window.claude.hot.ready(start):star
 const ST_RATE=4.8,ST_MGR='<svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="6" fill="#F2C9A0" stroke="#14191A" stroke-width="1.5"/><path d="M4 28c1-7 5-10 11-10s10 3 11 10z" fill="#2F6DB5" stroke="#14191A" stroke-width="1.5"/><path d="M15 18l-2 5 2 3 2-3z" fill="#F2694B"/></svg>';
 const ST_PACKS=[[25,0,''],[80,10,''],[250,20,'POPULAR'],[1000,30,'BEST VALUE']];
 const ST_PERKS=[['boost',40,'2× boost · 30 min','Double all income for 30 minutes, whenever you choose.'],
- ['tap2',0,'Double taps · 30 min','Every tap on a building earns twice as much for 30 minutes.'],
+ ['tap2',0,'Double taps · 30 min','For 30 minutes, taps earn twice as much, and taps on a building that\'s being built or upgraded take off twice as much time.'],
  ['crew',75,"Builder's crew",'Your next 3 builds or upgrades finish twice as fast.'],
  ['clean',300,'Clean record','Lowers your threat by 20% for 12 hours.'],
  ['jail',360,'Get out of jail free','Walk free instantly when you get busted.'],
