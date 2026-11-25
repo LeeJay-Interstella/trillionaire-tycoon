@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112434,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112435,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2173,6 +2173,8 @@ function tapSite(ev){if(s.jail)return jailNag();const o=cur();if(!o||!o.busy)ret
  artEl.classList.remove('pop');void artEl.offsetWidth;artEl.classList.add('pop');floaty(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,'-'+(c/1000).toFixed(2)+'s');tick()}
 function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!available(b))return;const p=buyPrice(b);if(!hasSite(b))return needLand(b);
  if(!canPay(b,p))return pmShort(b,p)||toast(gemPay(b)?`You need ${money(p-s.gems)} more crystals`:`You need ${$m(p-s.cash)} more`,'bad');
+ // a business from another island (e.g. bought from the wishlist) takes you to that island so you see it straight away
+ if((b.w|0)!==(s.world|0)&&worldOpen(b.w|0))travel(b.w|0);
  if(Array.isArray(s.wish))s.wish=s.wish.filter(c=>c!==b.code);pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);const dg=false?{n:0,need:24,seam:seamRoll(),f:0}:null;s.owned.push(Object.assign({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+(dg?DIGW:bt),total:bt},dg?{dig:dg}:{}));s.cur=s.owned.length-1;plotSel=null;closeOv();vib(20);save();upd()}
 function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
