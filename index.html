@@ -1672,7 +1672,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112432,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112433,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3476,14 +3476,15 @@ const Mentor=(()=>{
  function moment(id,ctx){const m=M();if(m.seen[id])return;m.seen[id]=1;learn(id);dot();save();if(m.mode!=='off')q.push({id,ctx:ctx||{}})}
  const app=()=>document.getElementById('app')||document.body;
  const busy=()=>!!ovKind||heroOn||!!document.querySelector('#gildfx,.vaultcover,#splash,#lx,#lockfx,#raidfx');
- const canShow=()=>!box&&!busy()&&Date.now()-freeAt>1500;
+ let hushTo=0; // after the player taps him away, he stays quiet for a while
+ const canShow=()=>!box&&!busy()&&Date.now()-freeAt>1500&&Date.now()>hushTo;
 
  function show(o){if(box)close(true);if(o&&(o.id||o.tip))M().lastSay=Date.now();hidePeek();const L=LI[o.id]||SPECIAL[o.id]||{},tip=o.tip;
   const pages=(tip?[tip.t]:(o.pages||L.say||[])).map(p=>fill(p,o.ctx)),e=(tip?tip.e:o.e||L.e)||'n',isL=!!LI[o.id]&&!tip;
   const el=document.createElement('div');el.id='mentor';el.className='mt'+(tip?' tip':'');
   el.innerHTML=`<div class="mt-dim"></div><div class="mt-wrap"><div class="mt-face">${F(e)}</div><div class="mt-name">MR TYCOON</div><div class="mt-box" role="dialog" aria-label="Mr Tycoon says">${isL?`<div class="mt-tag">NEW LESSON · ${LI[o.id].t.toUpperCase()}</div>`:o.ruleTag?`<div class="mt-tag${o.ruleTag==='MILESTONE'?' mile':''}">${o.ruleTag}</div>`:''}<p class="mt-txt" aria-live="polite"></p><div class="mt-foot"><span class="mt-step"></span><span class="mt-arr">▼</span></div><div class="mt-btns" hidden></div></div></div>`;
   app().appendChild(el);box={el,pages,i:0,e,o,btns:o.btns||null,typing:false};if(o.point)point(o.point,null)
-  el.addEventListener('click',ev=>{if(ev.target.closest('.mt-btns button'))return;if(box&&box.btns&&box.i===box.pages.length-1&&!box.typing)return;next()});
+  el.addEventListener('click',ev=>{if(ev.target.closest('.mt-btns button'))return;if(box&&!box.o.tut&&!ev.target.closest('.mt-wrap'))return dismiss();if(box&&box.btns&&box.i===box.pages.length-1&&!box.typing)return;next()});
   requestAnimationFrame(()=>el.classList.add('in'));page();vib&&vib(10)}
  function page(){const b=box,txt=b.el.querySelector('.mt-txt'),full=b.pages[b.i],last=b.i===b.pages.length-1,fc=b.el.querySelector('.mt-face');
   b.el.querySelector('.mt-step').textContent=b.pages.length>1?`${b.i+1} / ${b.pages.length}`:'';
@@ -3505,6 +3506,8 @@ const Mentor=(()=>{
   el.addEventListener('click',e=>{if(!el.classList.contains('ready'))return;if(e.target.closest('.mh-skip'))return end();if(typing){clearInterval(ht);typing=false;txt.textContent=pages[i];el.querySelector('.mh-img').classList.remove('talking');return}if(++i<pages.length)one();else end()});
   setTimeout(()=>{el.classList.add('ready');one()},1100);vib&&vib([20,40,20])}
  function next(){const b=box;if(!b)return;if(b.typing)return b.done();if(b.i<b.pages.length-1){b.i++;page()}else close()}
+ // a tap on the main screen sends him away straight away, with anything else he was waiting to say (it's all kept in the Business Book)
+ function dismiss(){q.length=0;const m=M();if(m.mq)m.mq.length=0;m.lastSay=Date.now();hushTo=Date.now()+90e3;close()}
  function close(now){clearInterval(tmr);const b=box;box=null;if(!b)return;const m=M();if(b.o.tip||b.o.id)m.lastTip=Date.now();save();if(b.o.point)unpoint();
   if(now)return b.el.remove();if(b.o.onEnd)setTimeout(b.o.onEnd,280);b.el.classList.remove('in');b.el.classList.add('out');setTimeout(()=>b.el.remove(),260)}
 
