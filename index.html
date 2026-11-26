@@ -795,14 +795,15 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .mgrt:before{content:'';width:9px;height:9px;border:2px solid #9FD0FF;border-radius:50%;box-sizing:border-box;background:linear-gradient(#9FD0FF,#9FD0FF) 50% 20%/2px 35% no-repeat}
 .mgrt:empty{display:none}.mgrfig.tr .tcall{margin-bottom:26px}
 .mgrbx{position:relative;width:100%;transform-origin:50% 100%;animation:bcsquish 2.4s ease-in-out infinite}
-.mgrbc{display:block;width:100%;aspect-ratio:240/223;height:auto;filter:drop-shadow(0 4px 3px #0003)}
+.mgrbc{display:block;width:100%;aspect-ratio:240/223;height:auto;filter:drop-shadow(0 1px 1px #0003)}
 .mgrsh{position:absolute;inset:0;pointer-events:none;-webkit-mask:url(img/briefcase.webp) center/100% 100% no-repeat;mask:url(img/briefcase.webp) center/100% 100% no-repeat;
  background:linear-gradient(110deg,#fff0 44%,#fff8 48%,#ffffffe0 50%,#fff8 52%,#fff0 56%) no-repeat;background-size:250% 100%;background-position:150% 0;animation:bcshine 2.4s ease-in-out infinite}
 @keyframes bcsquish{0%,55%,100%{transform:none}61%{transform:scale(1.1,.86)}70%{transform:translateY(-14%) scale(.92,1.1)}79%{transform:scale(1.07,.92)}86%{transform:scale(.98,1.03)}92%{transform:none}}
 @keyframes bcshine{0%,62%{background-position:150% 0}88%,100%{background-position:-50% 0}}
-.mgrfig:before{animation:bcshadow 2.4s ease-in-out infinite}@keyframes bcshadow{0%,62%,78%,100%{transform:none;opacity:1}70%{transform:scale(.8);opacity:.6}}
-@media (prefers-reduced-motion:reduce){.mgrbx,.mgrsh,.mgrfig:before{animation:none}}
-.mgrfig:before{content:'';position:absolute;left:4%;right:4%;top:calc(var(--bch,60px) - 9%);height:16%;border-radius:50%;background:radial-gradient(closest-side,#0006,#0000);z-index:-1}
+.mgrsd{animation:bcshadow 2.4s ease-in-out infinite}@keyframes bcshadow{0%,62%,78%,100%{transform:none;opacity:1}70%{transform:scale(.8);opacity:.6}}
+@media (prefers-reduced-motion:reduce){.mgrbx,.mgrsh,.mgrsd{animation:none}}
+/* the shadow is the case's own footprint on the ground (matching its angle), softened, sitting right under the base */
+.mgrsd{position:absolute;left:0;top:0;width:100%;height:var(--bch,60px);overflow:visible;z-index:-1;pointer-events:none;transform-origin:51% 82%}
 .mgrfig span{background:#fff;border:2px solid #1F3A5F;color:#1F3A5F;font-weight:900;font-size:9px;padding:1px 5px;white-space:nowrap}
 .amtw{min-width:0;line-height:1;display:flex;flex-direction:column;gap:3px}
 .amtw small{font-size:10px;font-weight:700;color:#D7F0C9;overflow:hidden;text-overflow:ellipsis}
@@ -1592,7 +1593,7 @@ const bimgTopOf=b=>{const m=BIMG[b.code];return Math.round(69-(m[3]-m[1])*bimgK(
 // It's one size for every building (the art is painted at relative size), tucked in by the building's own width.
 // Custom art can nudge it with BRIEF_POS: code -> [x, y, width] in stage units.
 const BRIEF_W=70,BRIEF_POS={};
-function briefAt(b){if(b&&BRIEF_POS[b.code])return BRIEF_POS[b.code];const m=b&&BIMG[b.code],w=m?(m[2]-m[0])*bimgK(m):BIMG_PLOT;return[-w*.08,69+34,BRIEF_W]}
+function briefAt(b){if(b&&BRIEF_POS[b.code])return BRIEF_POS[b.code];const m=b&&BIMG[b.code],w=m?(m[2]-m[0])*bimgK(m):BIMG_PLOT;return[-w*.08,69+25,BRIEF_W]}
 function bizArt(b){const m=BIMG[b.code];if(!m)return gw(b,art(b));const[x0,y0,x1,y1]=m,k=bimgK(m),S=1024*k;
  return gw(b,`<svg viewBox="0 0 1 1"><image href="${bimgUrl(b.code)}" data-bb="${m.join(',')}" x="${(-(x0+x1)/2*k).toFixed(1)}" y="${(69-(y1+1)*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`)}
 // Small pictures (shop cards and popups): the same image file, cropped to the building.
@@ -1702,7 +1703,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112444,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112445,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2015,7 +2016,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p>${(()=>{const x=st(o),d=o.busy==='up'?x.nThreat-x.threat:x.threat;if(Math.abs(d)<.005)return'';const v=Math.round(d*10)/10;return`<p class="ucthr" style="color:${d<0?'var(--green)':'var(--red)'};font-weight:800;font-size:14px;letter-spacing:.3px;margin-top:3px">${d<0?'−'+(-v):'+'+v}% threat when ${o.busy==='up'?'done':d<0?'built':'it opens'}</p><p class="ucthr2" style="font-weight:800;font-size:13px;letter-spacing:.3px;margin-top:2px;color:#8A9488">You'll go from ${thrShown()}% → <b style="color:${d<0?'var(--green)':'var(--red)'}">${Math.round(thrShown()+d)}%</b></p>`})()}</div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
  }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTopOf(b):TOPS[b.vis]);artEl.dataset.act='tapearn';
-  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div><b class="mgrt num" id="mgrT"></b><div class="mgrbx" role="button" aria-label="Manager on duty: open the shift"><img class="mgrbc" src="img/briefcase.webp" alt="" draggable="false"><i class="mgrsh"></i></div></div>
+  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div><b class="mgrt num" id="mgrT"></b><svg class="mgrsd" viewBox="0 0 240 223" aria-hidden="true"><defs><filter id="bcsdb" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="4"/></filter></defs><path d="M4 196 L78 236 L250 186 L176 146Z" fill="#000" opacity=".5" filter="url(#bcsdb)"/></svg><div class="mgrbx" role="button" aria-label="Manager on duty: open the shift"><img class="mgrbc" src="img/briefcase.webp" alt="" draggable="false"><i class="mgrsh"></i></div></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button>${canGild(b)&&goldOn()?`<button class="round gildb ${(s.gold||0)>=gildCost(b)?'can':''}" id="gildBtn" data-act="gild" aria-label="Gild this business"><svg viewBox="0 0 24 24"><path d="M6 9h12l3 9H3z"/><path d="M8 6.5l1-2.5M12 5.5V3M16 6.5l-1-2.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>`:''}<button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info${isGild(b)?' gilded':''}"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
