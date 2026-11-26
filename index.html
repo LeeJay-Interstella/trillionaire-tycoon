@@ -794,6 +794,10 @@ input.nm:focus{outline:none;border-color:var(--green)}
 .mgrt{position:absolute;bottom:calc(100% + 6px);left:50%;z-index:2;background:#1F3A5F;color:#fff;font-weight:900;font-size:11px;line-height:1;padding:4px 7px 4px 6px;white-space:nowrap;transform:translateX(-50%) rotate(-6deg);transform-origin:50% 100%;box-shadow:0 2px 0 #0003;display:flex;align-items:center;gap:4px;pointer-events:none}
 .mgrt:before{content:'';width:9px;height:9px;border:2px solid #9FD0FF;border-radius:50%;box-sizing:border-box;background:linear-gradient(#9FD0FF,#9FD0FF) 50% 20%/2px 35% no-repeat}
 .mgrt:empty{display:none}.mgrfig.tr .tcall{margin-bottom:26px}
+img.mgbc{object-fit:contain;filter:drop-shadow(0 2px 1px #0003)}
+.sr-top img.mgbc{width:44px;height:41px;flex:none}.sr-pop .h img.mgbc{width:34px;height:32px;flex:none}.mc .top img.mgbc{width:40px;height:37px;flex:none}
+.dlg .lvl img.mgbc{width:70px;height:65px}.dc-perk>img.mgbc{width:40px;height:37px;justify-self:center}.dc-gift img.mgbc{width:40px;height:37px;flex:none}
+.dc-win img.mgbc{width:76px;height:70px}.b img.mgbc{width:28px;height:26px}
 .mgrbx{position:relative;width:100%;transform-origin:50% 100%;animation:bcsquish 2.4s ease-in-out infinite}
 .mgrbc{display:block;width:100%;aspect-ratio:240/223;height:auto;filter:drop-shadow(0 1px 1px #0003)}
 .mgrsh{position:absolute;inset:0;pointer-events:none;-webkit-mask:url(img/briefcase.webp) center/100% 100% no-repeat;mask:url(img/briefcase.webp) center/100% 100% no-repeat;
@@ -1703,7 +1707,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112445,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112446,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -2522,7 +2526,7 @@ function backupDlg(){const code=btoa(unescape(encodeURIComponent(pack(s))));
 function howto(){const fromBoss=ovKind==='boss';dialog('How to play',`<p class="s" style="text-align:left;color:var(--ink)">1. Tap the shop button to buy a business.<br><br>2. Tap the building site to speed up construction, or finish it with crystals.<br><br>3. Bills pile up next to your business until it hits max capacity. Tap COLLECT before it fills. Tap the building itself to earn a little faster.<br><br>4. Upgrade to earn more. Sell weak or risky businesses.<br><br>5. Keep threat low or you'll end up in jail.<br><br>6. Grow your net worth to unlock new tiers and climb the rich list.</p>`,`<button class="yes" data-act="${fromBoss?'bossview':'close'}" data-v="main">${fromBoss?'Got it':"Let's go"}</button>`)}
 
 /* ================= daily chance + perk wallet ================= */
-const MGR='<svg class="mg" viewBox="0 0 20 28" shape-rendering="crispEdges"><rect x="6" y="2" width="8" height="8" fill="#F2C99A"/><rect x="6" y="1" width="8" height="3" fill="#3B2A1E"/><rect x="7" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="11" y="5" width="2" height="2" fill="#2A2A2A"/><rect x="8" y="8" width="4" height="1" fill="#B85C3A"/><rect x="4" y="11" width="12" height="11" fill="#1F3A5F"/><rect x="9" y="11" width="2" height="9" fill="#F5B946"/><rect x="8" y="11" width="1" height="3" fill="#fff"/><rect x="11" y="11" width="1" height="3" fill="#fff"/><rect x="15" y="14" width="4" height="6" fill="#C98A55"/><rect x="16" y="15" width="2" height="1" fill="#fff"/><rect x="16" y="17" width="2" height="1" fill="#fff"/><rect x="5" y="22" width="4" height="5" fill="#16223A"/><rect x="11" y="22" width="4" height="5" fill="#16223A"/></svg>';
+const MGR='<img class="mg mgbc" src="img/briefcase.webp" alt="" draggable="false">'; // the manager is shown as the briefcase everywhere
 const PICON={
  cash:'<svg viewBox="0 0 40 30"><rect x="4" y="16" width="32" height="10" rx="2" fill="#2C7526"/><rect x="2" y="10" width="32" height="10" rx="2" fill="#43B14F" stroke="#1E5A1A"/><rect x="6" y="4" width="32" height="10" rx="2" fill="#5DBB4F" stroke="#1E5A1A"/><circle cx="22" cy="9" r="3.4" fill="#B9EBAF"/></svg>',
  gems:'<svg viewBox="0 0 30 30"><polygon points="7,5 23,5 28,12 15,27 2,12" fill="#4AAFE3"/><polygon points="2,12 28,12 15,27" fill="#2F8DC0"/><polygon points="7,5 12,12 15,5" fill="#9ED6F0"/></svg>',
