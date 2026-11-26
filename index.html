@@ -789,7 +789,11 @@ input.nm:focus{outline:none;border-color:var(--green)}
 
 .safeb{position:absolute;right:58px;z-index:4;background:var(--gold);color:#5A3A08;font-weight:900;font-size:12px;padding:5px 9px;box-shadow:0 3px 0 #C98F1E;white-space:nowrap;pointer-events:none}
 .mgrfig{position:absolute;z-index:3;width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
-.mgrfig svg{width:36px;height:50px;filter:drop-shadow(0 3px 0 #0002)}
+.mgrbc{display:block;width:100%;aspect-ratio:240/223;height:auto;filter:drop-shadow(0 4px 3px #0003);animation:bcglow 2.4s ease-in-out infinite}
+@keyframes bcglow{0%,100%{filter:drop-shadow(0 4px 3px #0003)}50%{filter:drop-shadow(0 4px 3px #0003) drop-shadow(0 0 10px #F5B946cc)}}
+@media (prefers-reduced-motion:reduce){.mgrbc{animation:none}}
+.mgrfig span{position:absolute;right:-16%;bottom:2%;margin:0;font-size:8px;padding:1px 4px;box-shadow:0 2px 0 #1F3A5F}
+.mgrfig:before{content:'';position:absolute;left:4%;right:4%;top:calc(var(--bch,60px) - 9%);height:16%;border-radius:50%;background:radial-gradient(closest-side,#0006,#0000);z-index:-1}
 .mgrfig span{background:#fff;border:2px solid #1F3A5F;color:#1F3A5F;font-weight:900;font-size:9px;padding:1px 5px;white-space:nowrap}
 .amtw{min-width:0;line-height:1;display:flex;flex-direction:column;gap:3px}
 .amtw small{font-size:10px;font-weight:700;color:#D7F0C9;overflow:hidden;text-overflow:ellipsis}
@@ -1575,6 +1579,11 @@ const bimgTop=()=>WIDEQ.matches?-250:-205; // framing for painted art: a higher 
 const BIMG_PLOT=218,BIMG_REF=802; // Arms Exporter's painted width on its canvas
 const bimgK=m=>BIMG_PLOT/BIMG_REF;
 const bimgTopOf=b=>{const m=BIMG[b.code];return Math.round(69-(m[3]-m[1])*bimgK(m))};
+// the on-duty briefcase stands on the ground just in front of the building's front-left edge (clear of the base), in stage units, so it scales with every screen.
+// It's one size for every building (the art is painted at relative size), tucked in by the building's own width.
+// Custom art can nudge it with BRIEF_POS: code -> [x, y, width] in stage units.
+const BRIEF_W=70,BRIEF_POS={};
+function briefAt(b){if(b&&BRIEF_POS[b.code])return BRIEF_POS[b.code];const m=b&&BIMG[b.code],w=m?(m[2]-m[0])*bimgK(m):BIMG_PLOT;return[-w*.08,69+34,BRIEF_W]}
 function bizArt(b){const m=BIMG[b.code];if(!m)return gw(b,art(b));const[x0,y0,x1,y1]=m,k=bimgK(m),S=1024*k;
  return gw(b,`<svg viewBox="0 0 1 1"><image href="${bimgUrl(b.code)}" data-bb="${m.join(',')}" x="${(-(x0+x1)/2*k).toFixed(1)}" y="${(69-(y1+1)*k).toFixed(1)}" width="${S.toFixed(1)}" height="${S.toFixed(1)}" preserveAspectRatio="xMidYMid meet" decoding="async"/></svg>`)}
 // Small pictures (shop cards and popups): the same image file, cropped to the building.
@@ -1684,7 +1693,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112439,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112442,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1997,7 +2006,7 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
   panel.innerHTML=`<div class="uc">${CONE}<div><h2>${esc(b.name)}</h2><p>${o.busy==='up'?'Upgrading to Lv '+(o.level+1):'Under construction'}</p>${(()=>{const x=st(o),d=o.busy==='up'?x.nThreat-x.threat:x.threat;if(Math.abs(d)<.005)return'';const v=Math.round(d*10)/10;return`<p class="ucthr" style="color:${d<0?'var(--green)':'var(--red)'};font-weight:800;font-size:14px;letter-spacing:.3px;margin-top:3px">${d<0?'−'+(-v):'+'+v}% threat when ${o.busy==='up'?'done':d<0?'built':'it opens'}</p><p class="ucthr2" style="font-weight:800;font-size:13px;letter-spacing:.3px;margin-top:2px;color:#8A9488">You'll go from ${thrShown()}% → <b style="color:${d<0?'var(--green)':'var(--red)'}">${Math.round(thrShown()+d)}%</b></p>`})()}</div></div>
    <button class="finish" data-act="finish"><svg class="ff" viewBox="0 0 38 30"><polygon points="0,2 16,15 0,28"/><polygon points="16,2 32,15 16,28"/><rect x="32" y="2" width="5" height="26"/></svg><div><small>FINISH NOW</small><b class="num">${GEM}<span id="fcost"></span></b></div></button>`;
  }else{const b=B[o.bid],x=st(o);artEl.innerHTML=onStage(bizArt(b),BIMG[b.code]?bimgTopOf(b):TOPS[b.vis]);artEl.dataset.act='tapearn';
-  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div>${MGR}<span>ON DUTY</span></div>
+  L+=`<div class="getmore" id="getmore" data-act="shop" hidden><span>GET MORE<br>BUSINESS HERE</span><i></i></div><div class="fullflag" id="fullflag" hidden>FULL!</div><div class="safeb num" id="safeb" hidden></div><div class="mgrfig" id="mgrfig" data-act="mgrtap" hidden><div class="tcall" id="tcall" hidden><b class="num" id="tcallT"></b><small>TRAINING · TAP TO SPEED UP</small></div><img class="mgrbc" src="img/briefcase.webp" alt="" draggable="false"><span>ON DUTY</span></div>
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button>${canGild(b)&&goldOn()?`<button class="round gildb ${(s.gold||0)>=gildCost(b)?'can':''}" id="gildBtn" data-act="gild" aria-label="Gild this business"><svg viewBox="0 0 24 24"><path d="M6 9h12l3 9H3z"/><path d="M8 6.5l1-2.5M12 5.5V3M16 6.5l-1-2.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>`:''}<button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info${isGild(b)?' gilded':''}"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
@@ -2013,7 +2022,7 @@ function updStage(){const o=cur();{const lg=$('lgold');if(lg&&o)lg.textContent=M
   const p=1-(o.end-now())/o.total;const want=Math.floor(p*6);if(artEl.dataset.p!=want){artEl.dataset.p=want;artEl.innerHTML=onStage(siteArt(want/6),-110,1.35)}return}
  const x=st(o);if(!(x.rate>0)){$('fullflag').hidden=true;const gm0=$('getmore');if(gm0)gm0.hidden=true;$('tube').hidden=true;if(stackN!==0){colEl.innerHTML='';stackN=0}const ub=$('upBtn');if(ub)ub.classList.toggle('can',canPay(B[o.bid],x.up));updTrain();return}
  const sf=o.safe||0;$('camt').textContent=money(o.stored+sf);{const c=$('csafe');c.hidden=!(sf>=1);if(sf>=1)c.textContent='incl. '+$m(sf)+' from the safe';const cl=c.closest('.collect');if(cl)cl.classList.toggle('pend',!!s.pm);c.classList.toggle('plbl',!!s.pm);if(s.pm){c.hidden=false;c.textContent=sf>=1?'Pending · incl. safe':'Pending'}}
- updTrain();{const f=$('mgrfig');f.hidden=!mgrOn();f.classList.toggle('tr',!!s.mgr.train);const tc=$('tcall');if(tc){tc.hidden=!s.mgr.train;if(s.mgr.train)$('tcallT').textContent=dur(s.mgr.train.left/1000)}if(mgrOn()){const[X,Y]=P(-30,50,0);f.style.left=Math.round(VIEW.ox+X*VIEW.sc-28)+'px';f.style.top=Math.round(VIEW.oy+Y*VIEW.sc-62)+'px'}}$('lrate').textContent=$m(x.rate*bMul())+'/min'+(boostOn()?` (${s.boostX||2}X)`:'');
+ updTrain();{const f=$('mgrfig');f.hidden=!mgrOn();f.classList.toggle('tr',!!s.mgr.train);const tc=$('tcall');if(tc){tc.hidden=!s.mgr.train;if(s.mgr.train)$('tcallT').textContent=dur(s.mgr.train.left/1000)}if(mgrOn()){const o=cur(),[X,Y,W]=briefAt(o&&B[o.bid]),w=Math.round(W*VIEW.sc);f.style.width=w+'px';f.style.setProperty('--bch',Math.round(w*223/240)+'px');f.style.left=Math.round(VIEW.ox+X*VIEW.sc-w/2)+'px';f.style.bottom='';{const h=Math.round(w*223/240),ub=$('upBtn'),st=f.offsetParent;let top=Math.round(VIEW.oy+Y*VIEW.sc-h);if(ub&&st){const lim=ub.getBoundingClientRect().top-st.getBoundingClientRect().top-10-h;if(lim>0)top=Math.min(top,lim)}f.style.top=top+'px'}}}$('lrate').textContent=$m(x.rate*bMul())+'/min'+(boostOn()?` (${s.boostX||2}X)`:'');
  const full=o.stored>=x.hold-1e-9;$('cbtn').classList.toggle('full',full);$('fullflag').hidden=!full||sf>=1;{const sb=$('safeb');sb.hidden=!(sf>=1);if(sf>=1)sb.textContent='+'+$m(sf)+' in the safe'}
  $('upBtn').classList.toggle('can',s.cash>=x.up);
  const gm=$('getmore');if(gm)gm.hidden=s.seenShop||!(s.owned.length<4&&B.some(b=>!own(b.id)&&available(b)&&canPay(b,buyPrice(b))));
@@ -3897,14 +3906,17 @@ const Raid=(()=>{
  const chanceAt=th=>th<=MIN_TH?0:Math.min(MAX_P,(th-MIN_TH)/200);
  const takeOf=g=>Math.max(1,Math.min(MAX_TAKE,Math.round(g*(.03+Math.random()*.03))));
  const gold=()=>Math.floor(s.gold||0);
+ // the deal's own threat also puts your gold at risk: from 15% deal threat upwards, half of the rest is the raid chance (capped at 25%),
+ // so a big, risky deal can be raided even when your empire's threat is low
+ const dealP=r=>Math.min(MAX_P,Math.max(0,r-.15)*.5);
  // the deal card gets a vault-raid row once you have gold
  const _card=dealCard;dealCard=function(d,th,live){let h=_card.apply(this,arguments);if(!gold())return h;
-  const after=live?Math.round(threatRaw()-(cleanOn()?20:0)):Math.max(0,Math.round(threatRaw()-(cleanOn()?20:0)))+d.add,p=chanceAt(after);
-  const row=`<div><span>Vault raid</span><b style="color:${p?'#F5B946':'#8E9893'}">${p?`${Math.round(p*100)}% · up to 6% of gold`:`Safe under ${MIN_TH}% threat`}</b></div>`;
+  const after=live?Math.round(threatRaw()-(cleanOn()?20:0)):Math.max(0,Math.round(threatRaw()-(cleanOn()?20:0)))+d.add,p=Math.max(chanceAt(after),dealP(dealRisk(d,th)));if(!live)d.raidP=p;
+  const row=`<div><span>Vault raid</span><b style="color:${p?'#F5B946':'#8E9893'}">${p?`${Math.max(1,Math.round(p*100))}% · up to 6% of gold`:'Safe: low-risk deal'}</b></div>`;
   return h.replace('<div><span>If caught</span>',row+'<div><span>If caught</span>')};
  // when you say yes, the dice are rolled once: a raid may happen at a random moment while the deal runs
- const _yes=dealYes;dealYes=function(){const before=(s.deals||[]).length;_yes.apply(this,arguments);const d=(s.deals||[])[s.deals.length-1];if(!d||s.deals.length===before)return;
-  const th=Math.round(threatRaw()-(cleanOn()?20:0)),p=chanceAt(th);if(gold()&&Math.random()<p){d.raidAt=d.start+Math.random()*(d.end-d.start)*.9;save()}};
+ const _yes=dealYes;dealYes=function(){const before=(s.deals||[]).length,shown=s.deal&&s.deal.raidP;_yes.apply(this,arguments);const d=(s.deals||[])[s.deals.length-1];if(!d||s.deals.length===before)return;
+  const th=Math.round(threatRaw()-(cleanOn()?20:0)),p=Math.max(chanceAt(th),shown||0);if(gold()&&Math.random()<p){d.raidAt=d.start+Math.random()*(d.end-d.start)*.9;save()}};
  // a raid is its own thing (not jail): it waits until you're in the game, then you get one go at locking the vault
  setInterval(()=>{if(typeof s==='undefined'||!s)return;const t=now();
   // never both: getting arrested calls off any raid, and no raid starts while you're in jail
@@ -4375,6 +4387,18 @@ const DEAL_HI=[["Hi, boss.","Quick one, boss.","Got a minute?","Morning, boss. O
 const DEAL_YES=[["Lovely. I'll handle the paperwork. 🧾","Wise choice. Numbers never lie. Mine do. 📊","Done. Act natural.","Splendid. Shred this message."],["Nice one, boss. 🤝","Sorted. Keep your phone on.","Knew you would. Leave it with me.","Proper. I'll be in touch."],["Good. Nobody saw anything. 🕶️","Smart. Don't call me, I'll call you.","Pleasure, boss. 🤝","It's done. Stay away from the windows."]];
 const DEAL_NO=[["Suit yourself. The loophole won't wait.","Fine. More for my other clients.","Noted. Filed under 'missed out'."],["Your loss, boss. 🤷","No worries. Someone'll bite.","Fair enough. Plenty more lemons."],["Shame. I'll find someone braver.","You'll regret that.","Your call. Don't make it a habit."]];
 const DEAL_PAID=[["Funds cleared, boss. Squeaky clean. 🧾","All filed. Here's your cut.","The numbers worked out. They always do.","Paid in full. Nobody's any the wiser."],["Sold every last one. 😎","Told you I know a guy. Here you go.","Easy money, like I said.","Van's empty, pockets are full."],["The house paid out. Big night. 🎩","Nobody saw a thing. Here's yours.","Clean job. Count it.","Told you. I don't lose."]];
+// Pitches grow with the money: a street deal is a van of tellies, a $500B deal is a container fleet. [size band][contact]
+// Bands by stake: under $100M street (DEAL_TXT above), up to $100B big, $100B and up huge.
+const DEAL_BAND=c=>c<1e8?0:c<1e11?1:2;
+const DEAL_TXT_SZ=[null,[
+ ["A whole company's books need 'tidying'. Big fee, bigger silence.","Offshore account, three islands deep. Nobody follows the trail.","A pension fund wants a 'creative' investment. Your name stays off it.","Merger paperwork with a few zeros moved about. Quietly.","Tax haven shell companies. Twelve of them. All yours.","A bank's auditors are on holiday. Only for a week."],
+ ["A warehouse full of phones. Boxed, sealed, slightly stolen.","Forty lorries of designer trainers. Don't ask whose.","A cargo plane of perfume. Lands tonight, gone by morning.","My guy's got a showroom of supercars. Paperwork's 'pending'.","A shipping container of games consoles. Christmas came early.","Whole fleet of luxury yachts. Repainted, renamed, ready."],
+ ["An armoured van's route just leaked. Big. Dangerous.","The diamond exchange vault. One night. Tony's best crew.","A private jet full of gold bars needs a new owner.","A whole casino's takings. Cameras off for an hour.","An art gallery's entire collection. Insured for less than it's worth.","A rival's racetrack. Every race tonight is fixed."]],
+[["Move a small country's treasury through my accounts. Briefly.","A stock market glitch, sixty seconds long. I've timed it.","Rewrite a global bank's ledger overnight. Nobody checks every zero.","A sovereign bond that technically doesn't exist. Yet.","The central bank's rounding errors. Across the whole economy.","A mega-merger on Monday. We buy everything on Friday."],
+ ["A container ship of tellies. Thousands of containers. No manifest.","An oil tanker went 'missing' off the coast. Full.","A whole airline's fleet needs new owners. Discreetly.","Every smartphone in a factory, the whole year's run.","A port's entire month of cargo. One signature does it.","A chain of car factories. The lot. Rolling off the line to us."],
+ ["The world's biggest gold reserve. One night, one crew.","A satellite company's launch codes. Someone pays very well.","A whole city's casinos at once. Coordinated. Very loud.","Buy a football league. Fix the season. Bet the lot.","A private island bank. Tony's taking the vault, the bank and the island.","The mint itself. Freshly printed, still warm."]]];
+const DEAL_PAID_SZ=[null,[["Funds laundered across four continents. Spotless.","Every account's balanced. Nobody blinked."],["Warehouse empty, buyers happy. Here's yours. 😎","Every last box sold. Proper result."],["Clean getaway. Your cut, boss.","Crew's scattered, money's here."]],
+ [["Markets closed. Nobody noticed a thing. 📈","The ledger's clean. Your fortune isn't."],["Fleet's sold, ships renamed. Pay day. 🚢","Every container emptied. Told you, boss."],["Biggest job of my life. Here's your share.","They'll write books about this one."]]];
 const dPick=(L,k)=>{const r=s.dealSeen=s.dealSeen||{},seen=r[k]||[],ok=L.filter(x=>!seen.includes(x)),x=(ok.length?ok:L)[Math.floor(Math.random()*(ok.length||L.length))];r[k]=[x,...seen].slice(0,Math.max(1,Math.floor(L.length/2)));return x};
 const DEAL_STAKE=15,DEAL_LIFE=20*6e4,DEAL_MAX=3;
 let dealChat=null;
@@ -4387,9 +4411,9 @@ function dealTick(){if(!dealsOpen())return;const t=now();if(!s.deals)s.deals=[];
  if(!s.dealNext){s.dealNext=t+(5+Math.random()*10)*6e4;s.dealTier=pickTier()}
  if(s.deal&&t>=s.deal.exp){s.dealLog.unshift({at:s.deal.exp,txt:`${s.deal.who}'s offer expired`});s.dealLog.length=Math.min(s.dealLog.length,5);dealSchedule(s.deal.exp);s.deal=null;save()}
  let guard=0;while(!s.deal&&t>=s.dealNext&&guard++<50){const at=s.dealNext;if(t<at+DEAL_LIFE){s.deal=makeDeal(at,s.dealTier||0);vib([40,60,40]);save()}else dealSchedule(at+DEAL_LIFE)}}
-function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*T.mins)),pay=Math.round(cost*T.x),tx=dPick(DEAL_TXT[tier],'t'+tier),hi=dPick(DEAL_HI[tier],'h'+tier);
+function makeDeal(at,tier){const T=DEAL_T[tier],W=DEAL_WHO[tier],cost=Math.max(1000,Math.round(income()*T.mins)),pay=Math.round(cost*T.x),band=DEAL_BAND(cost),tx=band?dPick(DEAL_TXT_SZ[band][tier],'t'+band+tier):dPick(DEAL_TXT[tier],'t'+tier),hi=dPick(DEAL_HI[tier],'h'+tier);
  const dec=Math.max(0,Math.log10(Math.max(1,pay-cost))-6),add=Math.max(T.add,Math.round((T.add+dec*(T.szAdd||0))*(.75+Math.random()*.6)));
- return{tier,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add,at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
+ return{tier,band,who:W[0],role:W[1],em:W[2],cost,pay,sec:T.sec,add,at,exp:at+DEAL_LIFE,hi,text:tx.replace('{c}',$m(cost)).replace('{p}',$m(pay)).replace('{m}',T.sec/60)}}
 // a deal's threat over the whole deal: the tier's floor, plus your threat (with the deal's own added threat) x the contact's danger, capped per tier
 const DEAL_DNG=[.2,.4,.7];
 // bigger deals draw more attention: every 10x of profit above $1M adds the tier's sz points of threat
@@ -4410,7 +4434,7 @@ function dealArrest(at,d){if(cardDodge(at))return;const th=ownTh(d,at,dealTh(at)
 function dealsAt(c,quiet){const L=s.deals;if(!L||!L.length)return;for(const d of [...L]){if(d.end>c)continue;L.splice(L.indexOf(d),1);
   const j=s.jail,jailed=j&&j.until>d.end&&(j.until-j.total)<=d.end;if(!s.dealLog)s.dealLog=[];
   if(jailed){s.dealLog.unshift({at:d.end,txt:`Lost ${d.who}'s deal: you were in jail`,bad:1});if(!quiet)toast(`🚔 You were in jail when ${d.who}'s deal paid out. It was seized: the ${$m(d.cost)} stake and ${$m(d.pay)} return are gone.`,'bad')}
-  else{(s.dealPaid=s.dealPaid||[]).push({who:d.who,role:d.role,em:d.em,pay:d.pay,cost:d.cost,at:d.end});s.dealLog.unshift({at:d.end,txt:`${d.who} paid ${$m(d.pay)}`});if(!quiet){vib([40,60,40]);toast(`📱 ${d.who}: your money's ready, boss`,'good');if(ovKind==='deals'){dealChat=null;setTimeout(openDeals,60)}}}
+  else{(s.dealPaid=s.dealPaid||[]).push({who:d.who,role:d.role,em:d.em,pay:d.pay,cost:d.cost,at:d.end,band:d.band|0});s.dealLog.unshift({at:d.end,txt:`${d.who} paid ${$m(d.pay)}`});if(!quiet){vib([40,60,40]);toast(`📱 ${d.who}: your money's ready, boss`,'good');if(ovKind==='deals'){dealChat=null;setTimeout(openDeals,60)}}}
   s.dealLog.length=Math.min(s.dealLog.length,5)}}
 function dealUI(){const b=$('dealBtn');if(!b)return;const t=now(),run=(s.deals||[]).filter(d=>d.end>t).sort((a,c)=>a.end-c.end),off=!!s.deal;
  const paid=(s.dealPaid||[]).length;b.hidden=!(off||run.length||paid);if(b.hidden)return;const dd=$('dealDot');dd.hidden=!(off||paid);dd.textContent=paid?'$':'1';dd.classList.toggle('cash',!!paid);b.classList.toggle('buzz',off||!!paid);
@@ -4438,7 +4462,7 @@ function dealBody(){const c=dealChat,d=c?c.offer:s.deal,t=now(),inc=x=>`<div cla
  else h+=`<div class="dstat">Offer ends in <b class="num" id="dealExp">${dur((d.exp-t)/1000)}</b></div>`;
  const busy=(s.deals||[]).filter(x=>x.end>t).length>=DEAL_MAX,poor=s.cash<d.cost;
  return`<div class="dthread">${dealRunHTML(run)}${h}</div>`+(c?'':`<div class="dquick"><button class="dqr no" data-act="dealno">Not this time</button><button class="dqr yes" data-act="dealyes"${busy||poor?' disabled':''}>${busy?'3 deals running':poor?'Not enough cash':`I'm in · ${$m(d.cost)}`}</button></div>`)}
-function paidBody(){const L=s.dealPaid||[],tot=L.reduce((a,d)=>a+d.pay,0),d=L[0],line=d.line||(d.line=dPick(DEAL_PAID[Math.max(0,DEAL_WHO.findIndex(w=>w[0]===d.who))],'p'));
+function paidBody(){const L=s.dealPaid||[],tot=L.reduce((a,d)=>a+d.pay,0),d=L[0],line=d.line||(d.line=(()=>{const w=Math.max(0,DEAL_WHO.findIndex(w=>w[0]===d.who)),b=d.band|0;return b?dPick(DEAL_PAID_SZ[b][w],'p'+b):dPick(DEAL_PAID[w],'p')})());
  let h=`<div class="dm in">${esc(line)}</div>`;
  if(L.length>1)h+=`<div class="drun">${L.map(x=>`<div class="drr"><span class="dav s">${x.em}</span><span class="n">${esc(x.who)}</span><b class="g num">${$m(x.pay)}</b></div>`).join('')}</div>`;
  h+=`<div class="dpay"><small>PAYOUT${L.length>1?' · '+L.length+' DEALS':''}</small><b class="num">${$m(tot)}</b><span>+${$m(L.reduce((a,d)=>a+d.pay-d.cost,0))} profit</span></div>`;
