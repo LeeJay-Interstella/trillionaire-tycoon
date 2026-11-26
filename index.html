@@ -1707,7 +1707,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112446,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112447,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -3570,12 +3570,17 @@ const Mentor=(()=>{
  // idle tips use your real numbers, so they stay fresh
  function tips(){const out=[],w=s.world|0,inc=income();
   const full=s.owned.find(o=>B[o.bid].rate>0&&!o.busy&&o.stored>=st(o).hold*.85);
-  if(full){const x=st(full);out.push({k:'full'+full.bid,e:'worried',t:`${B[full.bid].name} is ${Math.min(100,Math.round(full.stored/x.hold*100))}% full. Collect it before it stops earning, boss.`})}
+  if(mgrOn()){const cm=commission(),safe=s.owned.reduce((a,o)=>a+(o.safe||0),0),left=dur((s.mgrUntil-Date.now())/1000);
+   if(full)out.push({k:'mfull',e:'happy',t:`${B[full.bid].name} is full, and that's fine while your manager's here. Everything past full goes in the safe, and you keep ${Math.round((1-cm)*100)}%.`});
+   if(safe>0)out.push({k:'msafe',e:'happy',t:`Your safes hold ${$m(safe)} so far. Collecting empties them, but your manager keeps working, so nothing is lost.`});
+   out.push({k:'mleft',e:'thinking',t:`Your manager's shift ends in ${left}. Collect before then and you're set.`});
+   if(s.mgr&&s.mgr.level<MGR_MAX)out.push({k:'mcut',e:'thinking',t:`Your manager takes a ${Math.round(cm*100)}% cut. Each training level lowers it, so more of the overflow is yours.`})}
+  else if(full){const x=st(full);out.push({k:'full'+full.bid,e:'worried',t:`${B[full.bid].name} is ${Math.min(100,Math.round(full.stored/x.hold*100))}% full. Collect it before it stops earning, boss.`})}
   const nb=nextBiz();if(nb)out.push({k:'nb'+nb.id,e:'thinking',t:`${nb.name} costs ${$m(nb.price)} and earns ${$m(nb.rate)} a minute. It would pay for itself in ${dur(nb.price/nb.rate*60)}.`});
   if(inc>0)out.push({k:'inc',e:'happy',t:`You're making ${$m(inc)} a minute. That's ${$m(inc*60)} an hour while you sit back.`});
   const th=threat();if(th>30)out.push({k:'th',e:'worried',t:`Your threat is ${Math.round(th)}%. A good cause would bring it down before the police come knocking.`});
   if(!mgrOn()&&s.owned.length>=3)out.push({k:'mgr',e:'n',t:"Heading off soon? A manager keeps full businesses earning while you're away."});
-  out.push({k:'rest',e:'happy',t:"Take a break, boss. Your businesses keep earning while you're away, up to what they can hold."});
+  if(!mgrOn())out.push({k:'rest',e:'happy',t:"Take a break, boss. Your businesses keep earning while you're away, up to what they can hold."});
   out.push({k:'gold',e:'surprised',t:"All the gold ever mined would fit in a cube about 22 metres wide. That's why it's worth so much."});
   out.push({k:'buffett',e:'n',t:"Warren Buffett bought his first shares when he was 11. He says his only regret is not starting sooner."});
   out.push({k:'comp',e:'thinking',t:"Small upgrades add up. Growth on top of growth is how empires get big."});
@@ -3688,8 +3693,11 @@ const Mentor=(()=>{
   ['gold','investing',"Gold doesn't shout. It waits."],['gold','investing',"Spend gold where it doubles forever."],['gold','assets',"Assets pay you. Things cost you."],
   ['worth','networth',"Net worth is the scoreboard. The game is what you build."],['worth','networth',"Every fortune starts as a small one."],['worth','legacy',"Celebrate, then get back to work."],
   ['mgr','delegation',"Hire people who make you money while you sleep."],['mgr','salary',"A good manager pays for themselves."],['mgr','delegation',"You can't grow if you do every job yourself."],
-  ['any','luck',"Luck is a bonus, not a plan."],['any','philanthropy',"Give a little, gain a lot of trust."],['any','expansion',"New markets, new rules. Learn them fast."],['any','legacy',"The richest boss is the one who keeps learning."],['any','cashflow',"Fortune favours the boss who collects on time."]];
+  ['any','luck',"Luck is a bonus, not a plan."],['any','philanthropy',"Give a little, gain a lot of trust."],['any','expansion',"New markets, new rules. Learn them fast."],['any','legacy',"The richest boss is the one who keeps learning."],['any','cashflow',"Fortune favours the boss who collects on time."],
+  ['mgrfull','delegation',"Let good people run the shop while you build the empire."],['mgrfull','salary',"A fair cut for a good manager is money well spent."],['mgrfull','capacity',"Full is only a problem when nobody's minding the till."]];
  const OPEN={
+  // while a manager is on shift, full businesses keep earning into the safe, so he talks about that instead of nagging
+  mgrfull:[["{biz} is full, and that's fine. Your manager keeps it earning into the safe.",'happy'],["Full is good on a shift, boss. You keep {keep}% of everything past full.",'wink'],["Your safes are holding {safe}. Collect when you're back and it's all yours.",'happy'],["Your manager takes {cut}% of the overflow. Train them and that cut shrinks.",'thinking'],["Shift ends in {left}. After that, full businesses stop earning again.",'thinking']],
   full:[["{biz} is full again, boss.",'worried'],["{biz} has stopped earning. It's full to the brim.",'worried'],["Psst. {biz} is overflowing.",'wink']],
   collect:[["{amt} in one go! Nice.",'happy'],["That's {amt} in your pocket.",'happy'],["Ka-ching, {amt}!",'surprised']],
   cash:[["You're sitting on {cash}, boss.",'thinking'],["{cash} in the bank and nothing to do.",'thinking'],["That {cash} is getting bored.",'wink']],
@@ -3707,7 +3715,7 @@ const Mentor=(()=>{
   rank:[["#{rank} on the rich list! {who} won't like that.",'surprised'],["You passed {who}. Number {rank} and climbing!",'happy'],["Top {rank}, boss. They're whispering your name.",'proud']],
   goals:[["{n} goals done! Pop into the Vault and grab your crystals.",'happy'],["{n} more trophies for the Vault. Go and claim them.",'proud']],
   tier:[["New businesses just unlocked: {tier}. Bigger shops, bigger money.",'surprised'],["{tier} is open to you now. Have a look in the shop.",'happy']]};
- const COOL={full:30,collect:25,cash:40,bought:12,upgraded:15,threat:30,deal:45,jail:0,back:90,gold:60,worth:0,mgr:60,any:45};
+ const COOL={full:30,mgrfull:30,collect:25,cash:40,bought:12,upgraded:15,threat:30,deal:45,jail:0,back:90,gold:60,worth:0,mgr:60,any:45};
  const pick=(L,key)=>{const m=M(),r=m.rot||(m.rot={}),n=L.length;const i=((r[key]||0)+Math.floor(Math.random()*Math.max(1,n-1))+1)%n;r[key]=i;return L[i]};
  function ruleFor(sit){const m=M(),got=m.rules||(m.rules={});const L=RULES.map((r,i)=>({r,i})).filter(x=>x.r[0]===sit),fresh=L.filter(x=>!got[x.i]);const x=(fresh.length?fresh:L)[Math.floor(Math.random()*(fresh.length||L.length))];return x}
  const tutOnNow=()=>{const m=M();return m.tut!=null&&m.tut!=='done'};
@@ -3727,7 +3735,8 @@ const Mentor=(()=>{
   if(s.jail&&s.jail.until!==m.lastJail){m.lastJail=s.jail.until;if(situation('jail',{}))return}
   const fulls=s.owned.filter(o=>B[o.bid].rate>0&&!o.busy&&o.stored>=st(o).hold*.999);
   if(fulls.length>=3&&!mgrOn()&&situation('mgr',{n:fulls.length}))return;
-  if(fulls.length&&situation('full',{biz:B[fulls[0].bid].name}))return;
+  if(fulls.length&&mgrOn()){const cm=commission();if(situation('mgrfull',{biz:B[fulls[0].bid].name,cut:Math.round(cm*100),keep:Math.round((1-cm)*100),safe:$m(s.owned.reduce((a,o)=>a+(o.safe||0),0)),left:dur((s.mgrUntil-Date.now())/1000)}))return}
+  else if(fulls.length&&situation('full',{biz:B[fulls[0].bid].name}))return;
   const th=Math.round(threat());if(th>=40&&th>=(m.lastTh||0)+10){m.lastTh=th;if(situation('threat',{th}))return}if(th<30)m.lastTh=0;
   const gb=goldOn&&goldOn()&&s.owned.map(o=>B[o.bid]).filter(canGild).sort((a,b)=>gildCost(a)-gildCost(b))[0];if(gb&&(s.gold||0)>=gildCost(gb)&&situation('gold',{gold:Math.floor(s.gold).toLocaleString('en-US')}))return;
   const nb=nextBiz();if(nb&&s.cash>=nb.price*3&&situation('cash',{cash:$m(s.cash)}))return;
