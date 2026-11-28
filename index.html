@@ -349,6 +349,12 @@ button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 #city.photo{background:#FFFFFF url(img/bg-day.webp) no-repeat;background-size:cover;background-position:50% 100%}
 .dark #city.photo{background-color:#9097D8;background-image:url(img/bg-night.webp)}
 /* threat pop-up */
+.vxch{margin:10px 14px 4px;background:#FFF7E3;border:3px solid #E0A82E;padding:10px 12px}.vxch.lock{opacity:.75;border-style:dashed;cursor:pointer}
+.vx-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.vx-h b{font-weight:900;font-size:15px}.vx-h span{font-size:12px;font-weight:800;color:#B7791F}
+.vxch p{margin:4px 0 8px;font-size:13px;font-weight:600;line-height:1.35}.vxch.lock p{margin-bottom:0}
+.vx-b{display:flex;gap:8px}.vx-b button{flex:1;padding:8px 6px;font:900 15px Montserrat,sans-serif;background:#F5B946;color:#3A2A08;border:0;box-shadow:0 4px 0 #C98F1E;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+.vx-b button small{font-size:11px;font-weight:800;opacity:.75}.vx-b button.off{opacity:.45;pointer-events:none}
+.dark .vxch{background:#2E2716;border-color:#9C7420}.cl{color:var(--sky)}
 .thx{text-align:left}.thx-top{display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 10px}.thx-top>b{font-size:42px;font-weight:900;line-height:1}
 .thx-chip{color:#fff;font-weight:900;font-size:13px;letter-spacing:.5px;text-transform:uppercase;padding:5px 9px}
 .thx-g{position:relative;margin:0 2px 14px}.thx-z{display:flex;height:12px;gap:2px}.thx-z i{flex:1}.thx-z i:first-child{border-radius:6px 0 0 6px}.thx-z i:last-child{border-radius:0 6px 6px 0}
@@ -1383,7 +1389,7 @@ img.mgbc{object-fit:contain;filter:drop-shadow(0 2px 1px #0003)}
 .t-gold .gbar{background:linear-gradient(#FFFBE6,#FFE08A 50%,#C98A1E)}
 .round.gildb{background:linear-gradient(135deg,#F7C64F,#D98E16)}.round.gildb svg{fill:#fff}
 .round.gildb.can{animation:gglow 1.2s infinite}@keyframes gglow{50%{box-shadow:0 0 0 6px #F5B94666}}
-.lines .gl{color:#B7791F}.lines .gl .gbar{margin-right:4px}
+.lines .gl{color:#B7791F}.lines .gl .gbar{margin-right:4px}.lines .cl{color:#1E8FC6}.lines .cl svg{width:12px;height:12px;vertical-align:-1px}
 .info.gilded .ribbon b{background:linear-gradient(#F5C451,#C98A1E)}.info.gilded .ribbon b:after{border-top-color:#C98A1E}
 .info.gilded h2{background:linear-gradient(90deg,#B7791F,#F0B83A,#B7791F);-webkit-background-clip:text;background-clip:text;color:transparent}
 .card.gilded{box-shadow:inset 0 0 0 3px #F0C75A;background:linear-gradient(#FFFAEA,#fff 40%)}.card.gilded h4{color:#B7791F}.card.gilded .tier{background:linear-gradient(135deg,#F5C451,#C98A1E);color:#3F2804}
@@ -1438,7 +1444,7 @@ img.mgbc{object-fit:contain;filter:drop-shadow(0 2px 1px #0003)}
 .gspark i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;background:#FFF6C8;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);opacity:0;animation:gtw 2.2s ease-in-out infinite;filter:drop-shadow(0 0 4px #FFD45A)}
 @keyframes gtw{0%,100%{transform:scale(.2) rotate(0);opacity:0}45%{transform:scale(1) rotate(45deg);opacity:1}70%{opacity:.6}}
 @media (prefers-reduced-motion:reduce){#stage.gilded #art svg,.gspark i{animation:none}}
-.st .gl{color:#B7791F}
+.st .gl{color:#B7791F}.st .cl{color:#1E8FC6}
 
 #splash .spf{position:absolute;top:0;width:var(--s);height:calc(var(--s)*.6);z-index:1;pointer-events:none;animation:spfall linear infinite;perspective:220px}
 #splash .spf.front{z-index:3}
@@ -1731,7 +1737,7 @@ function dayTick(){if(!s||(CLOCK_GUARD&&!clockChecked))return;const d=new Date(n
 /* ================= state ================= */
 // Save format: never rename SAVE_KEY. Businesses are stored by their code, not their list position,
 // so adding, removing or reordering businesses in an update keeps everyone's progress.
-/*build*/const BUILD=2026112449,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
+/*build*/const BUILD=2026112450,MUST=2026110820;/*notes*/const NOTES=["Improvements and fixes."];
 let pmWant=false,pmLater=null,clockAnchor=null;let clockOff=0,clockChecked=false,clockWait=true;const OFF_CAP=2*36e5,CLOCK_GUARD=!!String((window.TRILLIONAIRE_CONFIG||{}).supabaseUrl||'').trim();
 const SAVE_KEY='trillionaire.save',OLD_KEYS=['mogul.tycoon.v3'],SAVE_VER=4,now=()=>{let d=CLOCK_GUARD&&clockChecked&&clockAnchor?clockAnchor.srv+(performance.now()-clockAnchor.perf):Date.now()+clockOff;if(s){
  if(CLOCK_GUARD){if(!(s.verT>0))s.verT=Math.min(d,Math.max(s.last||0,s.savedAt||0)||d);if(clockChecked){if(d>s.verT)s.verT=d}else if(!s.pm){const lim=s.verT+(clockWait?0:OFF_CAP);if(d>lim){d=lim;if(!clockWait)pmWant=true}}}
@@ -1822,6 +1828,20 @@ const UPG=1.17,UP0=.25,UPC=1.19,UPMAX=43200,MAXL=50;
 // gold per hour at level 1 (+5% per level). Slowed 4x in build 185 so gilding is a long-term goal
 const GOLDM={bb01:.25,bb05:.375,bb08:.5,bb10:.75,bb11:1,bb19:1.5,bb20:2},GOLD_CAP_H=8;
 const isGild=b=>!!(b&&(s.gild||{})[b.code]);
+// Diamond Canyon digs crystals instead of gold: the same pattern as Bullion Bay's gold makers, about 1.5 crystals an hour across all seven
+// at level 1 (+5% a level), and each holds up to 8 hours of them. Collect picks them up with the cash.
+const CRYM={dc01:.06,dc05:.09,dc08:.12,dc10:.18,dc11:.23,dc19:.35,dc20:.47};
+const gemRateO=o=>{const b=B[o.bid],m=b&&CRYM[b.code];return m?m*(1+.05*(o.level-1)):0};
+function gemPend(o){const r=gemRateO(o);if(!r||o.busy)return 0;if(!(o.cAt>0)||o.cAt>now())o.cAt=now();return Math.min(r*GOLD_CAP_H,r*Math.max(0,now()-o.cAt)/3600000)}
+function gemTake(o){const p=gemPend(o),n=Math.floor(p);if(n<1)return 0;const r=gemRateO(o);o.cAt=p>=r*GOLD_CAP_H?now():o.cAt+n/r*3600000;s.gems+=n;gemLog(n,'Diamond Canyon');return n}
+const gemCardRate=b=>{const o=own(b.id);return +(o?gemRateO(o):CRYM[b.code]).toFixed(2)};
+// Business perk: owning the Bullion Exchange lets you trade crystals for gold at the Gold Vault, 8 crystals for 1 gold, up to 10 gold a day.
+// Kept deliberately slow so it adds a little to gold, never replaces digging it (the limit can be raised later, e.g. for market days).
+const XCH_CODE='bb10',XCH_RATE=8,XCH_DAY=10;
+const xchOn=()=>!!(BY[XCH_CODE]&&own(BY[XCH_CODE].id));
+const xchLeft=()=>{const d=new Date().toDateString();if(!s.xch||s.xch.d!==d)s.xch={d,n:0};return Math.max(0,XCH_DAY-s.xch.n)};
+function xchDo(n){if(!xchOn())return;n=Math.min(n,xchLeft(),Math.floor(s.gems/XCH_RATE));if(n<1)return toast(xchLeft()?`You need ${XCH_RATE} crystals for 1 gold`:`That's today's limit. The exchange reopens tomorrow`);
+ s.gems-=n*XCH_RATE;s.gold=(s.gold||0)+n;s.goldTot=(s.goldTot||0)+n;s.xch.n+=n;ev('exchange',{gold:n,gems:n*XCH_RATE});vib(20);save();hud();toast(`Traded ${n*XCH_RATE} crystals for ${n} gold`,'good');vaultRefresh()}
 const goldRate=o=>{const b=B[o.bid],m=b&&GOLDM[b.code];return m?m*(1+.05*(o.level-1)):0};
 function goldPend(o){const r=goldRate(o);if(!r||o.busy)return 0;if(!(o.gAt>0)||o.gAt>now())o.gAt=now();return Math.min(r*GOLD_CAP_H,r*Math.max(0,now()-o.gAt)/3600000)}
 function goldTake(o){const p=goldPend(o),n=Math.floor(p);if(n<1)return 0;const r=goldRate(o);o.gAt=p>=r*GOLD_CAP_H?now():o.gAt+n/r*3600000;s.gold=(s.gold||0)+n;s.goldTot=(s.goldTot||0)+n;return n}
@@ -1907,6 +1927,10 @@ function vaultBody(){const t=now(),gold=Math.floor(s.gold||0),mk=Object.keys(GOL
  const earners=B.filter(b=>b.rate>0),gilded=earners.filter(isGild).length,pct=gilded/earners.length*100;
  let h=`<div class="vhead">${VAULT_ART}<div><small>In the vault</small><b class="num"><i class="gbar"></i>${gold.toLocaleString('en-US')}</b><span>${rate?`Making ${(+rate.toFixed(1))} gold an hour`:'No gold makers yet'}</span></div></div>`;
  h+=`<div class="vcol ${ready>=1?'':'off'}" data-act="vaultcollect" role="button"><span class="num"><i class="gbar"></i> ${ready.toLocaleString('en-US')} ready</span><b>COLLECT GOLD</b></div>`;
+ {const xb=BY[XCH_CODE],left=xchLeft(),can=Math.min(left,Math.floor(s.gems/XCH_RATE));
+  h+=xchOn()?`<div class="vxch"><div class="vx-h"><b>Bullion Exchange</b><span class="num">${left}/${XCH_DAY} gold left today</span></div><p>Trade <b class="num">${XCH_RATE} ${GEM}</b> for <b class="num">1 gold</b>. You have <b class="num">${s.gems.toLocaleString('en-US')} ${GEM}</b>.</p>
+   <div class="vx-b"><button type="button" class="${can>=1?'':'off'}" data-act="xch" data-v="1">1 gold<small>${XCH_RATE} ${GEM}</small></button><button type="button" class="${can>=1?'':'off'}" data-act="xch" data-v="${Math.max(1,can)}">${can>1?can+' gold':'Max'}<small>${Math.max(1,can)*XCH_RATE} ${GEM}</small></button></div></div>`
+   :`<div class="vxch lock" data-act="pfgo" data-bid="${xb.id}" role="button"><div class="vx-h"><b>Bullion Exchange</b><span>Locked</span></div><p>Own the <b>Bullion Exchange</b> in Bullion Bay to trade crystals for gold here (${XCH_RATE} ${GEM} = 1 gold, up to ${XCH_DAY} a day).</p></div>`}
  h+=`<div class="vsec"><b>Golden Empire</b><span class="num">${gilded}/${earners.length} gilded</span></div><div class="vprog"><i style="width:${pct.toFixed(1)}%"></i></div><div class="vworlds">`;
  for(let w=0;w<WN.length;w++){const bs=earners.filter(b=>(b.w|0)===w);if(!bs.length||(w&&!worldOpen(w)&&!bs.some(isGild)))continue;h+=`<span>${esc(WN[w])} <b class="num">${bs.filter(isGild).length}/${bs.length}</b></span>`}
  h+=`</div>`;
@@ -2061,12 +2085,12 @@ function renderStage(){stageSig=sigNow();const o=cur();stackN=-1;colEl.innerHTML
    <div class="rounds"><button class="round sell" data-act="sell" aria-label="Sell business"><svg viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9-9-9zm5-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/><text x="13.5" y="16" font-size="8" font-weight="900" fill="#F07250" font-family="Arial">$</text></svg></button>
    <button class="round up" id="upBtn" data-act="upgrade" aria-label="Upgrade business"><svg viewBox="0 0 24 24"><path d="M12 3l9 9h-5v9H8v-9H3z"/></svg></button>${canGild(b)&&goldOn()?`<button class="round gildb ${(s.gold||0)>=gildCost(b)?'can':''}" id="gildBtn" data-act="gild" aria-label="Gild this business"><svg viewBox="0 0 24 24"><path d="M6 9h12l3 9H3z"/><path d="M8 6.5l1-2.5M12 5.5V3M16 6.5l-1-2.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></button>`:''}<button class="round train" id="trainBtn" data-act="train" aria-label="Train your manager" hidden><svg viewBox="0 0 24 24"><path d="M12 4L1 9l11 5 9-4.1V16h2V9z"/><path d="M5 12.2V16c0 1.7 3.1 3 7 3s7-1.3 7-3v-3.8l-7 3.2z"/></svg></button></div>`;
   panel.innerHTML=`<div class="info${isGild(b)?' gilded':''}"><div class="ribbon"><small>${b.w?(b.w===4?SDG[b.tier].toUpperCase():WS[b.w].split(' ').pop()):'TIER '+b.tier}</small><b class="num">${o.level}</b></div><div style="min-width:0"><h2>${esc(b.name)}</h2>
-   ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span>${GOLDM[b.code]?`<span class="gl">Gold</span><span class="gl">:</span><span class="gl"><i class="gbar"></i><span id="lgold">0</span> ready · ${(+goldRate(o).toFixed(2))}/h</span>`:''}${isGild(b)?`<span class="gl">Gilded</span><span class="gl">:</span><span class="gl">2× forever</span>`:''}${gemTapBiz(b)?`<span style="color:var(--sky)">Lucky taps</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)">${GEM} <span id="lgem">${gemTapToday()}</span>/${GEM_TAP_DAY} today</span>`:''}</div>`:
+   ${b.rate>0?`<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g" id="lrate"></span><span class="k">Max Capacity</span><span class="k">:</span><span class="k">${$m(x.hold)}</span><span class="r">Threat</span><span class="r">:</span><span class="r">${pct(x.threat)}</span>${GOLDM[b.code]?`<span class="gl">Gold</span><span class="gl">:</span><span class="gl"><i class="gbar"></i><span id="lgold">0</span> ready · ${(+goldRate(o).toFixed(2))}/h</span>`:''}${CRYM[b.code]?`<span class="cl">Crystals</span><span class="cl">:</span><span class="cl">${GEM} <span id="lgem">0</span> ready · ${(+gemRateO(o).toFixed(2))}/h</span>`:''}${isGild(b)?`<span class="gl">Gilded</span><span class="gl">:</span><span class="gl">2× forever</span>`:''}${gemTapBiz(b)?`<span style="color:var(--sky)">Lucky taps</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)">${GEM} <span id="lgem">${gemTapToday()}</span>/${GEM_TAP_DAY} today</span>`:''}</div>`:
     `<div class="lines num"><span class="g">Earning Rate</span><span class="g">:</span><span class="g">None</span><span class="g">Threat</span><span class="g">:</span><span class="g">${pct(x.threat)}</span><span style="color:var(--sky)">Tap goodwill</span><span style="color:var(--sky)">:</span><span style="color:var(--sky)"><span id="lgw">0%</span> </span><span class="gwrow"><i class="gwbar"><i id="lgwf" style="width:${gwEn(o)/GW_DAY*100}%"></i></i><span id="lgwn">${gwLeft(o)}</span></span></div>`}</div></div>
    ${b.rate>0?`<div class="collect" data-act="collect" role="button" tabindex="0" aria-label="Collect cash"><div class="amt num">${COIN}<div class="amtw"><span id="camt">0</span><small id="csafe" hidden></small></div></div><button data-act="collect" id="cbtn"><i class="coin"></i>COLLECT</button></div>`:
     `<div class="reducer"><b>Keeps you out of trouble</b><span>Lowers your threat by ${pct(-x.threat)}. Doesn't earn cash, but taps add goodwill.</span></div>`}`}
  layer.innerHTML=L;layout();updStage()}
-function updStage(){const o=cur();{const lg=$('lgold');if(lg&&o)lg.textContent=Math.floor(goldPend(o));const gb=$('gildBtn');if(gb&&o)gb.classList.toggle('can',(s.gold||0)>=gildCost(B[o.bid]))}const bc=$('boostChip');if(bc){const bo=boostOn(),tp=tapMul()>1;bc.hidden=!bo&&!tp;bc.textContent=[bo?(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000):'',tp?'2X TAPS · '+dur((s.tapUntil-now())/1000):''].filter(Boolean).join('  ·  ')}
+function updStage(){const o=cur();{const lg=$('lgold');if(lg&&o)lg.textContent=Math.floor(goldPend(o));const lc=$('lgem');if(lc&&o)lc.textContent=Math.floor(gemPend(o));const gb=$('gildBtn');if(gb&&o)gb.classList.toggle('can',(s.gold||0)>=gildCost(B[o.bid]))}const bc=$('boostChip');if(bc){const bo=boostOn(),tp=tapMul()>1;bc.hidden=!bo&&!tp;bc.textContent=[bo?(s.boostX||2)+'X INCOME · '+dur((s.boostUntil-now())/1000):'',tp?'2X TAPS · '+dur((s.tapUntil-now())/1000):''].filter(Boolean).join('  ·  ')}
  {const d=$('duty');if(d)d.hidden=true;const mt=$('mgrT');if(mt&&mgrOn())mt.textContent=dur((s.mgrUntil-now())/1000)} // the manager's time left now sits on the briefcase (the duty bar is gone)
  if(!o)return;
  if(o.busy){if(o.dig)return;const l=(o.end-now())/1000,t=$('ctimer');if(t)t.textContent=dur(l);const f=$('fcost');if(f)f.textContent=skipCost(o);
@@ -2135,7 +2159,7 @@ function hud(){pmUI();dealUI();{const gt=$('goldT'),on=goldOn();if(gt){if(gt.hid
 
 /* ================= actions ================= */
 function jailNag(){toast("You can't buy or upgrade while on community service. Done in "+jdur((s.jail.until-now())/1000)+'.','bad')}
-function collect(){const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const gn=goldTake(o);if(gn){goldFx(gn);hud()}const a=o.stored+(o.safe||0);if(a<1){if(!gn)toast('Nothing to collect yet. Bills are on their way.');else save();return}
+function collect(){const o=cur();if(!o||o.busy)return;if(!(st(o).rate>0))return toast("This business doesn't earn cash. It lowers your threat instead.");const gn=goldTake(o),cn=gemTake(o);if(gn){goldFx(gn);hud()}if(cn){toast(`+${cn} crystals dug up`,'good');hud()}const a=o.stored+(o.safe||0);if(a<1){if(!gn&&!cn)toast('Nothing to collect yet. Bills are on their way.');else save();return}
  bank(a);s.earned+=a;o.stored=0;o.safe=0;s.taps++;s.collects=(s.collects||0)+1;vib(12);
  const tgt=$('cash').getBoundingClientRect(),bills=[...colEl.children].reverse(),last=bills.length-1;
  bills.forEach((bEl,i)=>{const r=bEl.getBoundingClientRect();const f=document.createElement('div');f.className='fly';f.innerHTML=BILL;f.style.left=r.left+'px';f.style.top=r.top+'px';document.body.appendChild(f);bEl.style.visibility='hidden';
@@ -2251,7 +2275,7 @@ function buy(bid){if(s.jail)return jailNag();const b=B[bid];if(own(bid)||!availa
  if(Array.isArray(s.wish))s.wish=s.wish.filter(c=>c!==b.code);pay(b,p);ev('buybiz',{biz:b.name,price:Math.round(p),cur:gemPay(b)?'gems':'cash'});const bt=crewTime(b.time*1000);const dg=false?{n:0,need:24,seam:seamRoll(),f:0}:null;s.owned.push(Object.assign({bid,level:1,stored:0,inv:gemPay(b)?0:p,busy:'build',end:now()+(dg?DIGW:bt),total:bt},dg?{dig:dg}:{}));s.cur=s.owned.length-1;plotSel=null;closeOv();vib(20);save();upd()}
 function upgrade(){if(s.jail)return jailNag();const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o);if(x.maxed)return;
  if(!canPay(b,x.up))return pmShort(b,x.up)||toast(gemPay(b)?'Not enough crystals':`You need ${$m(x.up-s.cash)} more`,'bad');
- pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;{const gn=goldTake(o);if(gn)toast(`Collected ${gn} gold`,'good')}bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;if(GOLDM[b.code])o.gAt=o.end;closeOv();save();upd()}
+ pay(b,x.up);ev('upgrade',{biz:b.name,lv:o.level+1,price:Math.round(x.up),cur:gemPay(b)?'gems':'cash'});if(!gemPay(b))o.inv+=x.up;{const gn=goldTake(o),cn=gemTake(o);if(gn)toast(`Collected ${gn} gold`,'good');if(cn)toast(`Collected ${cn} crystals`,'good')}bank(o.stored+(o.safe||0));o.stored=0;o.safe=0;o.busy='up';o.total=crewTime(Math.max(1,x.upTime)*1000);o.end=now()+o.total;if(GOLDM[b.code])o.gAt=o.end;closeOv();save();upd()}
 function sell(){const o=cur();if(!o||!sellable(o))return;const v=sellValue(o);s.cash+=v;s.owned.splice(s.cur,1);s.cur=Math.max(0,Math.min(s.cur,s.owned.length-1));{const L=grp(false).concat(grp(true));if(L.length&&!cur())s.cur=L[0]}toast(`Sold ${B[o.bid].name} for ${$m(v)}`);closeOv();save();upd()}
 const isGood=o=>!!o&&!(B[o.bid].rate>0); // good causes earn nothing and lower threat
 // businesses step in tier order (cheapest first within a tier), not the order they were bought
@@ -2334,8 +2358,8 @@ function card(b){const o=own(b.id),open=b.w?worldOpen(b.w):b.tier<=s.tier,ok=req
  const btn=o?`<button class="price own" data-act="goto" data-bid="${b.id}">OWNED · LV ${o.level}</button>`:!open?`<div class="price off num" style="white-space:nowrap"><svg viewBox="0 0 16 18" style="width:14px;height:16px;flex:none" aria-label="Locked" role="img"><rect x="2" y="8" width="12" height="9" rx="2" fill="currentColor"/><path d="M5 8V5.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="2"/></svg>${b.secret?'FREE':priceHTML(b,b.price)}</div>`:!ok?`<div class="price off" style="font-size:11px;padding:8px">${esc(reqText(b))}</div>`:!land?`<button type="button" class="price off" style="font-size:11px;padding:8px" data-act="needland" data-bid="${b.id}">Buy a plot of land first</button>`:
   `<button class="price num ${canPay(b,buyPrice(b))?'':'off'}" data-act="ask" data-bid="${b.id}">${b.secret?'FREE':priceHTML(b,b.price)}</button>`;
  const earn=b.rate?`${$m(b.rate)}/m`:'—';
- return`<div class="card${open?'':' locked'}${isGild(b)?' gilded':''}" data-bc="${b.id}"><h4>${esc(b.name)}</h4><div class="pic" data-act="bizinfo" data-bid="${b.id}" style="cursor:pointer">${picArt(b)}</div><div class="trow"><span class="tier">${b.w===4?SDG[b.tier].toUpperCase():'TIER '+wTierOf(b)}${isGild(b)?' · GOLD 2×':''}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}${GOLDM[b.code]?`<span class="gemtap goldtap"><i class="gbar"></i> Makes ${goldCardRate(b)} gold/h</span>`:''}
-  <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span>${GOLDM[b.code]?`<span class="gl">Gold</span><span class="gl">:</span><span class="gl">${goldCardRate(b)}/h</span>`:''}<span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
+ return`<div class="card${open?'':' locked'}${isGild(b)?' gilded':''}" data-bc="${b.id}"><h4>${esc(b.name)}</h4><div class="pic" data-act="bizinfo" data-bid="${b.id}" style="cursor:pointer">${picArt(b)}</div><div class="trow"><span class="tier">${b.w===4?SDG[b.tier].toUpperCase():'TIER '+wTierOf(b)}${isGild(b)?' · GOLD 2×':''}${gemPay(b)?' · CRYSTAL':''}${b.secret?' · SECRET':''}</span>${wishBtn(b)}</div>${gemTapBiz(b)?`<span class="gemtap">${GEM} Lucky taps find crystals</span>`:''}${GOLDM[b.code]?`<span class="gemtap goldtap"><i class="gbar"></i> Makes ${goldCardRate(b)} gold/h</span>`:''}${CRYM[b.code]?`<span class="gemtap">${GEM} Digs ${gemCardRate(b)} crystals/h</span>`:''}${b.code===XCH_CODE?`<span class="gemtap goldtap">Perk: trade crystals for gold</span>`:''}
+  <div class="st num"><span class="g">Earning</span><span class="g">:</span><span class="g">${earn}</span><span class="g">Max Hold</span><span class="g">:</span><span class="g">${b.hold?$m(b.hold):'—'}</span>${GOLDM[b.code]?`<span class="gl">Gold</span><span class="gl">:</span><span class="gl">${goldCardRate(b)}/h</span>`:''}${CRYM[b.code]?`<span class="cl">Crystals</span><span class="cl">:</span><span class="cl">${gemCardRate(b)}/h</span>`:''}<span>Build Time</span><span>:</span><span>${dur(b.time)}</span>${(c=>`<span class="${c}">Threat</span><span class="${c}">:</span><span class="${c}">${b.threat}%</span>`)(b.threat<0?'g':'r')}</div>${btn}</div>`}
 // a plot of land in each world's colours: fenced dirt with a sign that says FOR SALE, SOLD, or nothing yet
 const PLOT_LOOK={1:['#EED39A','#D9B474','#B38A4E','#8A6A3E'],2:['#E39A6A','#C97A4E','#A0583A','#7A3E28'],3:['#8C7A62','#76654F','#5A4A38','#3E3226'],4:['#9C8AD0','#7E6CB8','#5E4E96','#423472']};
 const DLOOK={1:{g:'#EED39A',d:'#D9B474',pave:'#D6D0C4',rock:'#C9B48A',grass:'#8BC34A'},2:{g:'#E7A57A',d:'#CC8058',pave:'#D8C1B0',rock:'#B66A45',grass:'#9BB04A'},3:{g:'#9C8C74',d:'#7C6A54',pave:'#A7A29A',rock:'#5E5244',grass:'#6E9A3E'},4:{g:'#A898D6',d:'#8572BE',pave:'#B9B2D6',rock:'#6A5AA6',grass:'#7FD0C8'}};
@@ -2439,7 +2463,7 @@ function askUpgrade(){const o=cur();if(!o||o.busy)return;const b=B[o.bid],x=st(o
  if(x.maxed)return dialog('Max level',`<div class="pic">${picArt(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> is already at its highest level.</p>`,`<button class="ok" data-act="close">OK</button>`);
  dialog(`Upgrade ${esc(b.name)}`,`<p>Spend <span class="hlg num">${priceHTML(b,x.up)}</span> to reach <span class="hl">Level ${o.level+1}</span>?</p>
  <div class="cmp num">${b.rate?`<span>Earning rate</span><span>${$m(x.rate)}</span><span>→ ${$m(x.nRate)}</span><span>Max capacity</span><span>${$m(x.hold)}</span><span>→ ${$m(x.nHold)}</span>`:''}${GOLDM[b.code]?`<span style="color:#B7791F">Gold</span><span style="color:#B7791F">${+goldRate(o).toFixed(2)}/h</span><span style="color:#B7791F">→ ${+(GOLDM[b.code]*(1+.05*o.level)).toFixed(2)}/h</span>`:''}<span>Threat</span><span>${pct(x.threat)}</span><span style="color:${x.nThreat>x.threat?'var(--red)':'var(--green)'}">→ ${pct(x.nThreat)}</span><span>Upgrade time</span><span></span><span style="color:var(--ink)">${dur(x.upTime)}</span></div>
- <p class="s">Your stored ${GOLDM[b.code]?'cash and gold are':'cash is'} collected first. The business stops earning while the work happens.</p>`,
+ <p class="s">Your stored ${GOLDM[b.code]?'cash and gold are':CRYM[b.code]?'cash and crystals are':'cash is'} collected first. The business stops earning while the work happens.</p>`,
  `<button class="no" data-act="close">No</button><button class="yes" data-act="doupgrade" ${canPay(b,x.up)?'':'disabled'}>Yes</button>`)}
 function askSell(){const o=cur();if(!o)return;const b=B[o.bid];
  if(!sellable(o))return dialog("Can't sell",`<div class="pic">${picArt(b)}</div><p><span class="hl">${esc(b.name.toUpperCase())}</span> can never be sold.</p><p class="s">${b.threat<0?'Threat reducers stay with you for good.':'Businesses bought with crystals stay with you for good.'}</p>`,`<button class="ok" data-act="close">OK</button>`);
@@ -2542,7 +2566,7 @@ function pfRow(o){const b=B[o.bid],x=st(o),good=!(b.rate>0),f=x.hold>0?Math.min(
 // collect every business at once (all worlds)
 const colAllAmt=()=>s.owned.reduce((a,o)=>{const b=B[o.bid];return a+(b&&b.rate>0&&!o.busy?(o.stored||0)+(o.safe||0):0)},0);
 const colAllBtn=()=>{const a=colAllAmt();return`<div class="call${a>=1?'':' off'}" data-act="bosscollect" role="button"><span class="amt num"><i class="coin"></i><b>${$m(a)}</b></span><span class="go"><i class="coin"></i>COLLECT ALL</span></div>`};
-function bossCollect(){let a=0,n=0,gn=0;for(const o of s.owned){const b=B[o.bid];if(!b||!(b.rate>0)||o.busy)continue;gn+=goldTake(o);const v=(o.stored||0)+(o.safe||0);if(v<1)continue;a+=v;n++;o.stored=0;o.safe=0}
+function bossCollect(){let a=0,n=0,gn=0;for(const o of s.owned){const b=B[o.bid];if(!b||!(b.rate>0)||o.busy)continue;gn+=goldTake(o);gemTake(o);const v=(o.stored||0)+(o.safe||0);if(v<1)continue;a+=v;n++;o.stored=0;o.safe=0}
  if(a<1&&!gn)return toast('Nothing to collect yet. Bills are on their way.');bank(a);s.earned+=a;s.collects=(s.collects||0)+n;vib(20);save();
  toast(gn&&a<1?`Collected ${gn} gold`:`Collected ${$m(a)} from ${n} business${n>1?'es':''}${gn?` and ${gn} gold`:''}`,'good');const t=$('cash')&&$('cash').closest('.t');if(t){t.classList.add('bump');setTimeout(()=>t.classList.remove('bump'),180)}
  upd();const w=$('cAllW');if(w)w.innerHTML=colAllBtn();const p=$('pfw');if(p)p.innerHTML=pfBody()}
@@ -2846,7 +2870,7 @@ function shiftBody(i){const d=shiftData(i);if(!d)return`<div class="sr-note">Thi
  return h}
 function openShift(i,back){shiftIdx=i;shiftAll=false;sheet('Manager shift',shiftBody(i),'shiftrep');const hd=ovl.querySelector('.sheet-h');hd.classList.add('navy');
  if(back){const b=hd.querySelector('[data-act=close]');b.dataset.act='perkstab';b.dataset.v='shifts';b.setAttribute('aria-label','Back to shifts');b.innerHTML='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>'}}
-function collectAll(){let a=0,gn=0;for(const o of s.owned){if(o.busy||!(st(o).rate>0))continue;gn+=goldTake(o);a+=o.stored+(o.safe||0);o.stored=0;o.safe=0}
+function collectAll(){let a=0,gn=0;for(const o of s.owned){if(o.busy||!(st(o).rate>0))continue;gn+=goldTake(o);gemTake(o);a+=o.stored+(o.safe||0);o.stored=0;o.safe=0}
  if(a<1&&!gn)return closeOv();bank(a);s.earned+=a;s.collects=(s.collects||0)+1;cashTween=performance.now();stackN=-1;colEl.innerHTML='';vib(20);closeOv();toast('Collected '+$m(a)+' from all your businesses'+(gn?` and ${gn} gold`:''),'good');save();upd()}
 function shiftsBody(){const t=now(),list=s.shifts||[],wk=list.filter(r=>r.end>t-7*864e5);let h='';
  const live=s.shift?shiftData('live'):null,lx=live?shiftStats(live):null;
@@ -4105,6 +4129,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if
   case'finishok':{const o=cur();closeOv();if(!o||!o.busy||o.dig||o.bid!==+el.dataset.bid)return;const c=skipCost(o);if(s.gems<c)return toast('Not enough crystals','bad');s.gems-=c;gemLog(-c,'Finish upgrades early');s.speedups=(s.speedups||0)+1;o.end=now();tick();break}
   case'shop':if(!s.seenShop){s.seenShop=true;$('getmore')?.remove();save()}openShop();break;
   case'ask':askBuy(bid);break;
+  case'xch':xchDo(+el.dataset.v||1);break;
   case'wishgo':wishGo(bid);break;
   case'shopback':backToShop();break;
   case'buy':buy(bid);break;
